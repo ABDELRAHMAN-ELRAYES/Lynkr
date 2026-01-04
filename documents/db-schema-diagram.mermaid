@@ -1,0 +1,95 @@
+erDiagram
+    users ||--o| profiles : "has one"
+    users ||--o{ provider_join_requests : "creates"
+    users ||--o{ provider_join_requests : "evaluates"
+    profiles ||--o{ profile_education_history : "has many"
+    profiles ||--o{ profile_work_history : "has many"
+    profiles ||--o{ profile_languages : "has many"
+    services ||--o{ service_skills : "has many"
+    skills ||--o{ service_skills : "has many"
+
+    users {
+        UUID id PK
+        VARCHAR first_name
+        VARCHAR last_name
+        VARCHAR email UK
+        VARCHAR password
+        VARCHAR country
+        VARCHAR role
+        BOOLEAN is_active
+        TIMESTAMP created_at
+        TIMESTAMP updated_at
+    }
+
+    profiles {
+        UUID id PK
+        VARCHAR title
+        TEXT bio
+        DECIMAL hourly_rate
+        VARCHAR image_url
+        TEXT skills
+        VARCHAR service_type
+        TIMESTAMP created_at
+        TIMESTAMP updated_at
+        UUID user_id FK
+    }
+
+    profile_education_history {
+        UUID id PK
+        VARCHAR school
+        VARCHAR degree
+        VARCHAR field_of_study
+        TIMESTAMP start_date
+        TIMESTAMP end_date
+        TEXT description
+        UUID profile_id FK
+    }
+
+    profile_work_history {
+        UUID id PK
+        VARCHAR title
+        VARCHAR company
+        VARCHAR location
+        VARCHAR country
+        TIMESTAMP start_date
+        TIMESTAMP end_date
+        TEXT description
+        UUID profile_id FK
+    }
+
+    profile_languages {
+        UUID id PK
+        VARCHAR language
+        VARCHAR proficiency
+        UUID profile_id FK
+    }
+
+    provider_join_requests {
+        UUID id PK
+        TEXT reason
+        VARCHAR status
+        TIMESTAMP created_at
+        TIMESTAMP updated_at
+        UUID user_id FK
+        UUID evaluated_by FK
+    }
+
+    services {
+        UUID id PK
+        VARCHAR service_name
+        TEXT service_description
+        TIMESTAMP created_at
+        TIMESTAMP updated_at
+    }
+
+    skills {
+        UUID id PK
+        VARCHAR skill_name
+        TEXT skill_description
+        TIMESTAMP created_at
+    }
+
+    service_skills {
+        UUID service_id FK
+        UUID skill_id FK
+    }

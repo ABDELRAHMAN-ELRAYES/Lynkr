@@ -1,0 +1,30 @@
+export const usersData = [
+    {
+      id: 1,
+      name: "Sarah Chen",
+      email: "sarah.chen@example.com",
+      avatar: "/placeholder.svg?height=40&width=40",
+      role: "Client",
+      status: "active",
+      joinDate: "2024-12-15",
+      lastActive: "2 hours ago",
+      projects: 5,
+      totalSpent: "$24,500",
+      totalEarned: "$0",
+      location: "San Francisco, CA",
+      phone: "+1 (555) 123-4567",
+      verified: true,
+      rating: 4.8,
+      completedProjects: 12,
+      skills: ["UI/UX Design", "Product Management"],
+      languages: ["English", "Mandarin"],
+      earningsData: [
+        { month: "Jan", earnings: 4200 },
+        { month: "Feb", earnings: 5800 },
+        { month: "Mar", earnings: 7100 },
+        { month: "Apr", earnings: 6500 },
+        { month: "May", earnings: 8900 },
+      ],
+    },
+    // More users with enhanced data...
+  ];

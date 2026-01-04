@@ -1,0 +1,376 @@
+// This is your Prisma schema file
+// Clean architecture with PascalCase singular models
+
+generator client {
+    provider = "prisma-client-js"
+}
+
+datasource db {
+    provider = "postgresql"
+    url      = env("DATABASE_URL")
+}
+
+// ============================================
+// USER AUTHENTICATION & MANAGEMENT
+// ============================================
+
+model User {
+    id            String   @id @default(uuid())
+    firstName     String   @map("first_name")
+    lastName      String   @map("last_name")
+    email         String   @unique
+    username      String?  @unique
+    password      String
+    phone         String?
+    countryCode   String?  @map("country_code")
+    avatar        String?
+    role          String   @default("USER")
+    active        Boolean  @default(true)
+    emailVerified Boolean  @default(false) @map("email_verified")
+    createdAt     DateTime @default(now()) @map("created_at")
+    updatedAt     DateTime @updatedAt @map("updated_at")
+
+    // Relations
+    profile            Profile?
+    clientOperations   Operation[]    @relation("ClientOperations")
+    providerOperations Operation[]    @relation("ProviderOperations")
+    sentMessages       Message[]      @relation("SentMessages")
+    receivedMessages   Message[]      @relation("ReceivedMessages")
+    notifications      Notification[]
+    reviews            Review[]       @relation("UserReviews")
+    receivedReviews    Review[]       @relation("ReceivedReviews")
+    subscriptions      Subscription[]
+    proposals          Proposal[]
+    meetings           Meeting[]      @relation("MeetingHost")
+    transactions       Transaction[]
+    files              File[]
+}
+
+model EmailVerification {
+    id        String   @id @default(uuid())
+    userId    String   @map("user_id")
+    token     String   @unique
+    expiresAt DateTime @map("expires_at")
+    createdAt DateTime @default(now()) @map("created_at")
+}
+
+model PasswordReset {
+    id        String   @id @default(uuid())
+    userId    String   @map("user_id")
+    token     String   @unique
+    expiresAt DateTime @map("expires_at")
+    createdAt DateTime @default(now()) @map("created_at")
+}
+
+model Session {
+    id           String   @id @default(uuid())
+    userId       String   @map("user_id")
+    refreshToken String   @unique @map("refresh_token")
+    deviceInfo   String?  @map("device_info")
+    ipAddress    String?  @map("ip_address")
+    expiresAt    DateTime @map("expires_at")
+    createdAt    DateTime @default(now()) @map("created_at")
+}
+
+// ============================================
+// PROFILE & PORTFOLIO
+// ============================================
+
+model Profile {
+    id           String   @id @default(uuid())
+    userId       String   @unique @map("user_id")
+    bio          String?
+    title        String?
+    location     String?
+    hourlyRate   Float?   @map("hourly_rate")
+    availability String?
+    skills       String[]
+    experience   Int?
+    verified     Boolean  @default(false)
+    createdAt    DateTime @default(now()) @map("created_at")
+    updatedAt    DateTime @updatedAt @map("updated_at")
+
+    // Relations
+    user        User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+    education   Education[]
+    languages   Language[]
+    workHistory WorkHistory[]
+    portfolios  Portfolio[]
+}
+
+model Education {
+    id           String    @id @default(uuid())
+    profileId    String    @map("profile_id")
+    institution  String
+    degree       String
+    fieldOfStudy String    @map("field_of_study")
+    startDate    DateTime  @map("start_date")
+    endDate      DateTime? @map("end_date")
+    description  String?
+    createdAt    DateTime  @default(now()) @map("created_at")
+
+    // Relations
+    profile Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+}
+
+model Language {
+    id          String   @id @default(uuid())
+    profileId   String   @map("profile_id")
+    language    String
+    proficiency String
+    createdAt   DateTime @default(now()) @map("created_at")
+
+    // Relations
+    profile Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+}
+
+model WorkHistory {
+    id          String    @id @default(uuid())
+    profileId   String    @map("profile_id")
+    company     String
+    position    String
+    startDate   DateTime  @map("start_date")
+    endDate     DateTime? @map("end_date")
+    description String?
+    current     Boolean   @default(false)
+    createdAt   DateTime  @default(now()) @map("created_at")
+
+    // Relations
+    profile Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+}
+
+model Portfolio {
+    id          String   @id @default(uuid())
+    profileId   String   @map("profile_id")
+    title       String
+    description String?
+    imageUrl    String?  @map("image_url")
+    projectUrl  String?  @map("project_url")
+    category    String?
+    featured    Boolean  @default(false)
+    createdAt   DateTime @default(now()) @map("created_at")
+
+    // Relations
+    profile Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+}
+
+// ============================================
+// OPERATIONS & PROPOSALS
+// ============================================
+
+model Operation {
+    id          String    @id @default(uuid())
+    clientId    String    @map("client_id")
+    providerId  String?   @map("provider_id")
+    title       String
+    description String?
+    category    String?
+    budgetMin   Float?    @map("budget_min")
+    budgetMax   Float?    @map("budget_max")
+    deadline    DateTime?
+    status      String    @default("PENDING")
+    priority    String    @default("MEDIUM")
+    reference   String?   @unique
+    createdAt   DateTime  @default(now()) @map("created_at")
+    updatedAt   DateTime  @updatedAt @map("updated_at")
+
+    // Relations
+    client    User       @relation("ClientOperations", fields: [clientId], references: [id])
+    provider  User?      @relation("ProviderOperations", fields: [providerId], references: [id])
+    proposals Proposal[]
+    escrow    Escrow?
+}
+
+model Proposal {
+    id          String   @id @default(uuid())
+    operationId String   @map("operation_id")
+    providerId  String   @map("provider_id")
+    description String
+    price       Float
+    timeline    Int
+    status      String   @default("PENDING")
+    createdAt   DateTime @default(now()) @map("created_at")
+    updatedAt   DateTime @updatedAt @map("updated_at")
+
+    // Relations
+    operation Operation @relation(fields: [operationId], references: [id], onDelete: Cascade)
+    provider  User      @relation(fields: [providerId], references: [id])
+}
+
+// ============================================
+// PAYMENTS & ESCROW
+// ============================================
+
+model Transaction {
+    id              String   @id @default(uuid())
+    userId          String   @map("user_id")
+    amount          Float
+    currency        String   @default("USD")
+    type            String
+    status          String   @default("PENDING")
+    stripePaymentId String?  @map("stripe_payment_id")
+    description     String?
+    createdAt       DateTime @default(now()) @map("created_at")
+
+    // Relations
+    user User @relation(fields: [userId], references: [id])
+}
+
+model Escrow {
+    id                    String   @id @default(uuid())
+    operationId           String   @unique @map("operation_id")
+    amount                Float
+    currency              String   @default("USD")
+    status                String   @default("PENDING")
+    releasedAmount        Float    @default(0) @map("released_amount")
+    stripePaymentIntentId String   @map("stripe_payment_intent_id")
+    createdAt             DateTime @default(now()) @map("created_at")
+    updatedAt             DateTime @updatedAt @map("updated_at")
+
+    // Relations
+    operation Operation @relation(fields: [operationId], references: [id], onDelete: Cascade)
+}
+
+// ============================================
+// SERVICES & SUBSCRIPTIONS
+// ============================================
+
+model Service {
+    id          String   @id @default(uuid())
+    name        String
+    description String?
+    category    String?
+    basePrice   Float?   @map("base_price")
+    active      Boolean  @default(true)
+    createdAt   DateTime @default(now()) @map("created_at")
+    updatedAt   DateTime @updatedAt @map("updated_at")
+}
+
+model Plan {
+    id          String   @id @default(uuid())
+    name        String
+    description String?
+    price       Float
+    duration    Int
+    features    String[]
+    active      Boolean  @default(true)
+    createdAt   DateTime @default(now()) @map("created_at")
+    updatedAt   DateTime @updatedAt @map("updated_at")
+
+    // Relations
+    subscriptions Subscription[]
+}
+
+model Subscription {
+    id        String    @id @default(uuid())
+    userId    String    @map("user_id")
+    planId    String    @map("plan_id")
+    status    String    @default("ACTIVE")
+    startDate DateTime  @default(now()) @map("start_date")
+    endDate   DateTime? @map("end_date")
+    createdAt DateTime  @default(now()) @map("created_at")
+    updatedAt DateTime  @updatedAt @map("updated_at")
+
+    // Relations
+    user User @relation(fields: [userId], references: [id])
+    plan Plan @relation(fields: [planId], references: [id])
+}
+
+// ============================================
+// COMMUNICATION
+// ============================================
+
+model Message {
+    id         String   @id @default(uuid())
+    senderId   String   @map("sender_id")
+    receiverId String   @map("receiver_id")
+    content    String
+    read       Boolean  @default(false)
+    createdAt  DateTime @default(now()) @map("created_at")
+    updatedAt  DateTime @updatedAt @map("updated_at")
+
+    // Relations
+    sender   User @relation("SentMessages", fields: [senderId], references: [id])
+    receiver User @relation("ReceivedMessages", fields: [receiverId], references: [id])
+}
+
+model Meeting {
+    id          String    @id @default(uuid())
+    hostId      String    @map("host_id")
+    channelName String    @map("channel_name")
+    title       String?
+    description String?
+    scheduledAt DateTime? @map("scheduled_at")
+    duration    Int?
+    status      String    @default("SCHEDULED")
+    createdAt   DateTime  @default(now()) @map("created_at")
+    updatedAt   DateTime  @updatedAt @map("updated_at")
+
+    // Relations
+    host User @relation("MeetingHost", fields: [hostId], references: [id])
+}
+
+model Notification {
+    id        String   @id @default(uuid())
+    userId    String   @map("user_id")
+    title     String
+    message   String
+    type      String
+    read      Boolean  @default(false)
+    data      Json?
+    createdAt DateTime @default(now()) @map("created_at")
+    updatedAt DateTime @updatedAt @map("updated_at")
+
+    // Relations
+    user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+// ============================================
+// REVIEWS & RATINGS
+// ============================================
+
+model Review {
+    id         String   @id @default(uuid())
+    reviewerId String   @map("reviewer_id")
+    revieweeId String   @map("reviewee_id")
+    rating     Int
+    comment    String?
+    status     String   @default("APPROVED")
+    createdAt  DateTime @default(now()) @map("created_at")
+    updatedAt  DateTime @updatedAt @map("updated_at")
+
+    // Relations
+    reviewer User @relation("UserReviews", fields: [reviewerId], references: [id])
+    reviewee User @relation("ReceivedReviews", fields: [revieweeId], references: [id])
+}
+
+// ============================================
+// FILES & MEDIA
+// ============================================
+
+model File {
+    id           String   @id @default(uuid())
+    userId       String   @map("user_id")
+    filename     String
+    originalName String   @map("original_name")
+    path         String
+    size         Int
+    mimetype     String
+    createdAt    DateTime @default(now()) @map("created_at")
+
+    // Relations
+    user User @relation(fields: [userId], references: [id])
+}
+
+// ============================================
+// SETTINGS & CONFIGURATION
+// ============================================
+
+model Settings {
+    id          String   @id @default(uuid())
+    key         String   @unique
+    value       String
+    description String?
+    createdAt   DateTime @default(now()) @map("created_at")
+    updatedAt   DateTime @updatedAt @map("updated_at")
+}
