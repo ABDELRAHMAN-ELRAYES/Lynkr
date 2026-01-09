@@ -1,0 +1,296 @@
+erDiagram
+    %% ------------------
+    %% Module 1: IAM
+    %% ------------------
+    USERS {
+        uuid id PK
+        string first_name
+        string last_name
+        string email
+        string phone
+        string password_hash
+        string role
+        bool is_active
+        bool is_email_verified
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    OTP_VERIFICATIONS {
+        uuid id PK
+        uuid user_id FK
+        string otp_code
+        timestamp expires_at
+        bool is_used
+    }
+
+    %% ------------------
+    %% Module 2: Provider Profile
+    %% ------------------
+    PROVIDER_PROFILES {
+        uuid id PK
+        uuid user_id FK
+        string bio
+        string description
+        decimal hourly_rate
+        bool is_approved
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    PROVIDER_SERVICES {
+        uuid id PK
+        uuid provider_profile_id FK
+        string service_type
+    }
+
+    PROVIDER_SKILLS {
+        uuid id PK
+        uuid provider_profile_id FK
+        string skill_name
+    }
+
+    PROVIDER_EXPERIENCES {
+        uuid id PK
+        uuid provider_profile_id FK
+        string title
+        string organization
+        text description
+        date start_date
+        date end_date
+    }
+
+    PROVIDER_EDUCATION {
+        uuid id PK
+        uuid provider_profile_id FK
+        string degree
+        string major
+        string institution
+        string study_level
+        date start_date
+        date end_date
+    }
+
+    PROVIDER_LANGUAGES {
+        uuid id PK
+        uuid provider_profile_id FK
+        string language
+        string proficiency
+    }
+
+    %% ------------------
+    %% Module 4: Requests & Proposals
+    %% ------------------
+    REQUESTS {
+        uuid id PK
+        uuid client_id FK
+        string service_type
+        text description
+        decimal budget
+        date deadline
+        string status
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    PROPOSALS {
+        uuid id PK
+        uuid request_id FK
+        uuid provider_profile_id FK
+        decimal price
+        string price_type
+        int estimated_days
+        text notes
+        string status
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    %% ------------------
+    %% Module 5: Messaging & Communication
+    %% ------------------
+    MESSAGES {
+        uuid id PK
+        uuid sender_id FK
+        uuid receiver_id FK
+        uuid context_request_id FK
+        uuid context_project_id FK
+        text content
+        timestamp sent_at
+        bool is_read
+    }
+
+    %% ------------------
+    %% Module 6: Project Initialization
+    %% ------------------
+    PROJECTS {
+        uuid id PK
+        uuid client_id FK
+        uuid provider_profile_id FK
+        uuid accepted_proposal_id FK
+        string status
+        text scope
+        decimal price
+        int estimated_days
+        timestamp started_at
+        timestamp completed_at
+    }
+
+    %% ------------------
+    %% Module 7: Notifications & Alerts
+    %% ------------------
+    NOTIFICATIONS {
+        uuid id PK
+        uuid user_id FK
+        string type
+        text content
+        string context_type
+        uuid context_id
+        bool is_read
+        timestamp created_at
+    }
+
+    %% ------------------
+    %% Module 8: Payments & Escrow
+    %% ------------------
+    PAYMENTS {
+        uuid id PK
+        uuid project_id FK
+        uuid payer_id FK
+        decimal amount
+        string payment_type
+        string status
+        timestamp paid_at
+    }
+
+    ESCROW_ACCOUNTS {
+        uuid id PK
+        uuid project_id FK
+        decimal deposit_amount
+        decimal balance_amount
+        string status
+    }
+
+    %% ------------------
+    %% Module 9: Real-Time Scheduling & Teaching Sessions
+    %% ------------------
+    TEACHING_AVAILABILITY {
+        uuid id PK
+        uuid provider_profile_id FK
+        string day_of_week
+        time start_time
+        time end_time
+    }
+
+    TEACHING_BOOKINGS {
+        uuid id PK
+        uuid availability_id FK
+        uuid client_id FK
+        string status
+        timestamp booked_at
+    }
+
+    TEACHING_SESSIONS {
+        uuid id PK
+        uuid booking_id FK
+        string session_link
+        string status
+        timestamp started_at
+        timestamp ended_at
+    }
+
+    %% ------------------
+    %% Module 10: Reporting & Complaints
+    %% ------------------
+    COMPLAINTS {
+        uuid id PK
+        uuid complainant_id FK
+        uuid reported_user_id FK
+        uuid related_request_id FK
+        uuid related_project_id FK
+        string category
+        text description
+        string status
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    %% ------------------
+    %% Module 11: Subscription & Priority Listing
+    %% ------------------
+    SUBSCRIPTIONS {
+        uuid id PK
+        uuid provider_profile_id FK
+        string plan_name
+        string tier
+        decimal price
+        date start_date
+        date end_date
+        string status
+    }
+
+    %% ------------------
+    %% Module 12: Centralized File Management
+    %% ------------------
+    FILES {
+        uuid id PK
+        string file_name
+        string file_type
+        decimal file_size
+        string file_path
+        timestamp uploaded_at
+    }
+
+    FILE_CONTEXT {
+        uuid id PK
+        uuid file_id FK
+        string context_type
+        uuid context_id
+    }
+
+    %% ------------------
+    %% Relationships
+    %% ------------------
+    USERS ||--o{ OTP_VERIFICATIONS : has
+    USERS ||--o{ PROVIDER_PROFILES : has
+    PROVIDER_PROFILES ||--o{ PROVIDER_SERVICES : has
+    PROVIDER_PROFILES ||--o{ PROVIDER_SKILLS : has
+    PROVIDER_PROFILES ||--o{ PROVIDER_EXPERIENCES : has
+    PROVIDER_PROFILES ||--o{ PROVIDER_EDUCATION : has
+    PROVIDER_PROFILES ||--o{ PROVIDER_LANGUAGES : has
+
+    USERS ||--o{ REQUESTS : creates
+    REQUESTS ||--o{ PROPOSALS : receives
+    PROVIDER_PROFILES ||--o{ PROPOSALS : submits
+
+    USERS ||--o{ MESSAGES : sends
+    REQUESTS ||--o{ MESSAGES : context
+    PROJECTS ||--o{ MESSAGES : context
+
+    USERS ||--o{ PROJECTS : client
+    PROVIDER_PROFILES ||--o{ PROJECTS : provider
+    PROPOSALS ||--o{ PROJECTS : accepted_proposal
+
+    USERS ||--o{ NOTIFICATIONS : receives
+
+    PROJECTS ||--o{ PAYMENTS : has
+    PROJECTS ||--o{ ESCROW_ACCOUNTS : has
+
+    PROVIDER_PROFILES ||--o{ TEACHING_AVAILABILITY : has
+    TEACHING_AVAILABILITY ||--o{ TEACHING_BOOKINGS : has
+    USERS ||--o{ TEACHING_BOOKINGS : books
+    TEACHING_BOOKINGS ||--o{ TEACHING_SESSIONS : launches
+
+    USERS ||--o{ COMPLAINTS : submits
+    USERS ||--o{ COMPLAINTS : reported
+    REQUESTS ||--o{ COMPLAINTS : related
+    PROJECTS ||--o{ COMPLAINTS : related
+
+    PROVIDER_PROFILES ||--o{ SUBSCRIPTIONS : has
+
+    FILES ||--o{ FILE_CONTEXT : has
+    REQUESTS ||--o{ FILE_CONTEXT : relates
+    PROPOSALS ||--o{ FILE_CONTEXT : relates
+    MESSAGES ||--o{ FILE_CONTEXT : relates
+    COMPLAINTS ||--o{ FILE_CONTEXT : relates
+    PROJECTS ||--o{ FILE_CONTEXT : relates
