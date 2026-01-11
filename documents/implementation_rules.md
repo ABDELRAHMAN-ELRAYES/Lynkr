@@ -69,17 +69,30 @@ export interface IProfileResponse {
 }
 ```
 
-### 4. Layer Responsibilities
+### 4. Layer Responsibilities (CRITICAL)
+
+Each layer has **strict responsibilities**. Violating these boundaries leads to coupling, testing difficulties, and maintenance issues.
 
 #### 4.1 Repository Layer
-- **Pure database operations only**
-- Receives clean, pre-processed data
-- Uses typed interfaces (e.g., `ICreateProfileRepositoryData`)
-- NO business logic
-- NO data transformation (dates, mapping, etc.)
+**Purpose**: Pure database operations only.
+
+**MUST DO**:
+- Execute Prisma queries (create, read, update, delete)
+- Handle database-specific includes/relations
+- Return raw Prisma results
+- Receive clean, pre-processed data ready for database insertion
+- Use typed interfaces (e.g., `ICreateProfileRepositoryData`)
+- Throw `AppError` on database failures
+
+**MUST NOT DO**:
+- ❌ Business logic or validation
+- ❌ Data transformation (dates, formatting, mapping)
+- ❌ Access control / authorization checks
+- ❌ Call other services or external APIs
+- ❌ Format responses
 
 ```typescript
-// ✅ CORRECT - Repository receives typed data
+// ✅ CORRECT - Repository receives clean, typed data
 async createProfile(userId: string, data: ICreateProfileRepositoryData) {
     return await this.prisma.providerProfile.create({
         data: {
@@ -91,43 +104,140 @@ async createProfile(userId: string, data: ICreateProfileRepositoryData) {
 }
 ```
 
+---
+
 #### 4.2 Service Layer
-- Handles ALL business logic
-- Performs data transformation before calling repository
-- Converts dates from strings to Date objects
-- Maps arrays to repository-expected format
-- Validates business rules
+**Purpose**: Business logic, validation, and data transformation.
+
+**MUST DO**:
+- Implement ALL business logic and rules
+- Validate business constraints (e.g., "can only cancel if status is X")
+- Transform incoming data to repository format:
+  - Convert date strings to `Date` objects
+  - Map arrays to nested create format
+  - Clean/sanitize input data
+- Check authorization (e.g., "is this user the project owner?")
+- Orchestrate calls to multiple repositories if needed
+- Call external services (email, Stripe, etc.)
+- Pass errors to `next()` middleware
+
+**MUST NOT DO**:
+- ❌ Direct Prisma queries (use repository)
+- ❌ Access `req` or `res` objects
+- ❌ Format HTTP responses
+- ❌ Define routes or middleware
 
 ```typescript
-// ✅ CORRECT - Service transforms data
+// ✅ CORRECT - Service handles business logic and transforms data
 static async createProfile(userId: string, data: ICreateProfileData, next: NextFunction) {
-    // Transform experiences
+    // Business validation
+    if (!data.title || data.title.length < 3) {
+        return next(new AppError(400, "Title must be at least 3 characters"));
+    }
+
+    // Data transformation - convert dates
     const experiences = data.experiences?.map(exp => ({
         ...exp,
         startDate: new Date(exp.startDate),
         endDate: exp.endDate ? new Date(exp.endDate) : undefined,
     }));
 
-    // Prepare repository data
+    // Prepare repository-ready data
     const repositoryData: ICreateProfileRepositoryData = {
+        title: data.title,
+        bio: data.bio,
         experiences,
-        // ... other transformed data
     };
 
+    // Call repository with clean data
     return await this.repository.create(userId, repositoryData);
 }
 ```
 
+---
+
 #### 4.3 Controller Layer
-- Thin layer for HTTP handling
-- Extracts data from request
-- Calls service methods
-- Formats responses
+**Purpose**: Thin HTTP handler - extract request data, call service, format response.
+
+**MUST DO**:
+- Extract data from `req.body`, `req.params`, `req.query`, `req.user`
+- Call service methods with extracted data
+- Format and send HTTP responses with status codes
+- Pass `next` function to service for error handling
+
+**MUST NOT DO**:
+- ❌ Business logic or validation (belongs in service)
+- ❌ Data transformation (belongs in service)
+- ❌ Direct database/repository access
+- ❌ Define routes
+
+```typescript
+// ✅ CORRECT - Controller is thin, just handles HTTP
+export const createProject = async (req: Request, res: Response, next: NextFunction) => {
+    // Extract from request
+    const { proposalId, providerProfileId, totalPrice } = req.body;
+    const clientId = (req.user as any).id;
+
+    // Call service
+    const project = await ProjectService.createProject(
+        clientId,
+        providerProfileId,
+        proposalId,
+        totalPrice,
+        next
+    );
+
+    // Format response
+    if (project) {
+        return res.status(201).json({
+            status: "success",
+            message: "Project created successfully",
+            data: project
+        });
+    }
+};
+```
+
+---
 
 #### 4.4 Route Layer
-- Defines endpoints
-- Applies middleware (protect, checkPermissions)
-- Groups related routes
+**Purpose**: Define endpoints and apply middleware.
+
+**MUST DO**:
+- Define HTTP endpoints (GET, POST, PATCH, DELETE)
+- Apply authentication middleware (`protect`)
+- Apply authorization middleware (`checkPermissions`)
+- Apply file upload middleware when needed
+- Group related routes logically
+
+**MUST NOT DO**:
+- ❌ Contain any logic
+- ❌ Call services or repositories directly
+- ❌ Access request body or transform data
+
+```typescript
+// ✅ CORRECT - Routes only define endpoints and middleware
+const ProjectRouter = Router();
+ProjectRouter.use(protect);
+ProjectRouter.post("/", createProject);
+ProjectRouter.get("/me", getMyProjects);
+ProjectRouter.patch("/:id/complete", markComplete);
+```
+
+---
+
+#### 4.5 Types Layer
+**Purpose**: Define interfaces for data shapes.
+
+**MUST DO**:
+- Define `I[Entity]` for entity representation
+- Define `ICreate[Entity]Data` for creation input
+- Define `IUpdate[Entity]Data` for update input
+- Export types for use by other layers
+
+**MUST NOT DO**:
+- ❌ Import from Prisma (use custom types)
+- ❌ Contain logic or functions
 
 ### 5. Module Independence
 

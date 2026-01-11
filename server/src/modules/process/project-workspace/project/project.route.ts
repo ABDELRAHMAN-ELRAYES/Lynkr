@@ -5,9 +5,14 @@ import {
     getMyProjects,
     markComplete,
     confirmComplete,
-    cancelProject
+    cancelProject,
+    uploadProjectFile,
+    getProjectFiles,
+    deleteProjectFile,
+    getProjectActivities
 } from "./project.controller";
 import { protect } from "../../../auth/auth.controller";
+import upload, { validateUploadedFileSize } from "../../../../middlewares/file-upload";
 
 const ProjectRouter = Router();
 
@@ -32,4 +37,26 @@ ProjectRouter.patch("/:id/confirm", confirmComplete);
 // Client cancels project (triggers refund if applicable)
 ProjectRouter.patch("/:id/cancel", cancelProject);
 
+// ===== PROJECT FILES =====
+
+// Upload file to project
+ProjectRouter.post(
+    "/:id/files",
+    upload.single("file"),
+    validateUploadedFileSize,
+    uploadProjectFile
+);
+
+// List project files
+ProjectRouter.get("/:id/files", getProjectFiles);
+
+// Delete project file
+ProjectRouter.delete("/:id/files/:fileId", deleteProjectFile);
+
+// ===== PROJECT ACTIVITIES =====
+
+// Get project activity timeline
+ProjectRouter.get("/:id/activities", getProjectActivities);
+
 export default ProjectRouter;
+

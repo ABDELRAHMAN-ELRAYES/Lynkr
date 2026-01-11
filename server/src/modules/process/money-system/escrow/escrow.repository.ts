@@ -67,35 +67,41 @@ class EscrowRepository {
 
     async releaseEscrow(escrowId: string, providerProfileId: string) {
         try {
-            const escrow = await this.prisma.escrow.findUnique({
-                where: { id: escrowId }
-            });
+            return await this.prisma.$transaction(async (tx) => {
+                const escrow = await tx.escrow.findUnique({
+                    where: { id: escrowId }
+                });
 
-            if (!escrow) {
-                throw new AppError(404, "Escrow not found");
-            }
-
-            // Update escrow status
-            const updatedEscrow = await this.prisma.escrow.update({
-                where: { id: escrowId },
-                data: {
-                    status: "RELEASED",
-                    releasedAt: new Date(),
-                    balance: 0
+                if (!escrow) {
+                    throw new AppError(404, "Escrow not found");
                 }
-            });
 
-            // Add released amount to provider's available balance
-            await this.prisma.providerProfile.update({
-                where: { id: providerProfileId },
-                data: {
-                    availableBalance: {
-                        increment: escrow.balance
+                if (escrow.status === "RELEASED") {
+                    throw new AppError(400, "Escrow already released");
+                }
+
+                // Update escrow status
+                const updatedEscrow = await tx.escrow.update({
+                    where: { id: escrowId },
+                    data: {
+                        status: "RELEASED",
+                        releasedAt: new Date(),
+                        balance: 0
                     }
-                }
-            });
+                });
 
-            return updatedEscrow;
+                // Add released amount to provider's available balance
+                await tx.providerProfile.update({
+                    where: { id: providerProfileId },
+                    data: {
+                        availableBalance: {
+                            increment: escrow.balance
+                        }
+                    }
+                });
+
+                return updatedEscrow;
+            });
         } catch (error) {
             if (error instanceof AppError) throw error;
             throw new AppError(500, "Failed to release escrow");

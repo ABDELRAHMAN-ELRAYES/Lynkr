@@ -24,15 +24,23 @@ erDiagram
         bool is_used
     }
 
+    ADMIN_PRIVILEGES {
+        uuid id PK
+        uuid user_id FK
+        string name
+        timestamp created_at
+    }
+
     %% ------------------
     %% Module 2: Provider Profile
     %% ------------------
     PROVIDER_PROFILES {
         uuid id PK
         uuid user_id FK
+        string title
         string bio
-        string description
         decimal hourly_rate
+        decimal available_balance
         bool is_approved
         timestamp created_at
         timestamp updated_at
@@ -54,7 +62,9 @@ erDiagram
         uuid id PK
         uuid provider_profile_id FK
         string title
-        string organization
+        string company
+        string location
+        string country
         text description
         date start_date
         date end_date
@@ -66,7 +76,7 @@ erDiagram
         string degree
         string major
         string institution
-        string study_level
+        string country
         date start_date
         date end_date
     }
@@ -135,21 +145,7 @@ erDiagram
     }
 
     %% ------------------
-    %% Module 5: Messaging & Communication
-    %% ------------------
-    MESSAGES {
-        uuid id PK
-        uuid sender_id FK
-        uuid receiver_id FK
-        uuid context_request_id FK
-        uuid context_project_id FK
-        text content
-        timestamp sent_at
-        bool is_read
-    }
-
-    %% ------------------
-    %% Module 6: Project Initialization
+    %% Module 5: Payments & Escrow
     %% ------------------
     PROJECTS {
         uuid id PK
@@ -157,11 +153,58 @@ erDiagram
         uuid provider_profile_id FK
         uuid accepted_proposal_id FK
         string status
-        text scope
-        decimal price
-        int estimated_days
+        decimal total_price
+        decimal paid_amount
         timestamp started_at
         timestamp completed_at
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    PAYMENTS {
+        uuid id PK
+        uuid project_id FK
+        uuid payer_id FK
+        decimal amount
+        string currency
+        string payment_type
+        string status
+        string stripe_payment_id
+        timestamp paid_at
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    ESCROWS {
+        uuid id PK
+        uuid project_id FK
+        decimal deposit_amount
+        decimal balance
+        string status
+        timestamp released_at
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    %% ------------------
+    %% Module 6: Project Workspace & Collaboration
+    %% ------------------
+    PROJECT_FILES {
+        uuid id PK
+        uuid project_id FK
+        uuid file_id FK
+        uuid uploader_id FK
+        string description
+        timestamp created_at
+    }
+
+    PROJECT_ACTIVITIES {
+        uuid id PK
+        uuid project_id FK
+        uuid user_id FK
+        string action
+        text details
+        timestamp created_at
     }
 
     %% ------------------
@@ -176,27 +219,6 @@ erDiagram
         uuid context_id
         bool is_read
         timestamp created_at
-    }
-
-    %% ------------------
-    %% Module 8: Payments & Escrow
-    %% ------------------
-    PAYMENTS {
-        uuid id PK
-        uuid project_id FK
-        uuid payer_id FK
-        decimal amount
-        string payment_type
-        string status
-        timestamp paid_at
-    }
-
-    ESCROW_ACCOUNTS {
-        uuid id PK
-        uuid project_id FK
-        decimal deposit_amount
-        decimal balance_amount
-        string status
     }
 
     %% ------------------
@@ -269,7 +291,6 @@ erDiagram
         timestamp created_at
     }
 
-    %% Explicit File Join Tables (replaces FILE_CONTEXT)
     REQUEST_FILES {
         uuid id PK
         uuid request_id FK
@@ -287,51 +308,67 @@ erDiagram
     %% ------------------
     %% Relationships
     %% ------------------
+
+    %% Module 1: IAM
     USERS ||--o{ OTP_VERIFICATIONS : has
-    USERS ||--o{ PROVIDER_PROFILES : has
+    USERS ||--o{ ADMIN_PRIVILEGES : has
+
+    %% Module 2: Provider Profile
+    USERS ||--o| PROVIDER_PROFILES : has
     PROVIDER_PROFILES ||--o{ PROVIDER_SERVICES : has
     PROVIDER_PROFILES ||--o{ PROVIDER_SKILLS : has
     PROVIDER_PROFILES ||--o{ PROVIDER_EXPERIENCES : has
     PROVIDER_PROFILES ||--o{ PROVIDER_EDUCATION : has
     PROVIDER_PROFILES ||--o{ PROVIDER_LANGUAGES : has
 
-    USERS ||--o{ REQUESTS : creates
-    REQUESTS ||--o{ PROPOSALS : receives
-    PROVIDER_PROFILES ||--o{ PROPOSALS : submits
-
-    USERS ||--o{ MESSAGES : sends
-    REQUESTS ||--o{ MESSAGES : context
-    PROJECTS ||--o{ MESSAGES : context
-
-    USERS ||--o{ PROJECTS : client
-    PROVIDER_PROFILES ||--o{ PROJECTS : provider
-    PROPOSALS ||--o{ PROJECTS : accepted_proposal
-
-    USERS ||--o{ NOTIFICATIONS : receives
-
-    PROJECTS ||--o{ PAYMENTS : has
-    PROJECTS ||--o{ ESCROW_ACCOUNTS : has
-
-    PROVIDER_PROFILES ||--o{ TEACHING_AVAILABILITY : has
-    TEACHING_AVAILABILITY ||--o{ TEACHING_BOOKINGS : has
-    USERS ||--o{ TEACHING_BOOKINGS : books
-    TEACHING_BOOKINGS ||--o{ TEACHING_SESSIONS : launches
-
-    USERS ||--o{ COMPLAINTS : submits
-    USERS ||--o{ COMPLAINTS : reported
-    REQUESTS ||--o{ COMPLAINTS : related
-    PROJECTS ||--o{ COMPLAINTS : related
-
-    PROVIDER_PROFILES ||--o{ SUBSCRIPTIONS : has
-
-    %% Provider Application relationships
+    %% Provider Application & Review
     USERS ||--o{ PROVIDER_APPLICATIONS : submits
     PROVIDER_PROFILES ||--o{ PROVIDER_APPLICATIONS : linked_to
     PROVIDER_APPLICATIONS ||--o| APPLICATION_REVIEWS : reviewed_by
     USERS ||--o{ APPLICATION_REVIEWS : admin_reviews
 
-    %% Explicit file relationships
+    %% Module 4: Requests & Proposals
+    USERS ||--o{ REQUESTS : creates
+    PROVIDER_PROFILES ||--o{ REQUESTS : targeted_in
+    REQUESTS ||--o{ PROPOSALS : receives
+    PROVIDER_PROFILES ||--o{ PROPOSALS : submits
+
+    %% Module 5: Payments & Escrow
+    USERS ||--o{ PROJECTS : client
+    PROVIDER_PROFILES ||--o{ PROJECTS : provider
+    PROPOSALS ||--o| PROJECTS : accepted_into
+    PROJECTS ||--o| ESCROWS : has
+    PROJECTS ||--o{ PAYMENTS : has
+    USERS ||--o{ PAYMENTS : pays
+
+    %% Module 6: Project Workspace & Collaboration
+    PROJECTS ||--o{ PROJECT_FILES : has
+    FILES ||--o{ PROJECT_FILES : attached_to
+    USERS ||--o{ PROJECT_FILES : uploads
+    PROJECTS ||--o{ PROJECT_ACTIVITIES : has
+    USERS ||--o{ PROJECT_ACTIVITIES : performs
+
+    %% Module 7: Notifications
+    USERS ||--o{ NOTIFICATIONS : receives
+
+    %% Module 9: Teaching Sessions
+    PROVIDER_PROFILES ||--o{ TEACHING_AVAILABILITY : has
+    TEACHING_AVAILABILITY ||--o{ TEACHING_BOOKINGS : has
+    USERS ||--o{ TEACHING_BOOKINGS : books
+    TEACHING_BOOKINGS ||--o{ TEACHING_SESSIONS : launches
+
+    %% Module 10: Complaints
+    USERS ||--o{ COMPLAINTS : submits
+    USERS ||--o{ COMPLAINTS : reported
+    REQUESTS ||--o{ COMPLAINTS : related
+    PROJECTS ||--o{ COMPLAINTS : related
+
+    %% Module 11: Subscriptions
+    PROVIDER_PROFILES ||--o{ SUBSCRIPTIONS : has
+
+    %% Module 12: File Management
     FILES ||--o{ REQUEST_FILES : attached_to
     FILES ||--o{ PROPOSAL_FILES : attached_to
     REQUESTS ||--o{ REQUEST_FILES : has_attachments
     PROPOSALS ||--o{ PROPOSAL_FILES : has_attachments
+

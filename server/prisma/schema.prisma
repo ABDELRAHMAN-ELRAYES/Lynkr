@@ -39,6 +39,10 @@ model User {
     clientProjects       Project[]             @relation("ClientProjects")
     // User -> Payment (One -> Many) - as payer
     clientPayments       Payment[]             @relation("ClientPayments")
+    // User -> ProjectFile (One -> Many) - as uploader
+    projectFiles         ProjectFile[]
+    // User -> ProjectActivity (One -> Many)
+    projectActivities    ProjectActivity[]
 
     @@map("users")
 }
@@ -286,6 +290,8 @@ model File {
     requestFiles  RequestFile[]
     // File -> ProposalFile (One -> Many)
     proposalFiles ProposalFile[]
+    // File -> ProjectFile (One -> Many)
+    projectFiles  ProjectFile[]
 
     @@map("files")
 }
@@ -326,34 +332,6 @@ model ProposalFile {
 // Module 5: Payments & Escrow
 // ============================================
 
-model Project {
-    id                 String    @id @default(uuid())
-    clientId           String    @map("client_id")
-    providerProfileId  String    @map("provider_profile_id")
-    acceptedProposalId String    @unique @map("accepted_proposal_id")
-    status             String    @default("PENDING_PAYMENT") // PENDING_PAYMENT, IN_PROGRESS, COMPLETED, CANCELLED
-    totalPrice         Decimal   @map("total_price")
-    paidAmount         Decimal   @default(0) @map("paid_amount")
-    startedAt          DateTime? @map("started_at")
-    completedAt        DateTime? @map("completed_at")
-    createdAt          DateTime  @default(now()) @map("created_at")
-    updatedAt          DateTime  @updatedAt @map("updated_at")
-
-    // Relations
-    // Project -> User (Many -> One)
-    client           User            @relation("ClientProjects", fields: [clientId], references: [id])
-    // Project -> ProviderProfile (Many -> One)
-    providerProfile  ProviderProfile @relation(fields: [providerProfileId], references: [id])
-    // Project -> Proposal (One -> One)
-    acceptedProposal Proposal        @relation(fields: [acceptedProposalId], references: [id])
-    // Project -> Escrow (One -> One)
-    escrow           Escrow?
-    // Project -> Payment (One -> Many)
-    payments         Payment[]
-
-    @@map("projects")
-}
-
 model Payment {
     id              String    @id @default(uuid())
     projectId       String    @map("project_id")
@@ -391,4 +369,77 @@ model Escrow {
     project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
 
     @@map("escrows")
+}
+
+// ============================================
+// Module 6: Project Workspace & Collaboration
+// ============================================
+
+model Project {
+    id                 String    @id @default(uuid())
+    clientId           String    @map("client_id")
+    providerProfileId  String    @map("provider_profile_id")
+    acceptedProposalId String    @unique @map("accepted_proposal_id")
+    status             String    @default("PENDING_PAYMENT") // PENDING_PAYMENT, IN_PROGRESS, COMPLETED, CANCELLED
+    totalPrice         Decimal   @map("total_price")
+    paidAmount         Decimal   @default(0) @map("paid_amount")
+    startedAt          DateTime? @map("started_at")
+    completedAt        DateTime? @map("completed_at")
+    createdAt          DateTime  @default(now()) @map("created_at")
+    updatedAt          DateTime  @updatedAt @map("updated_at")
+
+    // Relations
+    // Project -> User (Many -> One)
+    client           User              @relation("ClientProjects", fields: [clientId], references: [id])
+    // Project -> ProviderProfile (Many -> One)
+    providerProfile  ProviderProfile   @relation(fields: [providerProfileId], references: [id])
+    // Project -> Proposal (One -> One)
+    acceptedProposal Proposal          @relation(fields: [acceptedProposalId], references: [id])
+    // Project -> Escrow (One -> One)
+    escrow           Escrow?
+    // Project -> Payment (One -> Many)
+    payments         Payment[]
+    // Project -> ProjectFile (One -> Many)
+    files            ProjectFile[]
+    // Project -> ProjectActivity (One -> Many)
+    activities       ProjectActivity[]
+
+    @@map("projects")
+}
+
+// Join table: Project <-> File (Many -> Many)
+model ProjectFile {
+    id          String   @id @default(uuid())
+    projectId   String   @map("project_id")
+    fileId      String   @map("file_id")
+    uploaderId  String   @map("uploader_id")
+    description String?
+    createdAt   DateTime @default(now()) @map("created_at")
+
+    // Relations
+    // ProjectFile -> Project (Many -> One)
+    project  Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+    // ProjectFile -> File (Many -> One)
+    file     File    @relation(fields: [fileId], references: [id], onDelete: Cascade)
+    // ProjectFile -> User (Many -> One)
+    uploader User    @relation(fields: [uploaderId], references: [id])
+
+    @@map("project_files")
+}
+
+model ProjectActivity {
+    id        String   @id @default(uuid())
+    projectId String   @map("project_id")
+    userId    String   @map("user_id")
+    action    String // FILE_UPLOADED, STATUS_CHANGED, COMPLETION_REQUESTED, COMPLETION_CONFIRMED, PROJECT_CANCELLED
+    details   String?  @db.Text
+    createdAt DateTime @default(now()) @map("created_at")
+
+    // Relations
+    // ProjectActivity -> Project (Many -> One)
+    project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+    // ProjectActivity -> User (Many -> One)
+    user    User    @relation(fields: [userId], references: [id])
+
+    @@map("project_activities")
 }

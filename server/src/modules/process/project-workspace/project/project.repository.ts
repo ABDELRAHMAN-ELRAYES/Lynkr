@@ -2,6 +2,7 @@ import PrismaClientSingleton from "../../../../data-server-clients/prisma-client
 import { PrismaClient } from "@prisma/client";
 import AppError from "../../../../utils/app-error";
 import { ICreateProjectData, IUpdateProjectData } from "./types/IProject";
+import { ICreateProjectFileData, ICreateActivityData } from "./types/IProjectWorkspace";
 
 class ProjectRepository {
     private prisma: PrismaClient;
@@ -63,7 +64,14 @@ class ProjectRepository {
                     },
                     acceptedProposal: true,
                     escrow: true,
-                    payments: true
+                    payments: true,
+                    files: {
+                        include: {
+                            file: true,
+                            uploader: { select: { id: true, firstName: true, lastName: true } }
+                        },
+                        orderBy: { createdAt: "desc" }
+                    }
                 }
             });
         } catch (error) {
@@ -142,6 +150,102 @@ class ProjectRepository {
             throw new AppError(500, "Failed to get project by proposal");
         }
     }
+
+    // ===== PROJECT FILES =====
+
+    async addProjectFile(data: ICreateProjectFileData) {
+        try {
+            return await this.prisma.projectFile.create({
+                data: {
+                    projectId: data.projectId,
+                    fileId: data.fileId,
+                    uploaderId: data.uploaderId,
+                    description: data.description
+                },
+                include: {
+                    file: true,
+                    uploader: { select: { id: true, firstName: true, lastName: true } }
+                }
+            });
+        } catch (error) {
+            throw new AppError(500, "Failed to add project file");
+        }
+    }
+
+    async getProjectFiles(projectId: string) {
+        try {
+            return await this.prisma.projectFile.findMany({
+                where: { projectId },
+                include: {
+                    file: true,
+                    uploader: { select: { id: true, firstName: true, lastName: true } }
+                },
+                orderBy: { createdAt: "desc" }
+            });
+        } catch (error) {
+            throw new AppError(500, "Failed to get project files");
+        }
+    }
+
+    async getProjectFileById(id: string) {
+        try {
+            return await this.prisma.projectFile.findUnique({
+                where: { id },
+                include: {
+                    file: true,
+                    uploader: { select: { id: true, firstName: true, lastName: true } },
+                    project: true
+                }
+            });
+        } catch (error) {
+            throw new AppError(500, "Failed to get project file");
+        }
+    }
+
+    async deleteProjectFile(id: string) {
+        try {
+            return await this.prisma.projectFile.delete({
+                where: { id }
+            });
+        } catch (error) {
+            throw new AppError(500, "Failed to delete project file");
+        }
+    }
+
+    // ===== PROJECT ACTIVITIES =====
+
+    async logActivity(data: ICreateActivityData) {
+        try {
+            return await this.prisma.projectActivity.create({
+                data: {
+                    projectId: data.projectId,
+                    userId: data.userId,
+                    action: data.action,
+                    details: data.details
+                },
+                include: {
+                    user: { select: { id: true, firstName: true, lastName: true } }
+                }
+            });
+        } catch (error) {
+            throw new AppError(500, "Failed to log activity");
+        }
+    }
+
+    async getProjectActivities(projectId: string) {
+        try {
+            return await this.prisma.projectActivity.findMany({
+                where: { projectId },
+                include: {
+                    user: { select: { id: true, firstName: true, lastName: true } }
+                },
+                orderBy: { createdAt: "desc" }
+            });
+        } catch (error) {
+            throw new AppError(500, "Failed to get project activities");
+        }
+    }
 }
 
 export default ProjectRepository;
+
