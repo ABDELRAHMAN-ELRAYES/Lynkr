@@ -5,7 +5,7 @@ import {
     getMessage,
     getConversation,
 } from "./chat.controller";
-import { protect } from "../../middlewares/auth.middleware";
+import { protect } from "../auth/auth.controller";
 
 const ChatRouter = Router();
 

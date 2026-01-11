@@ -1,54 +1,29 @@
-import { UserRole, AdminPrivilege } from "../../../enum/UserRole";
+import { UserRole } from "../../../enum/UserRole";
 
-export type LoginRequest = {
-    email: string;
-    password: string;
-};
-
-export type RegisterRequest = {
-    email: string;
-    password: string;
-    verificationCode: string;
-};
-
-export type NoCacheRegisterUserRequest = {
-    email: string;
-    password: string;
+export interface IUserLoginData {
+  usernameOrEmail: string;
+  password: string;
+}
+export interface IRegisterVerificationData {
+  email: string;
+}
+export interface IRegisterData {
+  otp: {
+    hashedOtp: string;
+    expiresIn: string;
+    enteredOtp: string;
+  };
+  user: {
     firstName: string;
     lastName: string;
-    phone: string;
-    role: UserRole;
-};
-
-export type NoCachePendingUserRegistration = {
-    email: string;
-    verificationCode: string;
-};
-
-export type ForgotPasswordRequest = {
-    email: string;
-};
-
-export type VerifyResetPasswordRequest = {
-    email: string;
-    verificationCode: string;
-};
-
-export type ResetPasswordRequest = {
     email: string;
     password: string;
-    verificationCode: string;
-};
+    phone: string;
+    role: UserRole;
+  };
+}
 
-export type AuthResponse = {
-    user: {
-        id: string;
-        email: string;
-        firstName: string;
-        lastName: string;
-        role: UserRole;
-        active: boolean;
-        privileges?: AdminPrivilege[];
-    };
-    token?: string;
-};
+export interface IResetPasswordData {
+  token: string;        
+  password: string;     
+}

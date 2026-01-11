@@ -29,15 +29,21 @@ class UserRepository {
     // Create user with specific roles
     async addUser(userData: NewUserData) {
         try {
+            // Generate username from email if not provided
+            const username = userData.username || userData.email.split('@')[0];
+
             return await this.prisma.user.create({
                 data: {
                     email: userData.email,
-                    username: userData.username,
+                    username,
                     firstName: userData.firstName,
                     lastName: userData.lastName,
                     role: userData.role,
                     password: userData.password,
                     phone: userData.phone,
+                },
+                include: {
+                    privileges: true,
                 },
             });
         } catch (error) {
@@ -179,6 +185,9 @@ class UserRepository {
                 where: {
                     OR: [{ email: usernameOrEmail }, { username: usernameOrEmail }],
                 },
+                include: {
+                    privileges: true, // Include admin privileges relation
+                },
             });
         } catch (error) {
             throw new AppError(500, "Error getting user by email or username");
@@ -201,7 +210,7 @@ class UserRepository {
     }
 
     // Check if the user found by his email if not create a new user
-    async findOrCreateUserByEmail(data: IUser) {
+    async findOrCreateUserByEmail(data: NewUserData) {
         try {
             const { email } = data;
             let user = await this.getUserByUsernameOrEmail(email);

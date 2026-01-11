@@ -4,13 +4,13 @@ import {
     getSetting,
     updateSetting,
 } from "./settings.controller";
-import { protect, restrictTo } from "../../middlewares/auth.middleware";
 import { UserRole } from "../../enum/UserRole";
+import { protect, checkPermissions } from "../auth/auth.controller";
 
 const SettingsRouter = Router();
 
 // All settings routes require admin access
-SettingsRouter.use(protect, restrictTo(UserRole.ADMIN, UserRole.SUPER_ADMIN));
+SettingsRouter.use(protect, checkPermissions([UserRole.ADMIN, UserRole.SUPER_ADMIN]));
 
 SettingsRouter.route("/")
     .get(getAllSettings);

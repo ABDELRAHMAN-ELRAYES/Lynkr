@@ -27,17 +27,12 @@ class UserService {
             return next(new AppError(400, "User with this email already exists"));
         }
 
-        let privileges;
-        if (userData.role === String(UserRole.ADMIN)) {
-            privileges = userData.privileges;
-        }
         const hashedPassword = await hash(password);
         const username = email.split("@")[0].toLowerCase();
         const newUserData: NewUserData = {
             ...userData,
             password: hashedPassword,
             username,
-            privileges,
         };
         return this.userRepository.addUser(newUserData);
     }
@@ -93,14 +88,11 @@ class UserService {
             return;
         }
 
-        let privileges;
-        if (updatedData.role === String(UserRole.ADMIN)) {
-            privileges = updatedData.privileges;
-        }
+        // Note: privileges are managed separately through admin.repository, not here
         const userData: IUser = {
             ...user,
             ...updatedData,
-            privileges,
+            privileges: user.privileges, // Keep existing privileges from database
         };
         return this.userRepository.updateUserById(userData);
     }
@@ -187,7 +179,7 @@ class UserService {
     }
 
     // Check if the user found by his email if not create a new user
-    static async findOrCreateUserByEmail(data: IUser) {
+    static async findOrCreateUserByEmail(data: NewUserData) {
         return this.userRepository.findOrCreateUserByEmail(data);
     }
 

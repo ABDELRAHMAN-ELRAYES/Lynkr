@@ -6,7 +6,7 @@ import {
     updateReview,
     deleteReview,
 } from "./review.controller";
-import { protect } from "../../middlewares/auth.middleware";
+import { protect } from "../auth/auth.controller";
 
 const ReviewRouter = Router();
 

@@ -1,6 +1,4 @@
 import express from "express";
-import cors from "cors";
-import cookieParser from "cookie-parser";
 import morgan from "morgan";
 import path from "path";
 import config from "./config/config";
@@ -26,6 +24,7 @@ import MeetingRouter from "./modules/meeting/meeting.route";
 import NotificationRouter from "./modules/notification/notification.route";
 import ProposalRouter from "./modules/proposal/proposal.route";
 import EscrowRouter from "./modules/escrow/escrow.route";
+import { bodyParser, cookieParserMiddleware, corsMiddleware, formParser } from "./middlewares/middlewares";
 
 // Seed default admin user
 (async () => {
@@ -63,13 +62,10 @@ export const ROOT_DIR: string = process.cwd();
 const app = express();
 
 // Middleware setup
-app.use(cors({
-    origin: config.cors.origin,
-    credentials: true,
-}));
-app.use(express.json({ limit: "10mb" }));
-app.use(express.urlencoded({ extended: true, limit: "10mb" }));
-app.use(cookieParser());
+app.use(corsMiddleware);
+app.use(formParser);
+app.use(bodyParser);
+app.use(cookieParserMiddleware);
 app.use(morgan("dev"));
 
 // Serve static files (uploads)
@@ -78,10 +74,7 @@ app.use(
     express.static(path.join(process.cwd(), "uploads"))
 );
 
-// Health check route
-app.get("/health", (_req, res) => {
-    res.status(200).json({ status: "ok", message: "Server is running" });
-});
+
 
 // API Routes
 app.use("/api/v1/auth", AuthRouter);

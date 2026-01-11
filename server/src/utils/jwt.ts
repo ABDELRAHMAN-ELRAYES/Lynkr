@@ -47,7 +47,3 @@ export const verifyPasswordResetJWT = (token: string): JwtPayload => {
   const resetSecret = config.jwt.resetPasswordSecret as string;
   return jwt.verify(token, resetSecret) as JwtPayload;
 };
-
-export const generateVerificationCode = (): string => {
-    return Math.floor(100000 + Math.random() * 900000).toString();
-};

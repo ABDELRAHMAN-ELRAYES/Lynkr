@@ -15,13 +15,18 @@ interface Config {
     cookies: {
         expiresIn: string;
     };
-    email: {
+    otp: {
+        expiresIn: number; // in minutes
+    };
+    mail: {
         host: string;
         port: number;
         secure: boolean;
         user: string;
         password: string;
         from: string;
+        defaultFrom: string;
+        service?: string;
     };
     stripe: {
         secretKey: string;
@@ -42,7 +47,7 @@ interface Config {
         email: string;
         password: string;
     };
-    frontendUrl: string;
+    webUrl: string;
     redis: {
         host: string;
         port: number;
@@ -67,13 +72,18 @@ const config: Config = {
     cookies: {
         expiresIn: process.env.COOKIE_EXPIRES_IN || "7",
     },
-    email: {
+    otp: {
+        expiresIn: parseInt(process.env.OTP_EXPIRES_IN || "10", 10), // default 10 minutes
+    },
+    mail: {
         host: process.env.EMAIL_HOST || "smtp.gmail.com",
         port: parseInt(process.env.EMAIL_PORT || "587", 10),
         secure: process.env.EMAIL_SECURE === "true",
         user: process.env.EMAIL_USER || "",
         password: process.env.EMAIL_PASSWORD || "",
-        from: process.env.EMAIL_FROM || "noreply@lynkr.com",
+        from: process.env.EMAIL_FROM || "info@lynkr.com",
+        defaultFrom: process.env.EMAIL_FROM || "info@lynkr.com",
+        service: process.env.EMAIL_SERVICE,
     },
     stripe: {
         secretKey: process.env.STRIPE_SECRET_KEY || "",
@@ -94,7 +104,7 @@ const config: Config = {
         email: process.env.ADMIN_EMAIL || "admin@lynkr.com",
         password: process.env.ADMIN_PASSWORD || "admin123",
     },
-    frontendUrl: process.env.FRONTEND_URL || "http://localhost:5173",
+    webUrl: process.env.FRONTEND_URL || "http://localhost:5173",
     redis: {
         host: process.env.REDIS_HOST || "localhost",
         port: parseInt(process.env.REDIS_PORT || "6379", 10),

@@ -7,7 +7,7 @@ import {
     updateMeeting,
     deleteMeeting,
 } from "./meeting.controller";
-import { protect } from "../../middlewares/auth.middleware";
+import { protect } from "../auth/auth.controller";
 
 const MeetingRouter = Router();
 

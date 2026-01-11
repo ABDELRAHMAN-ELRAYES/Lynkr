@@ -29,22 +29,28 @@ A comprehensive service marketplace platform connecting clients with skilled ser
 
 ### Frontend
 
-- **React 18** with **TypeScript** - Modern UI development
-- **Vite** - Fast build tool and development server
-- **Tailwind CSS** - Utility-first CSS framework
-- **React Hook Form** - Form state management
-- **Zustand/Redux Toolkit** - Application state management
-- **React Router** - Client-side routing
+- **React 19** with **TypeScript** - Modern UI development with latest concurrent features
+- **Vite 7** - Lightning-fast build tool and development server
+- **Tailwind CSS 4** - Utility-first CSS framework
+- **React Hook Form** - Form state management with validation
+- **Zustand** - Lightweight application state management
+- **React Router 7** - Client-side routing
 - **Socket.io Client** - Real-time communication
+- **STOMP.js** - WebSocket messaging protocol
+- **Agora RTC** - Real-time video/audio communication
+- **Stripe React** - Payment processing integration
+- **Radix UI** - Accessible component primitives
+- **Framer Motion** - Smooth animations and transitions
 
 ### Backend
 
-- **Spring Boot 3** with **Spring WebFlux** - Reactive web framework
-- **Java 17+** - Programming language
+- **Node.js 18+** with **Express 4** - Fast, minimalist web framework
+- **TypeScript 5** - Type-safe JavaScript development
+- **Prisma 5** - Next-generation ORM with type safety
 - **PostgreSQL 14+** - Primary database
-- **Redis** - Caching and session storage
-- **Elasticsearch** - Search and indexing
-- **Liquibase** - Database migration management
+- **Redis (ioredis)** - Caching and session storage
+- **Bull** - Queue management for background jobs
+- **Socket.io** - Real-time bidirectional communication
 
 ### DevOps & Tools
 
@@ -52,19 +58,21 @@ A comprehensive service marketplace platform connecting clients with skilled ser
 - **Docker Compose** - Multi-container orchestration
 - **GitHub Actions** - CI/CD pipeline
 - **Nginx** - Reverse proxy and static file serving
-- **Let's Encrypt** - SSL certificates
+- **tsx** - TypeScript execution for development
+- **Nodemon** - Development server with hot reload
 
 ### Third-party Services
 
-- **Stripe** - Payment processing
-- **AWS S3** - File storage
-- **Socket.io** - Real-time communication
-- **Google OAuth** - Social authentication
+- **Stripe** - Payment processing and escrow
+- **Agora** - Real-time video conferencing
+- **Nodemailer** - Email service integration
+- **Passport.js** - Authentication middleware
+- **Google OAuth 2.0** - Social authentication
+- **Multer** - File upload handling
 
 ## 📋 Prerequisites
 
-- **Node.js** 18+ and npm/yarn
-- **Java** 17+
+- **Node.js** 18+ with npm, yarn, or pnpm
 - **PostgreSQL** 14+
 - **Redis** 6+
 - **Docker** and Docker Compose (recommended)
@@ -103,38 +111,43 @@ A comprehensive service marketplace platform connecting clients with skilled ser
 
 #### Backend Setup
 
-1. **Navigate to backend directory**
+1. **Navigate to server directory**
 
    ```bash
-   cd backend
+   cd server
    ```
 
-2. **Configure database**
+2. **Install dependencies**
 
    ```bash
-   # Create PostgreSQL database
-   createdb lynkr_db
-
-   # Update application.yml with your database credentials
+   npm install
    ```
 
-3. **Run database migrations**
+3. **Configure environment variables**
 
    ```bash
-   ./mvnw liquibase:update
+   cp .env.example .env
+   # Edit .env with your database credentials
    ```
 
-4. **Start the backend server**
+4. **Generate Prisma client**
+
    ```bash
-   ./mvnw spring-boot:run
+   npm run prisma:generate
+   # For existing database: npm run prisma:pull
+   ```
+
+5. **Start the development server**
+   ```bash
+   npm run dev
    ```
 
 #### Frontend Setup
 
-1. **Navigate to frontend directory**
+1. **Navigate to web directory**
 
    ```bash
-   cd frontend
+   cd web
    ```
 
 2. **Install dependencies**
@@ -142,49 +155,90 @@ A comprehensive service marketplace platform connecting clients with skilled ser
    ```bash
    pnpm install
    # or
-   yarn install
+   npm install
    ```
 
-3. **Start development server**
+3. **Configure environment variables**
+
    ```bash
-   pnpm run dev
+   cp .env.example .env
+   # Edit .env with your API configuration
+   ```
+
+4. **Start development server**
+   ```bash
+   pnpm dev
    # or
-   yarn dev
+   npm run dev
    ```
 
 ## 📁 Project Structure
 
 ```
 lynkr/
-├── web/                 # React frontend application
+├── web/                     # React 19 frontend application
 │   ├── src/
-│   │   ├── components/       # Reusable UI components
-│   │   ├── pages/           # Page components
-│   │   ├── hooks/           # Custom React hooks
-│   │   ├── store/           # State management
-│   │   ├── services/        # API services
-│   │   ├── types/           # TypeScript type definitions
-│   │   └── utils/           # Utility functions
+│   │   ├── app/             # App configuration and routing
+│   │   ├── features/        # Feature modules (feature-based architecture)
+│   │   │   ├── admin/       # Admin dashboard
+│   │   │   ├── auth/        # Authentication pages
+│   │   │   ├── home/        # Home/landing pages
+│   │   │   ├── operations/  # Operation management
+│   │   │   ├── payment/     # Payment pages
+│   │   │   ├── profile/     # User profile pages
+│   │   │   ├── project/     # Project management
+│   │   │   └── services/    # Service pages
+│   │   ├── shared/          # Shared modules
+│   │   │   ├── components/  # Reusable UI components (34 components)
+│   │   │   ├── constants/   # Application constants
+│   │   │   ├── hooks/       # Custom React hooks
+│   │   │   ├── lib/         # Third-party library configs
+│   │   │   ├── services/    # API service layer (12 services)
+│   │   │   ├── types/       # TypeScript type definitions
+│   │   │   └── utils/       # Utility functions
+│   │   ├── assets/          # Assets (fonts, etc.)
+│   │   ├── styles/          # Global styles
+│   │   └── main.tsx         # Application entry point
 │   ├── public/              # Static assets
+│   │   ├── images/          # Image assets
+│   │   └── logo/            # Logo files
 │   ├── package.json
 │   └── vite.config.ts
-├── server/                 # Spring Boot backend
-│   ├── src/main/java/       # Java source code
-│   │   └── com/lynkr/
-│   │       ├── config/      # Configuration classes
-│   │       ├── controller/  # REST controllers
-│   │       ├── service/     # Business logic
-│   │       ├── repository/  # Data access layer
-│   │       ├── entity/      # Entity models
-│   │       ├── filters/     # Filters
-│   │       ├── security/    # Security Configrations
-│   │       └── dto/         # Data transfer objects
-│   ├── src/main/resources/
-│   │   ├── db/changelog/    # Liquibase migrations
-│   │   └── application.yml  # Application configuration
-│   └── pom.xml
+├── server/                  # Node.js + Express + TypeScript backend
+│   ├── src/
+│   │   ├── modules/         # Feature modules (16 modules)
+│   │   │   ├── admin/       # Admin management
+│   │   │   ├── auth/        # Authentication & authorization
+│   │   │   ├── chat/        # Real-time messaging
+│   │   │   ├── escrow/      # Escrow management
+│   │   │   ├── file/        # File upload & management
+│   │   │   ├── meeting/     # Video conferencing (Agora)
+│   │   │   ├── notification/# Notification system
+│   │   │   ├── operation/   # Operations management
+│   │   │   ├── payment/     # Payment processing (Stripe)
+│   │   │   ├── profile/     # User profiles & portfolios
+│   │   │   ├── proposal/    # Proposal management
+│   │   │   ├── review/      # Reviews & ratings
+│   │   │   ├── service/     # Service catalog
+│   │   │   ├── settings/    # System settings
+│   │   │   ├── subscription/# Subscription plans
+│   │   │   └── user/        # User management
+│   │   ├── config/          # Configuration files
+│   │   ├── data-server-clients/ # Database clients (Prisma)
+│   │   ├── enum/            # Enumerations
+│   │   ├── middlewares/     # Express middlewares
+│   │   ├── services/        # Shared services (email, queue)
+│   │   ├── utils/           # Utility functions
+│   │   ├── app.ts           # Express app setup
+│   │   └── server.ts        # Server entry point
+│   ├── prisma/
+│   │   └── schema.prisma    # Prisma database schema
+│   ├── uploads/             # File uploads directory
+│   ├── package.json
+│   └── tsconfig.json
+├── documents/               # Project documentation
 ├── docker-compose.yml       # Docker services configuration
-├── .env.example            # Environment variables template
+├── .env.example             # Environment variables template
 └── README.md
 ```
 

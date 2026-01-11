@@ -14,13 +14,20 @@ export type NewUserData = ICreateUser & {
     username: string;
 };
 
-export type IUser = ICreateUser & {
+export type IUser = {
     id: string;
-    avatar?: string;
-    active: boolean;
+    firstName: string;
+    lastName: string;
     username: string;
+    email: string;
+    phone: string | null;
+    password: string;
+    role: string; // UserRole enum value as string
+    active: boolean;
     createdAt: Date;
     updatedAt: Date;
+    avatar?: string;
+    privileges?: { id: string; userId: string; name: string; createdAt: Date }[]; // AdminPrivilege relation from database
 };
 
 export type UserResponse = {

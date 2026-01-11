@@ -6,7 +6,7 @@ import {
     updateOperation,
     deleteOperation,
 } from "./operation.controller";
-import { protect } from "../../middlewares/auth.middleware";
+import { protect } from "../auth/auth.controller";
 
 const OperationRouter = Router();
 

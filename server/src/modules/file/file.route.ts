@@ -6,7 +6,7 @@ import {
     deleteFile,
 } from "./file.controller";
 import upload from "../../middlewares/file-upload";
-import { protect } from "../../middlewares/auth.middleware";
+import { protect } from "../auth/auth.controller";
 
 const FileRouter = Router();
 

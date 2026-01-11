@@ -6,7 +6,7 @@ import {
     getSubscription,
     updateSubscription,
 } from "./subscription.controller";
-import { protect } from "../../middlewares/auth.middleware";
+import { protect } from "../auth/auth.controller";
 
 const SubscriptionRouter = Router();
 

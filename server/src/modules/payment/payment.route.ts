@@ -5,7 +5,7 @@ import {
     getAllTransactions,
     handleStripeWebhook,
 } from "./payment.controller";
-import { protect } from "../../middlewares/auth.middleware";
+import { protect } from "../auth/auth.controller";
 
 const PaymentRouter = Router();
 

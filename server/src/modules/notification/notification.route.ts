@@ -4,7 +4,7 @@ import {
     markNotificationAsRead,
     deleteNotification,
 } from "./notification.controller";
-import { protect } from "../../middlewares/auth.middleware";
+import { protect } from "../auth/auth.controller";
 
 const NotificationRouter = Router();
 

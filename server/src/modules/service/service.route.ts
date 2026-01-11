@@ -6,7 +6,7 @@ import {
     updateService,
     deleteService,
 } from "./service.controller";
-import { protect } from "../../middlewares/auth.middleware";
+import { protect } from "../auth/auth.controller";
 
 const ServiceRouter = Router();
 

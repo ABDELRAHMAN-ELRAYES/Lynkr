@@ -1,6 +1,7 @@
 import { Server as HTTPServer } from "http";
 import { Server as SocketIOServer, Socket } from "socket.io";
-import { verifyJWT } from "../utils/jwt-handler";
+import { verifyJWT } from "../utils/jwt";
+import AppError from "@/utils/app-error";
 
 class SocketService {
     private io: SocketIOServer | null = null;
@@ -26,19 +27,19 @@ class SocketService {
         this.io.use((socket, next) => {
             const token = socket.handshake.auth.token;
             if (!token) {
-                return next(new Error("Authentication error"));
+                return next(new AppError(401, "Authentication error"));
             }
 
             try {
                 const decoded = verifyJWT(token);
                 if (!decoded || !decoded.id) {
-                    return next(new Error("Invalid token"));
+                    return next(new AppError(401, "Invalid token"));
                 }
 
                 (socket as any).userId = decoded.id;
                 next();
             } catch (error) {
-                return next(new Error("Authentication failed"));
+                return next(new AppError(401, "Authentication failed"));
             }
         });
 

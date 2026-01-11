@@ -4,16 +4,23 @@ A modern React-based frontend for the Lynkr service marketplace platform. Built 
 
 ## Tech Stack
 
-- **React 18** - Modern UI library with hooks and concurrent features
-- **TypeScript** - Type-safe JavaScript development
-- **Vite** - Lightning-fast build tool and dev server
-- **Tailwind CSS** - Utility-first CSS framework
-- **React Hook Form** - Performant form library with easy validation
-- **Zustand/Redux Toolkit** - Lightweight state management
-- **React Router** - Client-side routing and navigation
+- **React 19.1** - Modern UI library with latest concurrent features
+- **TypeScript 5.9** - Type-safe JavaScript development
+- **Vite 7** - Lightning-fast build tool and dev server
+- **Tailwind CSS 4** - Utility-first CSS framework
+- **React Hook Form 7** - Performant form library with easy validation
+- **Zustand 5** - Lightweight state management
+- **React Router 7** - Client-side routing and navigation
 - **Socket.io Client** - Real-time communication
-- **React Query** - Server state management and caching
-- **Framer Motion** - Smooth animations and transitions
+- **STOMP.js** - WebSocket messaging protocol
+- **Agora RTC React 2.3** - Real-time video/audio conferencing
+- **Stripe React** - Payment processing integration
+- **Radix UI** - Accessible, unstyled component primitives
+- **Framer Motion 12** - Smooth animations and transitions
+- **Axios 1.12** - HTTP client for API requests
+- **Zod 4** - TypeScript-first schema validation
+- **Chart.js & Recharts** - Data visualization libraries
+- **Lucide React** - Beautiful icon library
 
 ## 📋 Prerequisites
 
@@ -71,53 +78,64 @@ Visit [http://localhost:5173](http://localhost:5173) to see the application.
 ```
 web/
 ├── public/                 # Static assets
-│   ├── icons/             # App icons and favicons
-│   └── images/            # Static images
+│   ├── images/            # Image files
+│   └── logo/              # Logo assets
 ├── src/
-│   ├── components/        # Reusable UI components
-│   │   ├── ui/           # Basic UI components (buttons, inputs, etc.)
-│   │   ├── forms/        # Form-specific components
-│   │   ├── layout/       # Layout components (header, sidebar, etc.)
-│   │   └── shared/       # Shared business logic components
-│   ├── pages/            # Page components
-│   │   ├── auth/         # Authentication pages
-│   │   ├── dashboard/    # Dashboard pages
-│   │   ├── services/     # Service-related pages
-│   │   ├── orders/       # Order management pages
-│   │   └── profile/      # User profile pages
-│   ├── hooks/            # Custom React hooks
-│   │   ├── useAuth.ts    # Authentication hook
-│   │   ├── useSocket.ts  # Socket.io integration
-│   │   └── useApi.ts     # API integration hooks
-│   ├── store/            # State management
-│   │   ├── authStore.ts  # User authentication state
-│   │   ├── orderStore.ts # Order management state
-│   │   └── uiStore.ts    # UI state (modals, notifications)
-│   ├── services/         # API service layer
-│   │   ├── api.ts        # Axios configuration
-│   │   ├── auth.ts       # Authentication services
-│   │   ├── orders.ts     # Order management services
-│   │   └── users.ts      # User management services
-│   ├── types/            # TypeScript type definitions
-│   │   ├── api.ts        # API response types
-│   │   ├── user.ts       # User-related types
-│   │   └── order.ts      # Order-related types
-│   ├── utils/            # Utility functions
-│   │   ├── format.ts     # Data formatting utilities
-│   │   ├── validation.ts # Form validation schemas
-│   │   └── constants.ts  # Application constants
-│   ├── styles/           # Global styles
-│   │   └── globals.css   # Global CSS and Tailwind imports
-│   ├── App.tsx           # Root application component
-│   ├── main.tsx          # Application entry point
-│   └── vite-env.d.ts     # Vite type definitions
-├── .env.example          # Environment variables template
-├── .env.local            # Local environment variables (git-ignored)
-├── index.html            # HTML template
-├── package.json          # Dependencies and scripts
-├── tailwind.config.js    # Tailwind CSS configuration
-├── tsconfig.json         # TypeScript configuration
-└── vite.config.ts        # Vite configuration
+│   ├── app/               # App configuration
+│   │   ├── App.tsx        # Root component
+│   │   ├── Router.tsx     # Route definitions
+│   │   └── providers/     # Context providers
+│   ├── features/          # Feature modules (feature-based architecture)
+│   │   ├── admin/         # Admin dashboard feature
+│   │   ├── auth/          # Authentication feature
+│   │   │   ├── components/  # Auth-specific components
+│   │   │   ├── pages/       # Auth pages (login, register, etc.)
+│   │   │   └── hooks/       # Auth-specific hooks
+│   │   ├── home/          # Home/landing pages
+│   │   ├── operations/    # Operation management
+│   │   ├── payment/       # Payment processing UI
+│   │   ├── profile/       # User profile management
+│   │   ├── project/       # Project management
+│   │   └── services/      # Service browsing & management
+│   ├── shared/            # Shared resources across features
+│   │   ├── components/    # Reusable UI components (34 components)
+│   │   │   ├── ui/        # Base UI components (Radix UI wrappers)
+│   │   │   ├── forms/     # Form components
+│   │   │   ├── layout/    # Layout components
+│   │   │   └── ...        # Other shared components
+│   │   ├── constants/     # Application constants
+│   │   ├── hooks/         # Custom React hooks (5 hooks)
+│   │   │   ├── useAuth.ts
+│   │   │   ├── useSocket.ts
+│   │   │   └── ...
+│   │   ├── lib/           # Third-party library configurations
+│   │   │   ├── axios.ts   # Axios setup
+│   │   │   ├── stripe.ts  # Stripe config
+│   │   │   └── ...
+│   │   ├── services/      # API service layer (12 services)
+│   │   │   ├── auth.service.ts
+│   │   │   ├── user.service.ts
+│   │   │   ├── operation.service.ts
+│   │   │   ├── payment.service.ts
+│   │   │   └── ...
+│   │   ├── types/         # TypeScript type definitions
+│   │   │   ├── api.types.ts
+│   │   │   ├── user.types.ts
+│   │   │   └── ...
+│   │   └── utils/         # Utility functions
+│   ├── assets/            # Assets (fonts, etc.)
+│   ├── styles/            # Global styles
+│   │   └── globals.css    # Global CSS and Tailwind
+│   ├── main.tsx           # Application entry point
+│   └── vite-env.d.ts      # Vite type definitions
+├── .env                   # Environment variables
+├── .env.example           # Environment template
+├── components.json        # shadcn/ui config
+├── index.html             # HTML entry point
+├── package.json           # Dependencies and scripts
+├── tailwind.config.js     # Tailwind CSS configuration
+├── tsconfig.json          # TypeScript configuration
+└── vite.config.ts         # Vite configuration
 ```
 
 ## 🛠️ Development Scripts

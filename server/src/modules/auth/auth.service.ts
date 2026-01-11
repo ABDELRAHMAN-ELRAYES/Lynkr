@@ -1,241 +1,380 @@
+import { Request, NextFunction, Response } from "express";
 import {
-    LoginRequest,
-    RegisterRequest,
-    NoCacheRegisterUserRequest,
-    ForgotPasswordRequest,
-    VerifyResetPasswordRequest,
-    ResetPasswordRequest,
-    AuthResponse,
-    NoCachePendingUserRegistration,
+    IUserLoginData,
+    IRegisterVerificationData,
+    IRegisterData,
+    IResetPasswordData,
 } from "./types/IAuth";
-import { hash, compare } from "../../utils/hashing-handler";
-import { generateToken, generateVerificationCode } from "../../utils/jwt-handler";
 import UserService from "../user/user.service";
-import { NextFunction } from "express";
+import { hash, compare } from "../../utils/hashing-handler";
 import AppError from "../../utils/app-error";
-import EmailService from "../../utils/email.service";
+import {
+    signJWT,
+    signPasswordResetJWT,
+    verifyJWT,
+    verifyPasswordResetJWT,
+} from "../../utils/jwt";
+import Email from "../../utils/email/email";
+import { generateOTP } from "../../utils/otp-generator";
+import config from "../../config/config";
+import { IUser } from "../user/types/IUser";
+import { AdminPrivilege, UserRole } from "../../enum/UserRole";
 
-// In-memory store for verification codes (in production, use Redis)
-const verificationCodes = new Map<string, { code: string; data: any; expiresAt: number }>();
-
-class AuthService {
-    static async login(loginData: LoginRequest, next: NextFunction): Promise<AuthResponse | undefined> {
-        const { email, password } = loginData;
-
-        const user = await UserService.getUserByUsernameOrEmail(email, next);
-        if (!user) return;
-
-        const isPasswordValid = await compare(password, user.password);
-        if (!isPasswordValid) {
-            next(new AppError(401, "Invalid credentials"));
-            return;
-        }
-
-        if (!user.active) {
-            next(new AppError(403, "Account is inactive"));
-            return;
-        }
-
-        const token = generateToken({
-            userId: user.id,
-            email: user.email,
-            role: user.role,
-        });
-
-        return {
-            user: {
-                id: user.id,
-                email: user.email,
-                firstName: user.firstName,
-                lastName: user.lastName,
-                role: user.role as any,
-                active: user.active,
-                privileges: user.privileges as any,
-            },
-            token,
-        };
-    }
-
-    static async register(
-        request: NoCacheRegisterUserRequest,
+class AuthenticationService {
+    static async login(
+        userData: IUserLoginData,
+        response: Response,
         next: NextFunction
-    ): Promise<NoCachePendingUserRegistration | undefined> {
-        const { email } = request;
+    ) {
+        const { usernameOrEmail, password } = userData;
+        // Check if the provided usernmae or email is fourn
+        const user = await UserService.getUserByUsernameOrEmail(
+            usernameOrEmail,
+            next
+        );
+        if (!user?.active) {
+            return next(new AppError(401, "غير مصرح به، حسابك معطل."));
+        }
 
-        // Check if user already exists
-        const existingUser = await UserService.isUserEmailExisted(email, next);
-        if (existingUser?.status === "fail") return;
+        if (!user || !user.password) return;
 
-        // Generate verification code
-        const verificationCode = generateVerificationCode();
-        const expiresAt = Date.now() + 10 * 60 * 1000; // 10 minutes
-
-        // Store verification data
-        verificationCodes.set(email, {
-            code: verificationCode,
-            data: request,
-            expiresAt,
-        });
-
-        // Send verification email
-        try {
-            await EmailService.sendVerificationEmail(email, verificationCode);
-        } catch (error) {
-            next(new AppError(500, "Failed to send verification email"));
+        // Check if the provided password is correct
+        const verifyPassword = await compare(password, user.password);
+        if (!verifyPassword) {
+            next(
+                new AppError(
+                    401,
+                    `المستخدم المقدم: ${usernameOrEmail} أو كلمة المرور غير صحيحة، حاول مرة أخرى!`
+                )
+            );
             return;
         }
+        // Create jwt token and Add cookie
+        const token = signJWT(user.id, response);
+
+        const data = { user, token };
+
+        return data;
+    }
+    // Verify User before signing up his information
+    static async register(
+        registerData: IRegisterVerificationData,
+        next: NextFunction
+    ) {
+        // extract email
+        const { email } = registerData;
+
+        // Check if the provided email is existed
+        const userExists = await UserService.isUserEmailExisted(email, next);
+        if (userExists && userExists.status === "fail") return;
+
+        // Cash user data and OTP
+        const otp = generateOTP();
+        const hashedOTP = await hash(otp);
+        const otpExpiresIn = new Date(
+            Date.now() + config.otp.expiresIn * 60 * 1000
+        ).toISOString();
+
+        // send verification email
+        const emailSender: string = config.mail.defaultFrom as string;
+        const emailObj: Email = new Email(emailSender, email);
+        const templateData = {
+            otp,
+            email,
+            otpExpiresIn,
+        };
+        emailObj
+            .send("signup-verification", "عملية التحقق من التسجيل", templateData)
+            .catch((error) =>
+                next(
+                    new AppError(
+                        500,
+                        "حدث خطأ ما أثناء محاولة إرسال بريد التحقق من التسجيل"
+                    )
+                )
+            );
 
         return {
             email,
-            verificationCode, // In production, don't return this
+            otp: { code: hashedOTP, expiresIn: otpExpiresIn },
         };
     }
-
-    static async verifyRegistration(
-        signupData: RegisterRequest,
+    static async registerVerification(
+        verificationProcessData: IRegisterData,
+        response: Response,
         next: NextFunction
-    ): Promise<AuthResponse | undefined> {
-        const { email, verificationCode } = signupData;
+    ) {
+        const {
+            otp: { hashedOtp, expiresIn, enteredOtp },
+            user: { firstName, lastName, email, password, phone, role },
+        } = verificationProcessData;
+        // check if the register time expired
+        const isExpired = Date.now() > Date.parse(expiresIn);
+        if (isExpired) {
+            return next(
+                new AppError(401, "انتهت الفترة المسموحة للتسجيل, سجل مرة اخري")
+            );
+        }
 
-        const storedData = verificationCodes.get(email);
-        if (!storedData) {
-            next(new AppError(400, "Verification code not found or expired"));
+        // Verfiy the hashed OTP with the entered one
+
+        const isVerified = await compare(enteredOtp, hashedOtp);
+        if (!isVerified) {
+            return next(new AppError(402, "كود التحقق المدخل غير صحيح"));
+        }
+
+        const newUserData = {
+            email,
+            phone,
+            firstName,
+            lastName,
+            password,
+            role,
+        };
+        const newUser = await UserService.saveUser(newUserData, next);
+        // Create jwt token and Add cookie
+        const token = signJWT(newUser?.id as string, response);
+
+        const data = { user: newUser, token, isVerified: true };
+        // send Welcome EmailgenerateRedisKey
+        const emailSender: string = config.mail.defaultFrom as string;
+        const emailObj: Email = new Email(emailSender, newUserData.email);
+        const templateData = {
+            name: newUser?.firstName,
+            email: newUser?.email,
+        };
+        emailObj
+            .send("welcome", "مرحباً بك في Operest", templateData)
+            .catch((error) =>
+                next(new AppError(500, "حدث خطأ ما أثناء محاولة إرسال بريد التحقق"))
+            );
+        // Delete cashed data
+        return data;
+    }
+    static async protect(request: Request, next: NextFunction) {
+        // Extract the jwt from browser cookies
+        const jwt = request.cookies.jwt;
+        // Check if there is a jwt
+        if (!jwt) {
+            next(new AppError(401, `غير مصرح لك، سجل الدخول وحاول مرة أخرى!`));
             return;
         }
 
-        if (storedData.code !== verificationCode) {
-            next(new AppError(400, "Invalid verification code"));
+        // Extract user id from jwt
+        let data;
+        try {
+            data = verifyJWT(jwt);
+        } catch (err) {
+            next(
+                new AppError(
+                    401,
+                    "رمز غير صالح أو منتهي الصلاحية. يرجى تسجيل الدخول مرة أخرى."
+                )
+            );
             return;
         }
-
-        if (Date.now() > storedData.expiresAt) {
-            verificationCodes.delete(email);
-            next(new AppError(400, "Verification code expired"));
-            return;
-        }
-
-        // Create user
-        const user = await UserService.saveUser(storedData.data, next);
+        const { id } = data;
+        // Add user data to the response
+        const user = await UserService.getUser(id, next);
         if (!user) return;
 
-        // Clean up verification code
-        verificationCodes.delete(email);
-
-        // Send welcome email
-        try {
-            await EmailService.sendWelcomeEmail(user.email, user.firstName);
-        } catch (error) {
-            // Log error but don't fail registration
-            console.error("Failed to send welcome email:", error);
+        // TODO: check if the user changed the password after the token is set (Log him out)
+        request.user = user as IUser;
+        next();
+    }
+    // Restrict routes to specific roles
+    static async checkPermissions(
+        user: IUser,
+        allowedRoles: UserRole[],
+        requiredPrivileges: AdminPrivilege[] = [],
+        next: NextFunction
+    ) {
+        if (!user) {
+            next(new AppError(401, "غير مصرح"));
+            return;
         }
 
-        const token = generateToken({
-            userId: user.id,
-            email: user.email,
-            role: user.role,
-        });
+        if (user.role === UserRole.SUPER_ADMIN || user.role === "SUPER_ADMIN") {
+            next();
+            return;
+        }
 
-        return {
-            user: {
-                id: user.id,
-                email: user.email,
-                firstName: user.firstName,
-                lastName: user.lastName,
-                role: user.role as any,
-                active: user.active,
-            },
-            token,
-        };
+        // Check if user role is in allowed roles (compare as strings)
+        const userRoleStr = user.role as string;
+        const allowedRoleStrs = allowedRoles.map(r => r as string);
+        if (!allowedRoleStrs.includes(userRoleStr)) {
+            next(new AppError(403, "تم الرفض، ليس لديك صلاحية للقيام بهذا الإجراء"));
+            return;
+        }
+
+        // --- Privilege Check (Only for ADMIN role) ---
+        if ((user.role === UserRole.ADMIN || user.role === "ADMIN") && requiredPrivileges.length > 0) {
+            const userPrivilegeNames = user.privileges?.map(p => p.name) || [];
+            const requiredPrivilegeNames = requiredPrivileges.map(p => p as string);
+
+            const hasAllPrivileges = requiredPrivilegeNames.every((privilege) =>
+                userPrivilegeNames.includes(privilege)
+            );
+
+            if (!hasAllPrivileges) {
+                next(
+                    new AppError(403, "تم الرفض، ليس لديك صلاحية للقيام بهذا الإجراء")
+                );
+                return;
+            }
+        }
+
+        next();
     }
+    // Send Forget password email
+    static async forgetPassword(email: string, next: NextFunction) {
+        if (!email) {
+            next(new AppError(400, "البريد الإلكتروني مطلوب"));
+            return;
+        }
 
-    static async forgotPassword(data: ForgotPasswordRequest, next: NextFunction): Promise<void> {
-        const { email } = data;
-
+        // Check if the user exists
         const user = await UserService.getUserByUsernameOrEmail(email, next);
-        if (!user) return;
+        if (!user) {
+            next(new AppError(401, "البريد الإلكتروني غير موجود!"));
+            return;
+        }
 
-        const verificationCode = generateVerificationCode();
-        const expiresAt = Date.now() + 10 * 60 * 1000;
+        const resetToken = signPasswordResetJWT(user.email);
 
-        verificationCodes.set(`reset_${email}`, {
-            code: verificationCode,
-            data: { email },
-            expiresAt,
-        });
+        const resetLink = `https://lynkr.com/reset-password?token=${encodeURIComponent(
+            resetToken
+        )}`;
+
+        const defaultFrom = config.mail.defaultFrom as string;
+        const emailObj = new Email(defaultFrom, user.email);
+
+        const templateData = {
+            name: user.firstName,
+            resetLink,
+            expirationTime: config.jwt.resetPasswordExpiresIn,
+            email: user.email,
+        };
 
         try {
-            await EmailService.sendPasswordResetEmail(email, verificationCode);
-        } catch (error) {
-            next(new AppError(500, "Failed to send password reset email"));
+            await emailObj.send(
+                "forget-password",
+                "إعادة تعيين كلمة المرور",
+                templateData
+            );
+        } catch (err: any) {
+            // Log more details about the error
+            if (err.code) {
+            }
+            if (err.response) {
+            }
+            return next(
+                new AppError(
+                    500,
+                    err.message ||
+                    "حدث خطأ ما أثناء محاولة إرسال بريد إعادة تعيين كلمة المرور. يرجى التحقق من إعدادات البريد الإلكتروني."
+                )
+            );
         }
+        let expiresIn = config.jwt.resetPasswordExpiresIn;
+        return { email: user.email, expiresIn };
     }
 
-    static async verifyResetPassword(
-        data: VerifyResetPasswordRequest,
+    // Reset user password
+    static async resetPassword(
+        resetPasswordData: IResetPasswordData,
         next: NextFunction
-    ): Promise<void> {
-        const { email, verificationCode } = data;
+    ) {
+        const { token, password } = resetPasswordData;
 
-        const storedData = verificationCodes.get(`reset_${email}`);
-        if (!storedData) {
-            next(new AppError(400, "Verification code not found or expired"));
+        if (!token) {
+            next(new AppError(400, "رمز إعادة التعيين مطلوب"));
             return;
         }
 
-        if (storedData.code !== verificationCode) {
-            next(new AppError(400, "Invalid verification code"));
+        let decoded: any;
+
+        try {
+            decoded = verifyPasswordResetJWT(token);
+        } catch (err) {
+            return next(
+                new AppError(401, "رمز إعادة التعيين غير صالح أو منتهي الصلاحية")
+            );
+        }
+
+        const email = decoded.email;
+
+        const expiresIn = decoded.expiresIn;
+
+        const isExpired = Date.now() > Date.parse(expiresIn);
+        if (isExpired) {
+            next(
+                new AppError(
+                    401,
+                    "كلمة المرور الجديدة مطلوبة، يرجى التحقق والمحاولة مرة أخرى!"
+                )
+            );
             return;
         }
 
-        if (Date.now() > storedData.expiresAt) {
-            verificationCodes.delete(`reset_${email}`);
-            next(new AppError(400, "Verification code expired"));
-            return;
-        }
-    }
-
-    static async resetPassword(data: ResetPasswordRequest, next: NextFunction): Promise<void> {
-        const { email, password, verificationCode } = data;
-
-        const storedData = verificationCodes.get(`reset_${email}`);
-        if (!storedData) {
-            next(new AppError(400, "Verification code not found or expired"));
+        if (!password) {
+            next(
+                new AppError(
+                    400,
+                    "كلمة المرور الجديدة مطلوبة، يرجى التحقق والمحاولة مرة أخرى!"
+                )
+            );
             return;
         }
 
-        if (storedData.code !== verificationCode) {
-            next(new AppError(400, "Invalid verification code"));
-            return;
-        }
-
-        if (Date.now() > storedData.expiresAt) {
-            verificationCodes.delete(`reset_${email}`);
-            next(new AppError(400, "Verification code expired"));
-            return;
-        }
-
+        // Update user with the new password
         const hashedPassword = await hash(password);
-        await UserService.updateUserPasswordByEmail(email, hashedPassword);
+        const user = await UserService.updateUserPasswordByEmail(
+            email,
+            hashedPassword
+        );
+        if (!user) {
+            next(new AppError(500, "عذراً، حدث خطأ أثناء إعادة تعيين كلمة المرور!"));
+            return;
+        }
 
-        verificationCodes.delete(`reset_${email}`);
+        // Send Reset Email performed successfully mail
+        const defaultFrom = config.mail.defaultFrom as string;
+        const emailObj = new Email(defaultFrom, email);
+        const templateData = {
+            name: user.firstName,
+            email: user.email,
+        };
+        emailObj.send(
+            "reset-password",
+            "تم إعادة تعيين كلمة المرور بنجاح",
+            templateData
+        );
+        return user;
     }
 
-    static async getCurrentUserData(userId: string, next: NextFunction): Promise<AuthResponse | undefined> {
-        const user = await UserService.getUser(userId, next);
-        if (!user) return;
+    static async logout(response: Response) {
+        response.cookie("jwt", "logged-out", {
+            expires: new Date(Date.now() + 10),
+        });
+    }
 
-        return {
-            user: {
-                id: user.id,
-                email: user.email,
-                firstName: user.firstName,
-                lastName: user.lastName,
-                role: user.role as any,
-                active: user.active,
-                privileges: user.privileges as any,
-            },
-        };
+    // * Get current user session data
+    static async getCurrentUserData(request: Request, next: NextFunction) {
+        const user = request.user;
+        if (!user) {
+            return next(new AppError(401, "غير مصرح"));
+        }
+        const currentUser = await UserService.getUserByUsernameOrEmail(
+            user.email,
+            next
+        );
+        // const convertedUser = convertToUserResponse(request.user as IUser);
+        if (!currentUser) {
+            return next(new AppError(401, "غير مصرح لك"));
+        }
+        return currentUser;
     }
 }
 
-export default AuthService;
+export default AuthenticationService;
