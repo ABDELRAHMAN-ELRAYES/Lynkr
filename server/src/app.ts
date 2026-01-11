@@ -24,6 +24,7 @@ import NotificationRouter from "./modules/notification/notification.route";
 import ProposalRouter from "./modules/proposal/proposal.route";
 import EscrowRouter from "./modules/escrow/escrow.route";
 import ProfileRouter from "./modules/provider/profile/profile.route";
+import RequestRouter from "./modules/request/request.route";
 import { bodyParser, cookieParserMiddleware, corsMiddleware, formParser } from "./middlewares/middlewares";
 
 // Seed default admin user
@@ -93,6 +94,7 @@ app.use("/api/v1/meetings", MeetingRouter);
 app.use("/api/v1/notifications", NotificationRouter);
 app.use("/api/v1/proposals", ProposalRouter);
 app.use("/api/v1/escrow", EscrowRouter);
+app.use("/api/v1/requests", RequestRouter);
 
 // 404 handler - MUST be after all routes
 app.use(notFoundHandler);

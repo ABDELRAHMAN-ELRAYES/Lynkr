@@ -1,21 +1,31 @@
-export type IProposal = {
+export type ProposalStatus = "PENDING" | "ACCEPTED" | "REJECTED";
+
+export interface IProposal {
     id: string;
-    orderId: string;
-    providerId: string;
-    description: string;
+    requestId: string;
+    providerProfileId: string;
     price: number;
-    timeline: number;
-    status: string;
+    priceType: string; // HOURLY, FIXED
+    estimatedDays: number;
+    notes?: string;
+    status: ProposalStatus;
     createdAt: Date;
     updatedAt: Date;
-};
+}
 
-export type CreateProposalRequest = {
-    orderId: string;
-    providerId: string;
-    description: string;
+export interface ICreateProposalData {
+    requestId: string;
+    providerProfileId: string;
     price: number;
-    timeline: number;
-};
+    priceType: string;
+    estimatedDays: number;
+    notes?: string;
+    files?: Express.Multer.File[];
+}
 
-export type ProposalResponse = IProposal;
+export interface IUpdateProposalData {
+    price?: number;
+    estimatedDays?: number;
+    notes?: string;
+    files?: Express.Multer.File[];
+}

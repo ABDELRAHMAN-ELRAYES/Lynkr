@@ -10,10 +10,7 @@ datasource db {
     url      = env("DATABASE_URL")
 }
 
-// ============================================
 // Module 1: Identity & Access Management (IAM)
-// ============================================
-
 model User {
     id        String   @id @default(uuid())
     firstName String   @map("first_name")
@@ -30,6 +27,7 @@ model User {
     // Relations
     privileges      AdminPrivilege[]
     providerProfile ProviderProfile?
+    clientRequests  Request[]        @relation("ClientRequests")
 
     @@map("users")
 }
@@ -60,12 +58,14 @@ model ProviderProfile {
     updatedAt  DateTime @updatedAt @map("updated_at")
 
     // Relations
-    user        User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
-    services    ProviderService[]
-    skills      ProviderSkill[]
-    experiences ProviderExperience[]
-    education   ProviderEducation[]
-    languages   ProviderLanguage[]
+    user           User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
+    services       ProviderService[]
+    skills         ProviderSkill[]
+    experiences    ProviderExperience[]
+    education      ProviderEducation[]
+    languages      ProviderLanguage[]
+    targetRequests Request[]            @relation("TargetProviderRequests")
+    proposals      Proposal[]
 
     @@map("provider_profiles")
 }
@@ -109,7 +109,7 @@ model ProviderExperience {
 model ProviderEducation {
     id                String    @id @default(uuid())
     providerProfileId String    @map("provider_profile_id")
-    school            String // institution/university
+    school            String
     degree            String
     fieldOfStudy      String    @map("field_of_study")
     description       String?   @db.Text
@@ -130,4 +130,97 @@ model ProviderLanguage {
     providerProfile ProviderProfile @relation(fields: [providerProfileId], references: [id], onDelete: Cascade)
 
     @@map("provider_languages")
+}
+
+// ============================================
+// Module 4: Requests & Proposals
+// ============================================
+
+model Request {
+    id               String    @id @default(uuid())
+    clientId         String    @map("client_id")
+    targetProviderId String?   @map("target_provider_id")
+    title            String
+    description      String    @db.Text
+    category         String
+    budgetType       String    @map("budget_type")
+    budgetCurrency   String    @default("USD") @map("budget_currency")
+    fromBudget       Decimal?  @map("from_budget")
+    toBudget         Decimal?  @map("to_budget")
+    deadline         DateTime?
+    responseDeadline DateTime  @map("response_deadline")
+    status           String    @default("PENDING")
+    isPublic         Boolean   @default(false) @map("is_public")
+    ndaRequired      Boolean   @default(false) @map("nda_required")
+    createdAt        DateTime  @default(now()) @map("created_at")
+    updatedAt        DateTime  @updatedAt @map("updated_at")
+
+    // Relations
+    targetProvider ProviderProfile? @relation("TargetProviderRequests", fields: [targetProviderId], references: [id])
+    proposals      Proposal[]
+    attachments    RequestFile[]
+    client         User             @relation("ClientRequests", fields: [clientId], references: [id], onDelete: Cascade)
+
+    @@map("requests")
+}
+
+model Proposal {
+    id                String   @id @default(uuid())
+    requestId         String   @map("request_id")
+    providerProfileId String   @map("provider_profile_id")
+    price             Decimal
+    priceType         String   @map("price_type")
+    estimatedDays     Int      @map("estimated_days")
+    notes             String?  @db.Text
+    status            String   @default("PENDING")
+    createdAt         DateTime @default(now()) @map("created_at")
+    updatedAt         DateTime @updatedAt @map("updated_at")
+
+    request         Request         @relation(fields: [requestId], references: [id], onDelete: Cascade)
+    providerProfile ProviderProfile @relation(fields: [providerProfileId], references: [id])
+    attachments     ProposalFile[]
+
+    @@unique([requestId, providerProfileId])
+    @@map("proposals")
+}
+
+model File {
+    id        String   @id @default(uuid())
+    filename  String
+    path      String
+    mimetype  String
+    size      Int
+    createdAt DateTime @default(now()) @map("created_at")
+
+    // Relations
+    requestFiles  RequestFile[]
+    proposalFiles ProposalFile[]
+
+    @@map("files")
+}
+
+model RequestFile {
+    id        String   @id @default(uuid())
+    requestId String   @map("request_id")
+    fileId    String   @map("file_id")
+    createdAt DateTime @default(now()) @map("created_at")
+
+    // Relations
+    request Request @relation(fields: [requestId], references: [id], onDelete: Cascade)
+    file    File    @relation(fields: [fileId], references: [id], onDelete: Cascade)
+
+    @@map("request_files")
+}
+
+model ProposalFile {
+    id         String   @id @default(uuid())
+    proposalId String   @map("proposal_id")
+    fileId     String   @map("file_id")
+    createdAt  DateTime @default(now()) @map("created_at")
+
+    // Relations
+    proposal Proposal @relation(fields: [proposalId], references: [id], onDelete: Cascade)
+    file     File     @relation(fields: [fileId], references: [id], onDelete: Cascade)
+
+    @@map("proposal_files")
 }

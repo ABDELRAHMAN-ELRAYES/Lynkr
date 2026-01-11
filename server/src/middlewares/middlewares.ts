@@ -14,7 +14,7 @@ export const formParser = express.urlencoded({ extended: true });
 
 // Middleware to verify cross origin requests
 export const corsMiddleware = cors({
-  origin: config.webURL,
+  origin: config.webUrl,
   credentials: true,
   methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization"],

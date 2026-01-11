@@ -1,53 +1,87 @@
-import { Request, Response, NextFunction } from "express";
-import { catchAsync } from "../../utils/catch-async";
+import { NextFunction, Request, Response } from "express";
 import ProposalService from "./proposal.service";
+import { ICreateProposalData } from "./types/IProposal";
 
-export const createProposal = catchAsync(
-    async (request: Request, response: Response, next: NextFunction) => {
-        const proposal = await ProposalService.createProposal(request.body, next);
-        response.status(201).json({ status: "success", data: { proposal } });
-    }
-);
+export const createProposal = async (req: Request, res: Response, next: NextFunction) => {
+    const proposalData: ICreateProposalData = {
+        requestId: req.body.requestId,
+        providerProfileId: "", // Will be filled by service from user ID
+        price: Number(req.body.price),
+        priceType: req.body.priceType,
+        estimatedDays: Number(req.body.estimatedDays),
+        notes: req.body.notes,
+        files: req.files as Express.Multer.File[],
+    };
 
-export const getProposalsByOrder = catchAsync(
-    async (request: Request, response: Response, next: NextFunction) => {
-        const proposals = await ProposalService.getProposalsByOrderId(request.params.orderId);
-        response.status(200).json({ status: "success", data: { proposals } });
-    }
-);
+    const newProposal = await ProposalService.createProposal((req.user as any).id, proposalData, next);
 
-export const getProposal = catchAsync(
-    async (request: Request, response: Response, next: NextFunction) => {
-        const proposal = await ProposalService.getProposalById(request.params.id, next);
-        if (!proposal) return;
-        response.status(200).json({ status: "success", data: { proposal } });
+    if (newProposal) {
+        return res.status(201).json({
+            status: "success",
+            data: newProposal,
+        });
     }
-);
+};
 
-export const acceptProposal = catchAsync(
-    async (request: Request, response: Response, next: NextFunction) => {
-        const proposal = await ProposalService.acceptProposal(request.params.id, next);
-        response.status(200).json({ status: "success", data: { proposal } });
+export const getProposalsByRequest = async (req: Request, res: Response, next: NextFunction) => {
+    const proposals = await ProposalService.getProposalsByRequestId(req.params.requestId, (req.user as any).id, next);
+    if (proposals) {
+        res.status(200).json({
+            status: "success",
+            data: proposals,
+        });
     }
-);
+};
 
-export const rejectProposal = catchAsync(
-    async (request: Request, response: Response, next: NextFunction) => {
-        const proposal = await ProposalService.rejectProposal(request.params.id, next);
-        response.status(200).json({ status: "success", data: { proposal } });
+export const getProposal = async (req: Request, res: Response, next: NextFunction) => {
+    const proposal = await ProposalService.getProposalById(req.params.id, (req.user as any).id, next);
+    if (proposal) {
+        res.status(200).json({
+            status: "success",
+            data: proposal,
+        });
     }
-);
+};
 
-export const updateProposal = catchAsync(
-    async (request: Request, response: Response, next: NextFunction) => {
-        const proposal = await ProposalService.updateProposal(request.params.id, request.body, next);
-        response.status(200).json({ status: "success", data: { proposal } });
+export const acceptProposal = async (req: Request, res: Response, next: NextFunction) => {
+    const proposal = await ProposalService.acceptProposal(req.params.id, (req.user as any).id, next);
+    if (proposal) {
+        res.status(200).json({
+            status: "success",
+            message: "Proposal accepted",
+            data: proposal,
+        });
     }
-);
+};
 
-export const deleteProposal = catchAsync(
-    async (request: Request, response: Response, next: NextFunction) => {
-        await ProposalService.deleteProposal(request.params.id, next);
-        response.status(204).json({ status: "success", data: null });
+export const rejectProposal = async (req: Request, res: Response, next: NextFunction) => {
+    const proposal = await ProposalService.rejectProposal(req.params.id, (req.user as any).id, next);
+    if (proposal) {
+        res.status(200).json({
+            status: "success",
+            message: "Proposal rejected",
+            data: proposal,
+        });
     }
-);
+};
+
+export const updateProposal = async (req: Request, res: Response, next: NextFunction) => {
+    const updateData = { ...req.body, files: req.files };
+    const proposal = await ProposalService.updateProposal(req.params.id, updateData, (req.user as any).id, next);
+    if (proposal) {
+        res.status(200).json({
+            status: "success",
+            data: proposal,
+        });
+    }
+};
+
+export const deleteProposal = async (req: Request, res: Response, next: NextFunction) => {
+    const result = await ProposalService.deleteProposal(req.params.id, (req.user as any).id, next);
+    if (result) {
+        res.status(204).json({
+            status: "success",
+            data: null,
+        });
+    }
+};
