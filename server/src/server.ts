@@ -11,6 +11,7 @@ const httpServer = http.createServer(app);
 
 // Initialize Socket.io
 const socketService = SocketService.getInstance();
+
 socketService.initialize(httpServer);
 
 const PORT = config.port || 8080;

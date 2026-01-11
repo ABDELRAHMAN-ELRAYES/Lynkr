@@ -10,7 +10,6 @@ import { globalErrorHandler, notFoundHandler } from "./middlewares/error-handler
 // Import all route modules
 import AuthRouter from "./modules/auth/auth.route";
 import UserRouter from "./modules/user/user.route";
-import ProfileRouter from "./modules/profile/profile.route";
 import OperationRouter from "./modules/operation/operation.route";
 import PaymentRouter from "./modules/payment/payment.route";
 import ServiceRouter from "./modules/service/service.route";
@@ -24,6 +23,7 @@ import MeetingRouter from "./modules/meeting/meeting.route";
 import NotificationRouter from "./modules/notification/notification.route";
 import ProposalRouter from "./modules/proposal/proposal.route";
 import EscrowRouter from "./modules/escrow/escrow.route";
+import ProfileRouter from "./modules/provider/profile/profile.route";
 import { bodyParser, cookieParserMiddleware, corsMiddleware, formParser } from "./middlewares/middlewares";
 
 // Seed default admin user

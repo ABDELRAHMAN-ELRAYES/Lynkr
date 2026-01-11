@@ -21,14 +21,15 @@ model User {
     username  String?  @unique
     email     String   @unique
     phone     String?  @unique
-    password  String 
-    role      String   @default("CLIENT") 
+    password  String
+    role      String   @default("CLIENT")
     active    Boolean  @default(true)
     createdAt DateTime @default(now()) @map("created_at")
     updatedAt DateTime @updatedAt @map("updated_at")
 
     // Relations
-    privileges AdminPrivilege[]
+    privileges      AdminPrivilege[]
+    providerProfile ProviderProfile?
 
     @@map("users")
 }
@@ -44,4 +45,89 @@ model AdminPrivilege {
 
     @@unique([userId, name])
     @@map("admin_privileges")
+}
+
+// Module 2: Provider Profile Models
+
+model ProviderProfile {
+    id         String   @id @default(uuid())
+    userId     String   @unique @map("user_id")
+    title      String? // Professional title
+    bio        String?  @db.Text
+    hourlyRate Decimal? @map("hourly_rate")
+    isApproved Boolean  @default(false) @map("is_approved")
+    createdAt  DateTime @default(now()) @map("created_at")
+    updatedAt  DateTime @updatedAt @map("updated_at")
+
+    // Relations
+    user        User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
+    services    ProviderService[]
+    skills      ProviderSkill[]
+    experiences ProviderExperience[]
+    education   ProviderEducation[]
+    languages   ProviderLanguage[]
+
+    @@map("provider_profiles")
+}
+
+model ProviderService {
+    id                String @id @default(uuid())
+    providerProfileId String @map("provider_profile_id")
+    serviceType       String @map("service_type")
+
+    providerProfile ProviderProfile @relation(fields: [providerProfileId], references: [id], onDelete: Cascade)
+
+    @@map("provider_services")
+}
+
+model ProviderSkill {
+    id                String @id @default(uuid())
+    providerProfileId String @map("provider_profile_id")
+    skillName         String @map("skill_name")
+
+    providerProfile ProviderProfile @relation(fields: [providerProfileId], references: [id], onDelete: Cascade)
+
+    @@map("provider_skills")
+}
+
+model ProviderExperience {
+    id                String    @id @default(uuid())
+    providerProfileId String    @map("provider_profile_id")
+    title             String
+    company           String
+    location          String
+    country           String
+    description       String?   @db.Text
+    startDate         DateTime  @map("start_date") @db.Date
+    endDate           DateTime? @map("end_date") @db.Date
+
+    providerProfile ProviderProfile @relation(fields: [providerProfileId], references: [id], onDelete: Cascade)
+
+    @@map("provider_experiences")
+}
+
+model ProviderEducation {
+    id                String    @id @default(uuid())
+    providerProfileId String    @map("provider_profile_id")
+    school            String // institution/university
+    degree            String
+    fieldOfStudy      String    @map("field_of_study")
+    description       String?   @db.Text
+    startDate         DateTime  @map("start_date") @db.Date
+    endDate           DateTime? @map("end_date") @db.Date
+
+    providerProfile ProviderProfile @relation(fields: [providerProfileId], references: [id], onDelete: Cascade)
+
+    @@map("provider_education")
+}
+
+model ProviderLanguage {
+    id                String @id @default(uuid())
+    providerProfileId String @map("provider_profile_id")
+    language          String
+    proficiency       String
+
+    providerProfile ProviderProfile @relation(fields: [providerProfileId], references: [id], onDelete: Cascade)
+
+    @@map("provider_languages")
 }
