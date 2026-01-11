@@ -11,21 +11,22 @@ import { globalErrorHandler, notFoundHandler } from "./middlewares/error-handler
 import AuthRouter from "./modules/auth/auth.route";
 import UserRouter from "./modules/user/user.route";
 import OperationRouter from "./modules/operation/operation.route";
-import PaymentRouter from "./modules/payment/payment.route";
+import PaymentRouter from "./modules/process/money-system/payment/payment.route";
 import ServiceRouter from "./modules/service/service.route";
 import SubscriptionRouter from "./modules/subscription/subscription.route";
 import ReviewRouter from "./modules/review/review.route";
 import SettingsRouter from "./modules/settings/settings.route";
 import AdminRouter from "./modules/admin/admin.route";
 import FileRouter from "./modules/file/file.route";
-import ChatRouter from "./modules/chat/chat.route";
+import ChatRouter from "./modules/process/project-workspace/chat/chat.route";
 import MeetingRouter from "./modules/meeting/meeting.route";
 import NotificationRouter from "./modules/notification/notification.route";
 import ProposalRouter from "./modules/proposal/proposal.route";
-import EscrowRouter from "./modules/escrow/escrow.route";
+import EscrowRouter from "./modules/process/money-system/escrow/escrow.route";
 import ProfileRouter from "./modules/provider/profile/profile.route";
-import RequestRouter from "./modules/request/request.route";
+import RequestRouter from "./modules/process/request/request.route";
 import ProviderApplicationRouter from "./modules/provider/provider-application/provider-application.route";
+import ProjectRouter from "./modules/process/project-workspace/project/project.route";
 import { bodyParser, cookieParserMiddleware, corsMiddleware, formParser } from "./middlewares/middlewares";
 
 // Seed default admin user
@@ -97,6 +98,7 @@ app.use("/api/v1/proposals", ProposalRouter);
 app.use("/api/v1/escrow", EscrowRouter);
 app.use("/api/v1/requests", RequestRouter);
 app.use("/api/v1/provider-applications", ProviderApplicationRouter);
+app.use("/api/v1/projects", ProjectRouter);
 
 // 404 handler - MUST be after all routes
 app.use(notFoundHandler);

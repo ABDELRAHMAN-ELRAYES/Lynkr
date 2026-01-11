@@ -1,5 +1,5 @@
 import ProposalRepository from "./proposal.repository";
-import RequestRepository from "../request/request.repository";
+import RequestRepository from "../process/request/request.repository";
 import ProfileRepository from "../provider/profile/profile.repository";
 import { NextFunction } from "express";
 import AppError from "../../utils/app-error";

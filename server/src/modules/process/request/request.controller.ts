@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import RequestService from "./request.service";
 import { ICreateRequestData } from "./types/IRequest";
-import ProfileService from "../provider/profile/profile.service";
+import ProfileService from "../../provider/profile/profile.service";
 import AppError from "@/utils/app-error";
 
 export const createRequest = async (req: Request, res: Response, next: NextFunction) => {

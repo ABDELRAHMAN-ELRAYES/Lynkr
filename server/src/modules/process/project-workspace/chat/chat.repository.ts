@@ -1,6 +1,6 @@
-import PrismaClientSingleton from "../../data-server-clients/prisma-client";
+import PrismaClientSingleton from "../../../../data-server-clients/prisma-client";
 import { PrismaClient } from "@prisma/client";
-import AppError from "../../utils/app-error";
+import AppError from "../../../../utils/app-error";
 
 class ChatRepository {
     private prisma: PrismaClient;

@@ -1,4 +1,4 @@
-import { IProposal } from "../../proposal/types/IProposal";
+import { IProposal } from "../../../proposal/types/IProposal";
 import { User } from "@prisma/client";
 
 export type RequestStatus =

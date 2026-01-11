@@ -6,9 +6,9 @@ import {
     updateRequest,
     cancelRequest,
 } from "./request.controller";
-import upload from "../../middlewares/file-upload";
-import { compressImages } from "../../middlewares/compress-image";
-import { protect } from "../auth/auth.controller";
+import upload from "../../../middlewares/file-upload";
+import { compressImages } from "../../../middlewares/compress-image";
+import { protect } from "../../auth/auth.controller";
 
 const RequestRouter = Router();
 

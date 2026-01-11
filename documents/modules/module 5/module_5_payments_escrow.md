@@ -194,3 +194,178 @@ This module is considered complete when:
 - All transactions are logged and visible
 
 At this point, the platform supports **secure monetary exchange** between clients and providers.
+
+---
+
+## 11. Escrow System Flow - Technical Implementation
+
+### 11.1 System Overview
+
+The Escrow system acts as a **trusted intermediary** that holds client funds until project completion is confirmed. This protects both parties:
+
+- **Client Protection**: Funds are only released when work is satisfactory
+- **Provider Protection**: Funds are guaranteed and cannot be withdrawn by client after work begins
+
+### 11.2 Escrow State Machine
+
+```
+┌─────────────────┐
+│  HOLDING        │ ◄── Initial state when escrow is created
+│  (Funds held)   │
+└────────┬────────┘
+         │
+         ├────────────────────────────────────┐
+         │                                    │
+         ▼                                    ▼
+┌─────────────────┐                 ┌─────────────────┐
+│  RELEASED       │                 │  REFUNDED       │
+│  (To Provider)  │                 │  (To Client)    │
+└─────────────────┘                 └─────────────────┘
+```
+
+**State Transitions:**
+
+| From | To | Trigger | Who |
+|------|-----|---------|-----|
+| HOLDING | RELEASED | Client confirms completion | Client |
+| HOLDING | REFUNDED | Project cancelled | Client |
+
+### 11.3 Complete Payment & Escrow Flow
+
+```
+Step 1: PROPOSAL ACCEPTANCE
+┌─────────────────────────────────────────────────────────────┐
+│  Client accepts Provider's proposal                         │
+│  ├── System creates PROJECT with status PENDING_PAYMENT     │
+│  └── System creates ESCROW with depositAmount = totalPrice  │
+└─────────────────────────────────────────────────────────────┘
+                            │
+                            ▼
+Step 2: PAYMENT INITIATION
+┌─────────────────────────────────────────────────────────────┐
+│  Client initiates payment via Stripe                        │
+│  ├── System creates PaymentIntent                          │
+│  ├── System creates PAYMENT record (status: PENDING)       │
+│  └── Client completes payment in frontend                  │
+└─────────────────────────────────────────────────────────────┘
+                            │
+                            ▼
+Step 3: PAYMENT CONFIRMATION (Webhook)
+┌─────────────────────────────────────────────────────────────┐
+│  Stripe webhook: payment_intent.succeeded                   │
+│  ├── Update PAYMENT status → COMPLETED                     │
+│  ├── Add funds to ESCROW balance                           │
+│  ├── Update PROJECT.paidAmount                             │
+│  └── If fully paid → PROJECT status → IN_PROGRESS          │
+└─────────────────────────────────────────────────────────────┘
+                            │
+                            ▼
+Step 4: PROJECT WORK
+┌─────────────────────────────────────────────────────────────┐
+│  Provider works on project                                  │
+│  └── Funds remain in ESCROW (status: HOLDING)              │
+└─────────────────────────────────────────────────────────────┘
+                            │
+                            ▼
+Step 5: PROJECT COMPLETION
+┌─────────────────────────────────────────────────────────────┐
+│  Provider marks project as COMPLETED                        │
+│  └── Client reviews and confirms completion                │
+└─────────────────────────────────────────────────────────────┘
+                            │
+                            ▼
+Step 6: ESCROW RELEASE
+┌─────────────────────────────────────────────────────────────┐
+│  Client confirms completion                                 │
+│  ├── ESCROW status → RELEASED                              │
+│  ├── ESCROW balance transferred to Provider.availableBalance│
+│  └── ESCROW balance set to 0                               │
+└─────────────────────────────────────────────────────────────┘
+                            │
+                            ▼
+Step 7: PROVIDER WITHDRAWAL
+┌─────────────────────────────────────────────────────────────┐
+│  Provider requests withdrawal from availableBalance         │
+│  └── Funds transferred via Stripe Connect (Phase 2)        │
+└─────────────────────────────────────────────────────────────┘
+```
+
+### 11.4 Database Schema
+
+```prisma
+model Project {
+    id                 String    @id @default(uuid())
+    clientId           String    @map("client_id")
+    providerProfileId  String    @map("provider_profile_id")
+    acceptedProposalId String    @unique @map("accepted_proposal_id")
+    status             String    @default("PENDING_PAYMENT")
+    totalPrice         Decimal   @map("total_price")
+    paidAmount         Decimal   @default(0) @map("paid_amount")
+    startedAt          DateTime? @map("started_at")
+    completedAt        DateTime? @map("completed_at")
+    
+    // Relations
+    escrow    Escrow?
+    payments  Payment[]
+}
+
+model Escrow {
+    id            String    @id @default(uuid())
+    projectId     String    @unique @map("project_id")
+    depositAmount Decimal   @map("deposit_amount")
+    balance       Decimal   @default(0)
+    status        String    @default("HOLDING") // HOLDING, RELEASED, REFUNDED
+    releasedAt    DateTime? @map("released_at")
+    
+    // Relations
+    project Project @relation(...)
+}
+
+model Payment {
+    id              String    @id @default(uuid())
+    projectId       String    @map("project_id")
+    payerId         String    @map("payer_id")
+    amount          Decimal
+    paymentType     String    @map("payment_type") // FULL, INITIAL, FINAL
+    status          String    @default("PENDING") // PENDING, COMPLETED, REFUNDED
+    stripePaymentId String?   @map("stripe_payment_id")
+    paidAt          DateTime? @map("paid_at")
+}
+
+model ProviderProfile {
+    // ... other fields
+    availableBalance Decimal @default(0) @map("available_balance")
+}
+```
+
+### 11.5 API Endpoints
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `POST` | `/api/v1/projects` | Create project from accepted proposal |
+| `POST` | `/api/v1/payments/intent` | Create Stripe payment intent |
+| `POST` | `/api/v1/payments/webhook` | Handle Stripe webhooks |
+| `PATCH` | `/api/v1/projects/:id/complete` | Provider marks complete |
+| `PATCH` | `/api/v1/projects/:id/confirm` | Client confirms → releases escrow |
+| `PATCH` | `/api/v1/projects/:id/cancel` | Client cancels → refunds escrow |
+| `GET` | `/api/v1/escrows/project/:id` | Get escrow status |
+| `GET` | `/api/v1/escrows/balance` | Get provider's available balance |
+| `POST` | `/api/v1/escrows/withdraw` | Request withdrawal |
+
+### 11.6 Security Considerations
+
+1. **Payment Validation**: All payments are validated against project total price
+2. **Authorization Checks**: Only project client can confirm/cancel, only provider can mark complete
+3. **Atomic Transactions**: Escrow release and balance update happen atomically
+4. **Webhook Verification**: Stripe webhook signatures are verified before processing
+5. **Double-Spend Prevention**: Escrow can only be released OR refunded, never both
+
+### 11.7 Error Handling
+
+| Error Case | Handling |
+|------------|----------|
+| Payment fails | Payment status set to CANCELLED, project remains PENDING_PAYMENT |
+| Double confirmation | Second attempt rejected with error |
+| Cancel after release | Rejected - cannot cancel completed project |
+| Withdrawal > balance | Rejected with "Insufficient balance" error |
+| Webhook signature invalid | Request rejected with 400 status |

@@ -35,6 +35,10 @@ model User {
     providerApplications ProviderApplication[]
     // User -> ApplicationReview (One -> Many)
     adminReviews         ApplicationReview[]   @relation("AdminReviews")
+    // User -> Project (One -> Many) - as client
+    clientProjects       Project[]             @relation("ClientProjects")
+    // User -> Payment (One -> Many) - as payer
+    clientPayments       Payment[]             @relation("ClientPayments")
 
     @@map("users")
 }
@@ -58,14 +62,15 @@ model AdminPrivilege {
 // ============================================
 
 model ProviderProfile {
-    id         String   @id @default(uuid())
-    userId     String   @unique @map("user_id")
-    title      String? // Professional title
-    bio        String?  @db.Text
-    hourlyRate Decimal? @map("hourly_rate")
-    isApproved Boolean  @default(false) @map("is_approved")
-    createdAt  DateTime @default(now()) @map("created_at")
-    updatedAt  DateTime @updatedAt @map("updated_at")
+    id               String   @id @default(uuid())
+    userId           String   @unique @map("user_id")
+    title            String? // Professional title
+    bio              String?  @db.Text
+    hourlyRate       Decimal? @map("hourly_rate")
+    availableBalance Decimal  @default(0) @map("available_balance")
+    isApproved       Boolean  @default(false) @map("is_approved")
+    createdAt        DateTime @default(now()) @map("created_at")
+    updatedAt        DateTime @updatedAt @map("updated_at")
 
     // Relations
     // ProviderProfile -> User (One -> One)
@@ -86,6 +91,8 @@ model ProviderProfile {
     proposals            Proposal[]
     // ProviderProfile -> ProviderApplication (One -> Many)
     providerApplications ProviderApplication[]
+    // ProviderProfile -> Project (One -> Many)
+    projects             Project[]
 
     @@map("provider_profiles")
 }
@@ -255,6 +262,8 @@ model Proposal {
     providerProfile ProviderProfile @relation(fields: [providerProfileId], references: [id])
     // Proposal -> ProposalFile (One -> Many)
     attachments     ProposalFile[]
+    // Proposal -> Project (One -> One)
+    project         Project?
 
     @@unique([requestId, providerProfileId])
     @@map("proposals")
@@ -311,4 +320,75 @@ model ProposalFile {
     file     File     @relation(fields: [fileId], references: [id], onDelete: Cascade)
 
     @@map("proposal_files")
+}
+
+// ============================================
+// Module 5: Payments & Escrow
+// ============================================
+
+model Project {
+    id                 String    @id @default(uuid())
+    clientId           String    @map("client_id")
+    providerProfileId  String    @map("provider_profile_id")
+    acceptedProposalId String    @unique @map("accepted_proposal_id")
+    status             String    @default("PENDING_PAYMENT") // PENDING_PAYMENT, IN_PROGRESS, COMPLETED, CANCELLED
+    totalPrice         Decimal   @map("total_price")
+    paidAmount         Decimal   @default(0) @map("paid_amount")
+    startedAt          DateTime? @map("started_at")
+    completedAt        DateTime? @map("completed_at")
+    createdAt          DateTime  @default(now()) @map("created_at")
+    updatedAt          DateTime  @updatedAt @map("updated_at")
+
+    // Relations
+    // Project -> User (Many -> One)
+    client           User            @relation("ClientProjects", fields: [clientId], references: [id])
+    // Project -> ProviderProfile (Many -> One)
+    providerProfile  ProviderProfile @relation(fields: [providerProfileId], references: [id])
+    // Project -> Proposal (One -> One)
+    acceptedProposal Proposal        @relation(fields: [acceptedProposalId], references: [id])
+    // Project -> Escrow (One -> One)
+    escrow           Escrow?
+    // Project -> Payment (One -> Many)
+    payments         Payment[]
+
+    @@map("projects")
+}
+
+model Payment {
+    id              String    @id @default(uuid())
+    projectId       String    @map("project_id")
+    payerId         String    @map("payer_id")
+    amount          Decimal
+    currency        String    @default("USD")
+    paymentType     String    @map("payment_type") // FULL, INITIAL, FINAL
+    status          String    @default("PENDING") // PENDING, COMPLETED, REFUNDED, CANCELLED
+    stripePaymentId String?   @map("stripe_payment_id")
+    paidAt          DateTime? @map("paid_at")
+    createdAt       DateTime  @default(now()) @map("created_at")
+    updatedAt       DateTime  @updatedAt @map("updated_at")
+
+    // Relations
+    // Payment -> Project (Many -> One)
+    project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+    // Payment -> User (Many -> One)
+    payer   User    @relation("ClientPayments", fields: [payerId], references: [id])
+
+    @@map("payments")
+}
+
+model Escrow {
+    id            String    @id @default(uuid())
+    projectId     String    @unique @map("project_id")
+    depositAmount Decimal   @map("deposit_amount")
+    balance       Decimal   @default(0)
+    status        String    @default("HOLDING") // HOLDING, RELEASED, REFUNDED
+    releasedAt    DateTime? @map("released_at")
+    createdAt     DateTime  @default(now()) @map("created_at")
+    updatedAt     DateTime  @updatedAt @map("updated_at")
+
+    // Relations
+    // Escrow -> Project (One -> One)
+    project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+    @@map("escrows")
 }

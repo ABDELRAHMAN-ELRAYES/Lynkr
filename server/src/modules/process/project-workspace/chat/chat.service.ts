@@ -1,6 +1,6 @@
 import ChatRepository from "./chat.repository";
 import { NextFunction } from "express";
-import AppError from "../../utils/app-error";
+import AppError from "../../../../utils/app-error";
 
 class ChatService {
     private static repository = ChatRepository.getInstance();
