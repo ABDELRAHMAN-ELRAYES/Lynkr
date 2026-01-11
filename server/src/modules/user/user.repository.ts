@@ -29,13 +29,10 @@ class UserRepository {
     // Create user with specific roles
     async addUser(userData: NewUserData) {
         try {
-            // Generate username from email if not provided
-            const username = userData.username || userData.email.split('@')[0];
-
             return await this.prisma.user.create({
                 data: {
                     email: userData.email,
-                    username,
+                    username: userData.username || userData.email.split('@')[0], // Fallback if still needed or ensure service sends it
                     firstName: userData.firstName,
                     lastName: userData.lastName,
                     role: userData.role,
@@ -240,6 +237,18 @@ class UserRepository {
             return await this.prisma.user.update({
                 where: { id: userId },
                 data: { password },
+            });
+        } catch (error) {
+            throw new AppError(500, `User not found or update failed`);
+        }
+    }
+
+    async updateUserRole(userId: string, role: string, tx?: any) {
+        try {
+            const prisma = tx || this.prisma;
+            return await prisma.user.update({
+                where: { id: userId },
+                data: { role },
             });
         } catch (error) {
             throw new AppError(500, `User not found or update failed`);

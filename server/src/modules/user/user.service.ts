@@ -7,7 +7,7 @@ import {
 } from "./types/IUser";
 import { hash, compare } from "../../utils/hashing-handler";
 import UserRepository from "./user.repository";
-import { NextFunction, Request } from "express";
+import { NextFunction } from "express";
 import AppError from "../../utils/app-error";
 import { UserRole } from "../../enum/UserRole";
 
@@ -219,6 +219,11 @@ class UserService {
         return this.userRepository.updateUserPassword(userId, hashedPassword);
     }
 
+    // Update the user role
+    static async updateUserRole(userId: string, role: UserRole) {
+        return this.userRepository.updateUserRole(userId, role);
+    }
+
     // Create a batch of users
     static async createBatchUsers(users: NewUserData[]) {
         const usersWithHashedPassword = await Promise.all(
@@ -241,14 +246,10 @@ class UserService {
             role?: UserRole;
             status?: boolean;
         },
-        request: Request,
+        currentUserEmail: string,
         next: NextFunction
     ) {
-        if (!request.user) {
-            return next(new AppError(401, "You are not authenticated"));
-        }
-
-        const excluded: string[] = [request.user.email];
+        const excluded: string[] = [currentUserEmail];
         const { users, total } = await this.userRepository.getBatchUsers(
             params,
             excluded
@@ -303,10 +304,10 @@ class UserService {
 
     static async updateUserProfile(
         updatedData: UpdateUserRequest & { hasNewAvatar: string; avatar?: string },
-        request: Request,
+        fileFilename: string | undefined,
         next: NextFunction
     ) {
-        const file = request.file as Express.Multer.File | null;
+
         try {
             const { id } = updatedData;
             const user = await this.getUser(id, next);
@@ -342,7 +343,7 @@ class UserService {
                 email: updatedData.email,
                 phone: updatedData.phone,
                 ...(updatedData.hasNewAvatar === "true" &&
-                    file && { avatar: file.filename }),
+                    fileFilename && { avatar: fileFilename }),
             };
 
             const updatedUser = await this.userRepository.updateUserProfile(data);

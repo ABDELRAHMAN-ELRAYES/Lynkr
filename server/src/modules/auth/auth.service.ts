@@ -1,4 +1,4 @@
-import { Request, NextFunction, Response } from "express";
+import { NextFunction } from "express";
 import {
     IUserLoginData,
     IRegisterVerificationData,
@@ -11,19 +11,16 @@ import AppError from "../../utils/app-error";
 import {
     signJWT,
     signPasswordResetJWT,
-    verifyJWT,
     verifyPasswordResetJWT,
 } from "../../utils/jwt";
 import Email from "../../utils/email/email";
 import { generateOTP } from "../../utils/otp-generator";
 import config from "../../config/config";
 import { IUser } from "../user/types/IUser";
-import { AdminPrivilege, UserRole } from "../../enum/UserRole";
 
 class AuthenticationService {
     static async login(
         userData: IUserLoginData,
-        response: Response,
         next: NextFunction
     ) {
         const { usernameOrEmail, password } = userData;
@@ -49,8 +46,8 @@ class AuthenticationService {
             );
             return;
         }
-        // Create jwt token and Add cookie
-        const token = signJWT(user.id, response);
+        // Create jwt token
+        const token = signJWT(user.id);
 
         const data = { user, token };
 
@@ -101,7 +98,6 @@ class AuthenticationService {
     }
     static async registerVerification(
         verificationProcessData: IRegisterData,
-        response: Response,
         next: NextFunction
     ) {
         const {
@@ -132,8 +128,8 @@ class AuthenticationService {
             role,
         };
         const newUser = await UserService.saveUser(newUserData, next);
-        // Create jwt token and Add cookie
-        const token = signJWT(newUser?.id as string, response);
+        // Create jwt token
+        const token = signJWT(newUser?.id as string);
 
         const data = { user: newUser, token, isVerified: true };
         // send Welcome EmailgenerateRedisKey
@@ -151,81 +147,7 @@ class AuthenticationService {
         // Delete cashed data
         return data;
     }
-    static async protect(request: Request, next: NextFunction) {
-        // Extract the jwt from browser cookies
-        const jwt = request.cookies.jwt;
-        // Check if there is a jwt
-        if (!jwt) {
-            next(new AppError(401, `غير مصرح لك، سجل الدخول وحاول مرة أخرى!`));
-            return;
-        }
 
-        // Extract user id from jwt
-        let data;
-        try {
-            data = verifyJWT(jwt);
-        } catch (err) {
-            next(
-                new AppError(
-                    401,
-                    "رمز غير صالح أو منتهي الصلاحية. يرجى تسجيل الدخول مرة أخرى."
-                )
-            );
-            return;
-        }
-        const { id } = data;
-        // Add user data to the response
-        const user = await UserService.getUser(id, next);
-        if (!user) return;
-
-        // TODO: check if the user changed the password after the token is set (Log him out)
-        request.user = user as IUser;
-        next();
-    }
-    // Restrict routes to specific roles
-    static async checkPermissions(
-        user: IUser,
-        allowedRoles: UserRole[],
-        requiredPrivileges: AdminPrivilege[] = [],
-        next: NextFunction
-    ) {
-        if (!user) {
-            next(new AppError(401, "غير مصرح"));
-            return;
-        }
-
-        if (user.role === UserRole.SUPER_ADMIN || user.role === "SUPER_ADMIN") {
-            next();
-            return;
-        }
-
-        // Check if user role is in allowed roles (compare as strings)
-        const userRoleStr = user.role as string;
-        const allowedRoleStrs = allowedRoles.map(r => r as string);
-        if (!allowedRoleStrs.includes(userRoleStr)) {
-            next(new AppError(403, "تم الرفض، ليس لديك صلاحية للقيام بهذا الإجراء"));
-            return;
-        }
-
-        // --- Privilege Check (Only for ADMIN role) ---
-        if ((user.role === UserRole.ADMIN || user.role === "ADMIN") && requiredPrivileges.length > 0) {
-            const userPrivilegeNames = user.privileges?.map(p => p.name) || [];
-            const requiredPrivilegeNames = requiredPrivileges.map(p => p as string);
-
-            const hasAllPrivileges = requiredPrivilegeNames.every((privilege) =>
-                userPrivilegeNames.includes(privilege)
-            );
-
-            if (!hasAllPrivileges) {
-                next(
-                    new AppError(403, "تم الرفض، ليس لديك صلاحية للقيام بهذا الإجراء")
-                );
-                return;
-            }
-        }
-
-        next();
-    }
     // Send Forget password email
     static async forgetPassword(email: string, next: NextFunction) {
         if (!email) {
@@ -353,15 +275,12 @@ class AuthenticationService {
         return user;
     }
 
-    static async logout(response: Response) {
-        response.cookie("jwt", "logged-out", {
-            expires: new Date(Date.now() + 10),
-        });
+    static async logout() {
+        return;
     }
 
     // * Get current user session data
-    static async getCurrentUserData(request: Request, next: NextFunction) {
-        const user = request.user;
+    static async getCurrentUserData(user: IUser, next: NextFunction) {
         if (!user) {
             return next(new AppError(401, "غير مصرح"));
         }

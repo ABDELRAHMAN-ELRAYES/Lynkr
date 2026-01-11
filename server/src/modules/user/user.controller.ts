@@ -156,6 +156,10 @@ export const getBatchUsers = catchAsync(
             status,
         } = request.query as Record<string, string>;
 
+        if (!request.user) {
+            return next(new Error("You are not authenticated"));
+        }
+
         const result = await UserService.getBatchUsers(
             {
                 page: parseInt(page, 10),
@@ -169,7 +173,7 @@ export const getBatchUsers = catchAsync(
                             ? false
                             : undefined,
             },
-            request,
+            request.user.email,
             next
         );
 
@@ -219,7 +223,7 @@ export const updateUserProfile = catchAsync(
         };
         const user = await UserService.updateUserProfile(
             updatedData,
-            request,
+            request.file?.filename,
             next
         );
 

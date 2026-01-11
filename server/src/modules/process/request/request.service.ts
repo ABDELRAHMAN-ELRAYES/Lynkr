@@ -1,8 +1,9 @@
 import RequestRepository from "./request.repository";
-import { NextFunction, Request } from "express"; // Import Express Request
+import { NextFunction } from "express"; // Import Express Request
 import { ICreateRequestData, IUpdateRequestData, IRequestRepositoryData } from "./types/IRequest";
 import AppError from "@/utils/app-error";
 import { UserRole } from "@/enum/UserRole";
+import { IUser } from "@/modules/user/types/IUser";
 
 class RequestService {
     private static repository = RequestRepository.getInstance();
@@ -20,7 +21,7 @@ class RequestService {
             const projectDeadline = data.deadline ? new Date(data.deadline) : undefined;
 
             const isPublic = !data.targetProviderId;
-            const status = "PENDING"; /// isPublic ? "PUBLIC" : "PENDING"; // Start as PENDING for both, logic can adjust. Actually public requests should be PUBLIC status.
+            /// isPublic ? "PUBLIC" : "PENDING"; // Start as PENDING for both, logic can adjust. Actually public requests should be PUBLIC status.
 
             // Refined status logic
             let initialStatus = "PENDING";
@@ -62,7 +63,7 @@ class RequestService {
         }
     }
 
-    static async getRequestById(id: string, user: any, next: NextFunction) {
+    static async getRequestById(id: string, user: IUser, next: NextFunction) {
         const request = await this.repository.getRequestById(id);
         if (!request) {
             return next(new AppError(404, "Request not found"));

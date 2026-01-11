@@ -2,6 +2,8 @@ import ProviderApplicationRepository from "./provider-application.repository";
 import ProfileRepository from "../profile/profile.repository";
 import { NextFunction } from "express";
 import AppError from "../../../utils/app-error";
+import UserService from "../../user/user.service";
+import { UserRole } from "../../../enum/UserRole";
 
 const COOLDOWN_DAYS = 30;
 
@@ -87,7 +89,9 @@ class ProviderApplicationService {
         }
 
         // 4. Update user role
-        // TODO: Update user role to PROVIDER_APPROVED
+        if (application.userId) {
+            await UserService.updateUserRole(application.userId, UserRole.PROVIDER_APPROVED);
+        }
 
         return { message: "Application approved successfully" };
     }

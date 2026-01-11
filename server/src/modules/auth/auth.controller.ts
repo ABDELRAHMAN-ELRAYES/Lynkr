@@ -9,12 +9,15 @@ import AuthenticationService from "./auth.service";
 import { AdminPrivilege, UserRole } from "../../enum/UserRole";
 import { IUser } from "../user/types/IUser";
 import { getRolePrivileges, getRoleAllowedTabs } from "../../config/rbac";
+import { attachAuthCookie } from "../../utils/jwt";
+import { AuthMiddleware } from "../../middlewares/auth.middleware";
 
 export const login = catchAsync(async (request: Request, response: Response, next: NextFunction) => {
-  const data = await AuthenticationService.login(request.body, response, next);
+  const data = await AuthenticationService.login(request.body, next);
   if (!data) return;
 
   const { user, token } = data;
+  attachAuthCookie(response, token);
 
   const dbPrivileges = user.privileges?.map((p) => p.name) ?? [];
 
@@ -67,10 +70,10 @@ export const registerVerification = catchAsync(
     // use the verification data for user verification and signup if verified
     const data = await AuthenticationService.registerVerification(
       verificationData,
-      response,
       next
     );
     if (!data) return;
+    attachAuthCookie(response, data.token);
 
     response.status(200).json({
       status: "success",
@@ -82,7 +85,7 @@ export const registerVerification = catchAsync(
 // Protect specific routes from unlogged users
 export const protect = catchAsync(
   async (request: Request, response: Response, next: NextFunction) => {
-    AuthenticationService.protect(request, next);
+    AuthMiddleware.protect(request, response, next);
   }
 );
 
@@ -93,14 +96,8 @@ export const checkPermissions = (
 ) =>
   catchAsync(
     async (request: Request, response: Response, next: NextFunction) => {
-      const user = request.user as IUser;
-
-      AuthenticationService.checkPermissions(
-        user,
-        allowedRoles,
-        requiredPrivileges,
-        next
-      );
+      const handler = AuthMiddleware.checkPermissions(allowedRoles, requiredPrivileges);
+      handler(request, response, next);
     }
   );
 
@@ -142,7 +139,10 @@ export const resetPassword = catchAsync(
 // Logout the current user
 export const logout = catchAsync(
   async (request: Request, response: Response, next: NextFunction) => {
-    AuthenticationService.logout(response);
+    AuthenticationService.logout();
+    response.cookie("jwt", "logged-out", {
+      expires: new Date(Date.now() + 10),
+    });
     response.status(200).json({
       status: "success",
       message: "تم تسجيل الخروج بنجاح",
@@ -153,7 +153,7 @@ export const logout = catchAsync(
 // * Get current user session Data
 export const getCurrentUserData = catchAsync(
   async (request: Request, response: Response, next: NextFunction) => {
-    const user = await AuthenticationService.getCurrentUserData(request, next);
+    const user = await AuthenticationService.getCurrentUserData(request.user as IUser, next);
     if (!user) return;
 
     const dbPrivileges = user.privileges?.map((p) => p.name) ?? [];

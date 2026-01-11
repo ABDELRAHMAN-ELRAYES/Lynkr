@@ -27,6 +27,7 @@ export type IUser = {
     createdAt: Date;
     updatedAt: Date;
     avatar?: string;
+    providerProfile?: { id: string };
     privileges?: { id: string; userId: string; name: string; createdAt: Date }[]; // AdminPrivilege relation from database
 };
 
