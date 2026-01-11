@@ -3,6 +3,7 @@ import app from "./app";
 import config from "./config/config";
 import PrismaClientSingleton from "./data-server-clients/prisma-client";
 import SocketService from "./services/socket.service";
+import { startAutoPublishJob } from "./services/auto-publish-requests.job";
 
 const prisma = PrismaClientSingleton.getPrismaClient();
 
@@ -20,6 +21,9 @@ httpServer.listen(PORT, () => {
     console.log(`Server is running on port [${PORT}]`);
     console.log(`Environment: ${config.nodeEnv}`);
     console.log(`WebSocket server initialized`);
+
+    // Start scheduled jobs
+    startAutoPublishJob();
 });
 
 // Graceful shutdown

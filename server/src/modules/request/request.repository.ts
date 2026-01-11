@@ -39,6 +39,7 @@ class RequestRepository {
                     responseDeadline: data.responseDeadline,
                     status: data.status,
                     isPublic: data.isPublic,
+                    enableAutoPublish: data.enableAutoPublish,
                     ndaRequired: data.ndaRequired,
                     attachments: data.files && data.files.length > 0 ? {
                         create: data.files.map(file => ({

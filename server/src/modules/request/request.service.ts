@@ -41,7 +41,8 @@ class RequestService {
                 deadline: projectDeadline,
                 responseDeadline, // 3 days rule
                 status: initialStatus,
-                isPublic: isPublic || false, // Should match targetProviderId logic
+                isPublic: isPublic || false,
+                enableAutoPublish: data.enableAutoPublish && !isPublic || false, // Only for direct requests
                 ndaRequired: data.ndaRequired || false,
                 files: data.files,
             };

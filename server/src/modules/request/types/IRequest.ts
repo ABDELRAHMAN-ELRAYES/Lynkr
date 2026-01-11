@@ -27,6 +27,7 @@ export interface IRequest {
     responseDeadline: Date;
     status: RequestStatus;
     isPublic: boolean;
+    enableAutoPublish: boolean;
     ndaRequired: boolean;
     createdAt: Date;
     updatedAt: Date;
@@ -49,6 +50,7 @@ export interface ICreateRequestData {
     toBudget?: number;
     deadline?: string | Date;
     ndaRequired?: boolean;
+    enableAutoPublish?: boolean;
     files?: Express.Multer.File[];
 }
 
@@ -81,6 +83,7 @@ export interface IRequestRepositoryData {
     responseDeadline: Date;
     status: string;
     isPublic: boolean;
+    enableAutoPublish: boolean;
     ndaRequired: boolean;
     files?: Express.Multer.File[];
 }
