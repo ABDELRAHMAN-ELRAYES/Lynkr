@@ -213,6 +213,13 @@ modules/provider/
 4. Repository receives clean ICreateProfileRepositoryData
 5. No coupling between modules except through type imports
 
+### 11. File Handling & Attachments
+- **NEVER use polymorphic relations** (e.g., `FileContext`) for linking files to entities.
+- **ALWAYS create explicit join tables** for each entity that requires file attachments.
+- Naming convention: `[EntityName]File` (e.g., `RequestFile`, `ProposalFile`).
+- The join table must link `[entityId]` and `fileId`.
+- Use the `File` model for storing metadata and nested writes for transactional creation.
+
 ## Checklist for New Module Implementation
 
 - [ ] Create module directory with proper structure
