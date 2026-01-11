@@ -179,9 +179,12 @@ export interface IProviderService {
 - Always include try-catch in service/repository methods
 
 ### 10. Migration Strategy
-- One migration per module implementation
-- Name migrations descriptively: `001_module_name`, `002_provider_profile`
-- Run migrations separately: `npx prisma migrate dev --name [migration_name]`
+- One migration per feature or module implementation
+- **Naming convention**: `NNN_entity_or_feature_name`
+  - Examples: `001_user_auth`, `002_provider_profile`, `004_provider_application_auto_publish`
+  - Use 3-digit prefix for ordering
+  - Use snake_case for the description
+- Run migrations in development: `npx prisma migrate dev --name [migration_name]`
 - Regenerate Prisma client after schema changes: `npx prisma generate`
 
 ## Module 2 Implementation Example
@@ -219,6 +222,85 @@ modules/provider/
 - Naming convention: `[EntityName]File` (e.g., `RequestFile`, `ProposalFile`).
 - The join table must link `[entityId]` and `fileId`.
 - Use the `File` model for storing metadata and nested writes for transactional creation.
+
+### 12. Entity Separation (Clean Schema Design)
+- **Each logical entity should be a separate model** with explicit relations.
+- **NEVER embed admin/audit fields directly in the main entity** when they represent a distinct action.
+- Use 1:1 relations for action records (e.g., `ProviderApplication` → `ApplicationReview`).
+
+**Example**:
+```prisma
+// ❌ WRONG - Admin fields embedded in application
+model ProviderApplication {
+    adminId       String?
+    adminReason   String?
+    rejectedAt    DateTime?
+}
+
+// ✅ CORRECT - Separate Review model
+model ProviderApplication {
+    review ApplicationReview?
+}
+
+model ApplicationReview {
+    id            String @id
+    applicationId String @unique
+    adminId       String
+    decision      String
+    reason        String?
+    reviewedAt    DateTime
+}
+```
+
+### 13. Prisma Schema Documentation
+- **Document all relationships with cardinality comments**
+- Place comment on the line **above** the relation field
+- Use format: `// ModelA -> ModelB (One -> One|One -> Many|Many -> One)`
+
+**Example**:
+```prisma
+model User {
+    // Relations
+    // User -> AdminPrivilege (One -> Many)
+    privileges      AdminPrivilege[]
+    // User -> ProviderProfile (One -> One)
+    providerProfile ProviderProfile?
+}
+
+model AdminPrivilege {
+    // Relations
+    // AdminPrivilege -> User (Many -> One)
+    user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+```
+
+### 14. Schema Diagram Maintenance
+- **Update `documents/schema.mermaid`** whenever schema changes occur
+- Keep entity definitions in sync with actual Prisma models
+- Update relationships to reflect new models
+
+### 15. Prisma Schema Model Ordering
+- **Order models by module number** as defined in `documents/modules/`
+- Group models with section comment headers: `// ============================================`
+- Include module name in header: `// Module N: Module Name`
+- Models within a module should be ordered logically (parent entities before child entities)
+
+**Example**:
+```prisma
+// ============================================
+// Module 1: Identity & Access Management (IAM)
+// ============================================
+
+model User { ... }
+model AdminPrivilege { ... }
+
+// ============================================
+// Module 2: Provider Profile & Onboarding
+// ============================================
+
+model ProviderProfile { ... }
+model ProviderService { ... }
+```
 
 ## Checklist for New Module Implementation
 

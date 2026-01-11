@@ -78,17 +78,45 @@ erDiagram
         string proficiency
     }
 
+    %% Provider Application & Review
+    PROVIDER_APPLICATIONS {
+        uuid id PK
+        uuid user_id FK
+        uuid provider_profile_id FK
+        string status
+        timestamp cooldown_ends_at
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    APPLICATION_REVIEWS {
+        uuid id PK
+        uuid application_id FK
+        uuid admin_id FK
+        string decision
+        text reason
+        timestamp reviewed_at
+    }
+
     %% ------------------
     %% Module 4: Requests & Proposals
     %% ------------------
     REQUESTS {
         uuid id PK
         uuid client_id FK
-        string service_type
+        uuid target_provider_id FK
+        string title
         text description
-        decimal budget
+        string category
+        string budget_type
+        decimal from_budget
+        decimal to_budget
         date deadline
+        timestamp response_deadline
         string status
+        bool is_public
+        bool enable_auto_publish
+        bool nda_required
         timestamp created_at
         timestamp updated_at
     }
@@ -234,18 +262,26 @@ erDiagram
     %% ------------------
     FILES {
         uuid id PK
-        string file_name
-        string file_type
-        decimal file_size
-        string file_path
-        timestamp uploaded_at
+        string filename
+        string path
+        string mimetype
+        int size
+        timestamp created_at
     }
 
-    FILE_CONTEXT {
+    %% Explicit File Join Tables (replaces FILE_CONTEXT)
+    REQUEST_FILES {
         uuid id PK
+        uuid request_id FK
         uuid file_id FK
-        string context_type
-        uuid context_id
+        timestamp created_at
+    }
+
+    PROPOSAL_FILES {
+        uuid id PK
+        uuid proposal_id FK
+        uuid file_id FK
+        timestamp created_at
     }
 
     %% ------------------
@@ -288,9 +324,14 @@ erDiagram
 
     PROVIDER_PROFILES ||--o{ SUBSCRIPTIONS : has
 
-    FILES ||--o{ FILE_CONTEXT : has
-    REQUESTS ||--o{ FILE_CONTEXT : relates
-    PROPOSALS ||--o{ FILE_CONTEXT : relates
-    MESSAGES ||--o{ FILE_CONTEXT : relates
-    COMPLAINTS ||--o{ FILE_CONTEXT : relates
-    PROJECTS ||--o{ FILE_CONTEXT : relates
+    %% Provider Application relationships
+    USERS ||--o{ PROVIDER_APPLICATIONS : submits
+    PROVIDER_PROFILES ||--o{ PROVIDER_APPLICATIONS : linked_to
+    PROVIDER_APPLICATIONS ||--o| APPLICATION_REVIEWS : reviewed_by
+    USERS ||--o{ APPLICATION_REVIEWS : admin_reviews
+
+    %% Explicit file relationships
+    FILES ||--o{ REQUEST_FILES : attached_to
+    FILES ||--o{ PROPOSAL_FILES : attached_to
+    REQUESTS ||--o{ REQUEST_FILES : has_attachments
+    PROPOSALS ||--o{ PROPOSAL_FILES : has_attachments
