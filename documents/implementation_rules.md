@@ -283,10 +283,20 @@ export interface IProviderService {
 - Use absolute imports for shared utilities: `"../../../utils/app-error"`
 
 ### 9. Error Handling
-- Repository throws AppError on failures
-- Service catches and passes to next() middleware
-- Use descriptive error messages
-- Always include try-catch in service/repository methods
+- Follow the pattern used in `server/src/modules/user`:
+  - **Controllers**:
+    - Wrap ALL controller methods with `catchAsync` from `utils/catch-async`.
+    - Pass `next` to the service method call.
+    - Check for returned `user`/`data` before sending response (if service returns undefined due to error).
+  - **Services**:
+    - Accept `next: NextFunction` as the last parameter.
+    - Use `return next(new AppError(code, message))` for business logic validation errors (e.g. "User not found", "Invalid password").
+    - Do NOT wrap the main logic in `try/catch` unless performing specific cleanup; rely on bubbling up repository errors.
+  - **Repositories**:
+    - Wrap database calls in `try/catch`.
+    - Throw `AppError(500, "Specific Message")` in the catch block.
+- Use strict typing for errors where possible.
+- Always include `try/catch` in repository methods to catch database errors explicitly.
 
 ### 10. Migration Strategy
 - One migration per feature or module implementation

@@ -156,7 +156,7 @@ class UserRepository {
 
     async updateUserById(userData: IUser) {
         try {
-            const { id, privileges, ...restData } = userData;
+            const { id, privileges, providerProfile, ...restData } = userData;
 
             return await this.prisma.user.update({
                 where: { id },

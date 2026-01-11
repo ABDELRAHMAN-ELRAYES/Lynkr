@@ -20,7 +20,12 @@ export interface IProjectFile {
 
 export interface ICreateProjectFileData {
     projectId: string;
-    fileId: string;
+    file: {
+        filename: string;
+        path: string;
+        mimetype: string;
+        size: number;
+    };
     uploaderId: string;
     description?: string;
 }

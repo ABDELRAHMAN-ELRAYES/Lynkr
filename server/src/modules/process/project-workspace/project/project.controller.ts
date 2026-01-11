@@ -1,9 +1,11 @@
 import { Request, Response, NextFunction } from "express";
 import ProjectService from "./project.service";
+import { catchAsync } from "../../../../utils/catch-async";
+import { IUser } from "../../../user/types/IUser"; // Assuming IUser location
 
-export const createProject = async (req: Request, res: Response, next: NextFunction) => {
+export const createProject = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
     const { proposalId, providerProfileId, totalPrice } = req.body;
-    const clientId = (req.user as any).id;
+    const clientId = (req.user as IUser).id;
 
     const project = await ProjectService.createProjectFromProposal(
         clientId,
@@ -20,9 +22,9 @@ export const createProject = async (req: Request, res: Response, next: NextFunct
             data: project
         });
     }
-};
+});
 
-export const getProject = async (req: Request, res: Response, next: NextFunction) => {
+export const getProject = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
     const project = await ProjectService.getProjectById(req.params.id, next);
 
     if (project) {
@@ -31,10 +33,10 @@ export const getProject = async (req: Request, res: Response, next: NextFunction
             data: project
         });
     }
-};
+});
 
-export const getMyProjects = async (req: Request, res: Response, next: NextFunction) => {
-    const user = req.user as any;
+export const getMyProjects = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
+    const user = req.user as IUser;
 
     let projects: any;
     if (user.role === "CLIENT") {
@@ -51,10 +53,10 @@ export const getMyProjects = async (req: Request, res: Response, next: NextFunct
             data: projects
         });
     }
-};
+});
 
-export const markComplete = async (req: Request, res: Response, next: NextFunction) => {
-    const user = req.user as any;
+export const markComplete = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
+    const user = req.user as IUser;
 
     if (!user.providerProfile) {
         return res.status(403).json({
@@ -77,10 +79,10 @@ export const markComplete = async (req: Request, res: Response, next: NextFuncti
             data: project
         });
     }
-};
+});
 
-export const confirmComplete = async (req: Request, res: Response, next: NextFunction) => {
-    const clientId = (req.user as any).id;
+export const confirmComplete = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
+    const clientId = (req.user as IUser).id;
 
     const project = await ProjectService.confirmProjectComplete(req.params.id, clientId, next);
 
@@ -91,10 +93,10 @@ export const confirmComplete = async (req: Request, res: Response, next: NextFun
             data: project
         });
     }
-};
+});
 
-export const cancelProject = async (req: Request, res: Response, next: NextFunction) => {
-    const clientId = (req.user as any).id;
+export const cancelProject = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
+    const clientId = (req.user as IUser).id;
 
     const project = await ProjectService.cancelProject(req.params.id, clientId, next);
 
@@ -105,12 +107,12 @@ export const cancelProject = async (req: Request, res: Response, next: NextFunct
             data: project
         });
     }
-};
+});
 
 // ===== PROJECT FILES =====
 
-export const uploadProjectFile = async (req: Request, res: Response, next: NextFunction) => {
-    const user = req.user as any;
+export const uploadProjectFile = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
+    const user = req.user as IUser;
     const file = req.file;
 
     if (!file) {
@@ -120,39 +122,33 @@ export const uploadProjectFile = async (req: Request, res: Response, next: NextF
         });
     }
 
-    try {
-        // Save file record to database first
-        const savedFile = await FileService.saveFileRecord({
+    // Pass file metadata directly to ProjectService
+    // The service/repo will handle the creation of the File record internally
+    const projectFile = await ProjectService.uploadProjectFile(
+        req.params.id,
+        {
             filename: file.filename,
             path: file.path,
             mimetype: file.mimetype,
             size: file.size
+        },
+        user.id,
+        user.providerProfile?.id,
+        req.body.description,
+        next
+    );
+
+    if (projectFile) {
+        return res.status(201).json({
+            status: "success",
+            message: "File uploaded successfully",
+            data: projectFile
         });
-
-        // Then link to project
-        const projectFile = await ProjectService.uploadProjectFile(
-            req.params.id,
-            savedFile.id,
-            user.id,
-            user.providerProfile?.id,
-            req.body.description,
-            next
-        );
-
-        if (projectFile) {
-            return res.status(201).json({
-                status: "success",
-                message: "File uploaded successfully",
-                data: projectFile
-            });
-        }
-    } catch (error) {
-        return next(error);
     }
-};
+});
 
-export const getProjectFiles = async (req: Request, res: Response, next: NextFunction) => {
-    const user = req.user as any;
+export const getProjectFiles = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
+    const user = req.user as IUser;
 
     const files = await ProjectService.getProjectFiles(
         req.params.id,
@@ -167,10 +163,10 @@ export const getProjectFiles = async (req: Request, res: Response, next: NextFun
             data: files
         });
     }
-};
+});
 
-export const deleteProjectFile = async (req: Request, res: Response, next: NextFunction) => {
-    const userId = (req.user as any).id;
+export const deleteProjectFile = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
+    const userId = (req.user as IUser).id;
 
     const result = await ProjectService.deleteProjectFile(req.params.fileId, userId, next);
 
@@ -180,12 +176,12 @@ export const deleteProjectFile = async (req: Request, res: Response, next: NextF
             message: "File deleted successfully"
         });
     }
-};
+});
 
 // ===== PROJECT ACTIVITIES =====
 
-export const getProjectActivities = async (req: Request, res: Response, next: NextFunction) => {
-    const user = req.user as any;
+export const getProjectActivities = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
+    const user = req.user as IUser;
 
     const activities = await ProjectService.getProjectActivities(
         req.params.id,
@@ -200,5 +196,4 @@ export const getProjectActivities = async (req: Request, res: Response, next: Ne
             data: activities
         });
     }
-};
-
+});

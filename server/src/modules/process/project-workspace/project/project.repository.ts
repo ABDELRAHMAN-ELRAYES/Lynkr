@@ -157,9 +157,16 @@ class ProjectRepository {
         try {
             return await this.prisma.projectFile.create({
                 data: {
-                    projectId: data.projectId,
-                    fileId: data.fileId,
-                    uploaderId: data.uploaderId,
+                    project: { connect: { id: data.projectId } },
+                    file: {
+                        create: {
+                            filename: data.file.filename,
+                            path: data.file.path,
+                            mimetype: data.file.mimetype,
+                            size: data.file.size
+                        }
+                    },
+                    uploader: { connect: { id: data.uploaderId } },
                     description: data.description
                 },
                 include: {
