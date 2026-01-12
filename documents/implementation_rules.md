@@ -283,18 +283,95 @@ export interface IProviderService {
 - Use absolute imports for shared utilities: `"../../../utils/app-error"`
 
 ### 9. Error Handling
-- Follow the pattern used in `server/src/modules/user`:
-  - **Controllers**:
-    - Wrap ALL controller methods with `catchAsync` from `utils/catch-async`.
-    - Pass `next` to the service method call.
-    - Check for returned `user`/`data` before sending response (if service returns undefined due to error).
-  - **Services**:
-    - Accept `next: NextFunction` as the last parameter.
-    - Use `return next(new AppError(code, message))` for business logic validation errors (e.g. "User not found", "Invalid password").
-    - Do NOT wrap the main logic in `try/catch` unless performing specific cleanup; rely on bubbling up repository errors.
-  - **Repositories**:
-    - Wrap database calls in `try/catch`.
-    - Throw `AppError(500, "Specific Message")` in the catch block.
+
+> **⚠️ MANDATORY**: All modules MUST follow the same error handling patterns as the `server/src/modules/user` module. This ensures consistency across the codebase.
+
+#### 9.1 Controller Error Handling
+- Wrap **ALL** controller methods with `catchAsync` from `utils/catch-async`.
+- Pass `next` to the service method call.
+- Check for returned `user`/`data` before sending response (if service returns undefined due to error).
+
+```typescript
+// ✅ CORRECT - Controller with catchAsync
+import { catchAsync } from "../../utils/catch-async";
+
+export const createEntity = catchAsync(
+    async (request: Request, response: Response, next: NextFunction) => {
+        const data = request.body;
+        const entity = await EntityService.create(data, next);
+        if (!entity) return; // Service returned undefined due to error
+        response.status(201).json({ status: "success", data: { entity } });
+    }
+);
+```
+
+#### 9.2 Service Error Handling
+- Accept `next: NextFunction` as the **last parameter**.
+- Use `return next(new AppError(code, message))` for business logic validation errors (e.g. "User not found", "Invalid password").
+- Do **NOT** wrap the main logic in `try/catch` unless performing specific cleanup; rely on bubbling up repository errors.
+
+```typescript
+// ✅ CORRECT - Service with next parameter
+static async create(data: ICreateData, next: NextFunction) {
+    if (!data.name) {
+        return next(new AppError(400, "Name is required"));
+    }
+    return await this.repository.create(data);
+}
+```
+
+#### 9.3 Repository Error Handling
+- Wrap database calls in `try/catch`.
+- Throw `AppError(500, "Specific Message")` in the catch block.
+
+```typescript
+// ✅ CORRECT - Repository with try/catch
+async create(data: ICreateData) {
+    try {
+        return await this.prisma.entity.create({ data });
+    } catch (error) {
+        throw new AppError(500, "Failed to create entity");
+    }
+}
+```
+
+#### 9.4 File Cleanup on Failed Requests
+When a request includes file uploads, you **MUST** delete the uploaded files if the request fails at any point. This prevents orphaned files on the server.
+
+**Implementation Pattern:**
+```typescript
+// In Service Layer - Clean up files on validation failure
+static async createWithFile(
+    data: ICreateData,
+    uploadedFile: Express.Multer.File | undefined,
+    next: NextFunction
+) {
+    // Delete uploaded file if validation fails
+    if (!data.name) {
+        if (uploadedFile) {
+            await deleteFile(uploadedFile.path); // Use your file deletion utility
+        }
+        return next(new AppError(400, "Name is required"));
+    }
+
+    try {
+        return await this.repository.create(data, uploadedFile?.filename);
+    } catch (error) {
+        // Delete uploaded file if database operation fails
+        if (uploadedFile) {
+            await deleteFile(uploadedFile.path);
+        }
+        throw error;
+    }
+}
+```
+
+**File Cleanup Requirements:**
+- Delete files immediately when validation fails in the service layer.
+- Delete files when database operations fail (wrap in try/catch for cleanup).
+- Use a centralized file deletion utility (e.g., `utils/file-utils.ts`).
+- Log file deletion failures for debugging purposes.
+
 - Use strict typing for errors where possible.
 - Always include `try/catch` in repository methods to catch database errors explicitly.
 

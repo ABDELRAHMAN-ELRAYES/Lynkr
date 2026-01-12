@@ -1,4 +1,4 @@
-import { Router } from "express";
+import { Router,Request,Response } from "express";
 import {
     getCurrentUserData,
     login,
@@ -31,11 +31,11 @@ AuthRouter.get(
 AuthRouter.get(
     "/google/callback",
     passport.authenticate("google", { session: false }),
-    (req, res) => {
+    (req:Request, res:Response) => {
         const user = req.user as any;
 
         // Sign JWT and set cookie
-        const token = signJWT(user.id, res);
+        const token = signJWT(user.id);
 
         // Redirect to frontend with token
         res.redirect(`${config.webUrl || process.env.FRONTEND_URL}?token=${token}`);

@@ -3,7 +3,7 @@ import { NextFunction } from "express";
 import config from "../../../../config/config";
 import AppError from "../../../../utils/app-error";
 import PaymentRepository from "./payment.repository";
-import ProjectRepository from "../../project-workspace/project/project.repository";
+import ProjectRepository from "./../../project/project.repository";
 import EscrowRepository from "../escrow/escrow.repository";
 import { PaymentType } from "./types/IPayment";
 

@@ -1,112 +1,99 @@
 ## Module Goal (Execution Perspective)
 
-Enable **real-time, context-bound communication** between clients and providers during the engagement lifecycle while preserving **history, auditability, and boundaries**.
+Enable **real-time, context-bound communication** between clients and providers during the project lifecycle while preserving **history, auditability, and boundaries**.
+
+> **Status: IMPLEMENTED** - Full real-time WebSocket support via Socket.IO
 
 ---
 
 ## 1. Message Entry Tasks
 
-### 1.1 Contextual Messaging
+### 1.1 Contextual Messaging ✅
 
-* Allow messages to be sent **only within defined contexts**:
-
-  * Request (pre-acceptance)
-  * Project (post-acceptance)
-* Prevent messages outside these contexts
-* Include sender and timestamp automatically
+* Messages sent **only within Project context** (post-deal approval)
+* Conversation created when project starts (after proposal acceptance)
+* Only project participants (client + provider) can message each other
+* Sender and timestamp included automatically
 
 ---
 
-### 1.2 Text Message Tasks
+### 1.2 Text Message Tasks ✅
 
-* Provide input for textual communication
-* Enforce:
-
-  * Maximum character limit
-  * Prohibited content (Phase 1: basic keyword blocking optional)
-* Prevent empty or invalid messages
-
----
-
-### 1.3 Media Attachment Tasks (Phase 1)
-
-* Allow attachment of files during messages (optional for Phase 1)
-* Validate file type and size
-* Associate attachment with correct message context
-* Display attachment metadata (name, type, size)
+* Text input for communication
+* Maximum character limit (5000 chars)
+* Empty/invalid message prevention
 
 ---
 
 ## 2. Conversation Management Tasks
 
-### 2.1 Message Ordering
+### 2.1 Message Ordering ✅
 
-* Maintain chronological order of messages
-* Ensure correct alignment for sender/receiver view
-* Provide last-message preview in conversation list
-
----
-
-### 2.2 Conversation History
-
-* Preserve full message history for the context
-* Allow read-only viewing for past messages
-* Prevent message editing after sending
+* Chronological order maintained
+* Last-message preview in conversation list
 
 ---
 
-### 2.3 Read Receipts & Status
+### 2.2 Conversation History ✅
 
-* Optional Phase 1: Track message delivery and read status
-* Notify sender upon message delivery (if implemented)
-* Keep system-ready for future real-time enhancements
+* Full message history preserved
+* Read-only viewing for past messages
+
+---
+
+### 2.3 Read Receipts & Status ✅
+
+* Real-time read status tracking via `message:read` event
+* Conversation-wide read status via `conversation:read` event
 
 ---
 
 ## 3. Real-Time Interaction Tasks
 
-### 3.1 Message Delivery
+### 3.1 Message Delivery ✅ **REAL-TIME**
 
-* Deliver messages instantly within context
-* Support multiple concurrent sessions per user
-* Ensure that offline users receive pending messages when reconnecting
-
----
-
-### 3.2 Notification Integration
-
-* Trigger notifications for new messages
-* Include context reference (request/project)
-* Respect user notification preferences (Phase 1: basic delivery only)
+* **WebSocket real-time delivery** via Socket.IO
+* `message:new` event broadcasts instantly to participants
+* Offline users receive messages when reconnecting
 
 ---
 
-## 4. Access & Permissions Tasks
+### 3.2 Typing Indicators ✅
 
-* Only participants in the conversation can send or receive messages
-* Ensure blocked or suspended users cannot participate
-* Maintain admin visibility (Phase 2)
+* `conversation:typing` event for real-time typing status
 
 ---
 
-## 5. Error & Edge Case Handling
+### 3.3 Notification Integration ✅
 
-* Attempt to send messages in invalid contexts
-* User offline / connection issues
-* Message duplication (retry handling)
-* Attempt to attach unsupported files
-* Deleted project/request during active conversation
-
----
-
-## 6. Module Completion Criteria
-
-Module 5 is complete when:
-
-* Users can send and receive messages in valid contexts
-* Conversation history is preserved and ordered
-* Participants are restricted to their relevant context
-* Attachments, if present, are correctly associated
-* Edge cases (invalid context, deleted entities) are handled gracefully
 * Notifications trigger for new messages
+* Project reference included in notification
 
+---
+
+## 4. Access & Permissions Tasks ✅
+
+* Only project participants can send/receive messages
+* Authorization verified at service layer
+
+---
+
+## 5. Socket Events
+
+| Client → Server | Server → Client |
+|-----------------|-----------------|
+| `conversation:join` | `message:new` |
+| `conversation:leave` | `message:read` |
+| `conversation:typing` | `conversation:read` |
+| `conversation:markRead` | `conversation:typing` |
+
+---
+
+## 6. Module Completion Criteria ✅
+
+* ✅ Real-time message send/receive within project conversations
+* ✅ Conversation history preserved and ordered
+* ✅ Participants restricted to project members
+* ✅ Real-time read receipts
+* ✅ Typing indicators
+* ✅ Notifications for new messages

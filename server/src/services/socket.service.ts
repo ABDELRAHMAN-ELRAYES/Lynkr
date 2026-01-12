@@ -1,7 +1,7 @@
 import { Server as HTTPServer } from "http";
 import { Server as SocketIOServer, Socket } from "socket.io";
 import { verifyJWT } from "../utils/jwt";
-import AppError from "@/utils/app-error";
+import AppError from "../utils/app-error";
 
 class SocketService {
     private io: SocketIOServer | null = null;
@@ -24,6 +24,7 @@ class SocketService {
             },
         });
 
+        // JWT Authentication middleware
         this.io.use((socket, next) => {
             const token = socket.handshake.auth.token;
             if (!token) {
@@ -47,28 +48,57 @@ class SocketService {
             const userId = (socket as any).userId;
             console.log(`User connected: ${userId}`);
 
-            // Join user's personal room
+            // Join user's personal room for direct messages
             socket.join(`user:${userId}`);
 
-            // Handle chat messages
-            socket.on("chat:message", (data) => {
-                this.handleChatMessage(socket, data);
+            // ============================================
+            // Conversation Events
+            // ============================================
+
+            // Join a conversation room
+            socket.on("conversation:join", (conversationId: string) => {
+                socket.join(`conversation:${conversationId}`);
+                console.log(`User ${userId} joined conversation ${conversationId}`);
             });
 
-            // Handle typing indicators
-            socket.on("chat:typing", (data) => {
-                this.handleTyping(socket, data);
+            // Leave a conversation room
+            socket.on("conversation:leave", (conversationId: string) => {
+                socket.leave(`conversation:${conversationId}`);
             });
 
-            // Handle project room joining
-            socket.on("project:join", (projectId) => {
+            // Typing indicator
+            socket.on("conversation:typing", (data: { conversationId: string; isTyping: boolean }) => {
+                socket.to(`conversation:${data.conversationId}`).emit("conversation:typing", {
+                    userId,
+                    isTyping: data.isTyping,
+                });
+            });
+
+            // Mark messages as read (client tells server they've read messages)
+            socket.on("conversation:markRead", (data: { conversationId: string }) => {
+                // Broadcast to other participant that messages were read
+                socket.to(`conversation:${data.conversationId}`).emit("conversation:read", {
+                    userId,
+                    conversationId: data.conversationId,
+                    readAt: new Date(),
+                });
+            });
+
+            // ============================================
+            // Project Events
+            // ============================================
+
+            socket.on("project:join", (projectId: string) => {
                 socket.join(`project:${projectId}`);
             });
 
-            // Handle project room leaving
-            socket.on("project:leave", (projectId) => {
+            socket.on("project:leave", (projectId: string) => {
                 socket.leave(`project:${projectId}`);
             });
+
+            // ============================================
+            // Disconnect
+            // ============================================
 
             socket.on("disconnect", () => {
                 console.log(`User disconnected: ${userId}`);
@@ -76,51 +106,18 @@ class SocketService {
         });
     }
 
-    private handleChatMessage(socket: Socket, data: any): void {
-        const { receiverId, projectId, message } = data;
-        const senderId = (socket as any).userId;
+    // ============================================
+    // Emit Methods (called from services)
+    // ============================================
 
-        // Broadcast to receiver
-        if (receiverId) {
-            this.io?.to(`user:${receiverId}`).emit("chat:message", {
-                senderId,
-                message,
-                timestamp: new Date(),
-            });
-        }
-
-        // Broadcast to project room
-        if (projectId) {
-            socket.to(`project:${projectId}`).emit("chat:message", {
-                senderId,
-                message,
-                timestamp: new Date(),
-            });
-        }
+    // Send to specific user
+    sendToUser(userId: string, event: string, data: any): void {
+        this.io?.to(`user:${userId}`).emit(event, data);
     }
 
-    private handleTyping(socket: Socket, data: any): void {
-        const { receiverId, projectId, isTyping } = data;
-        const senderId = (socket as any).userId;
-
-        if (receiverId) {
-            this.io?.to(`user:${receiverId}`).emit("chat:typing", {
-                senderId,
-                isTyping,
-            });
-        }
-
-        if (projectId) {
-            socket.to(`project:${projectId}`).emit("chat:typing", {
-                senderId,
-                isTyping,
-            });
-        }
-    }
-
-    // Send notification to specific user
-    sendNotification(userId: string, notification: any): void {
-        this.io?.to(`user:${userId}`).emit("notification", notification);
+    // Broadcast to conversation room
+    broadcastToConversation(conversationId: string, event: string, data: any): void {
+        this.io?.to(`conversation:${conversationId}`).emit(event, data);
     }
 
     // Broadcast to project room
@@ -128,9 +125,40 @@ class SocketService {
         this.io?.to(`project:${projectId}`).emit(event, data);
     }
 
-    // Send to specific user
-    sendToUser(userId: string, event: string, data: any): void {
-        this.io?.to(`user:${userId}`).emit(event, data);
+    // Send notification
+    sendNotification(userId: string, notification: any): void {
+        this.io?.to(`user:${userId}`).emit("notification", notification);
+    }
+
+    // ============================================
+    // Message-specific methods
+    // ============================================
+
+    // Broadcast new message to conversation participants
+    broadcastNewMessage(conversationId: string, message: any): void {
+        this.io?.to(`conversation:${conversationId}`).emit("message:new", {
+            conversationId,
+            message,
+        });
+    }
+
+    // Broadcast message read status
+    broadcastMessageRead(conversationId: string, userId: string, messageIds: string[]): void {
+        this.io?.to(`conversation:${conversationId}`).emit("message:read", {
+            conversationId,
+            userId,
+            messageIds,
+            readAt: new Date(),
+        });
+    }
+
+    // Broadcast all messages in conversation marked as read
+    broadcastConversationRead(conversationId: string, userId: string): void {
+        this.io?.to(`conversation:${conversationId}`).emit("conversation:read", {
+            conversationId,
+            userId,
+            readAt: new Date(),
+        });
     }
 
     getIO(): SocketIOServer | null {

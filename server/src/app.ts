@@ -17,7 +17,6 @@ import SubscriptionRouter from "./modules/subscription/subscription.route";
 import ReviewRouter from "./modules/review/review.route";
 import SettingsRouter from "./modules/settings/settings.route";
 import AdminRouter from "./modules/admin/admin.route";
-import ChatRouter from "./modules/process/project-workspace/chat/chat.route";
 import MeetingRouter from "./modules/meeting/meeting.route";
 import NotificationRouter from "./modules/notification/notification.route";
 import ProposalRouter from "./modules/proposal/proposal.route";
@@ -25,7 +24,9 @@ import EscrowRouter from "./modules/process/money-system/escrow/escrow.route";
 import ProfileRouter from "./modules/provider/profile/profile.route";
 import RequestRouter from "./modules/process/request/request.route";
 import ProviderApplicationRouter from "./modules/provider/provider-application/provider-application.route";
-import ProjectRouter from "./modules/process/project-workspace/project/project.route";
+import ProjectRouter from "./modules/process/project/project.route";
+import ConversationRouter from "./modules/messaging/conversation/conversation.route";
+import MessageRouter from "./modules/messaging/message/message.route";
 import { bodyParser, cookieParserMiddleware, corsMiddleware, formParser } from "./middlewares/middlewares";
 
 // Seed default admin user
@@ -89,7 +90,6 @@ app.use("/api/v1/subscriptions", SubscriptionRouter);
 app.use("/api/v1/reviews", ReviewRouter);
 app.use("/api/v1/settings", SettingsRouter);
 app.use("/api/v1/admin", AdminRouter);
-app.use("/api/v1/chat", ChatRouter);
 app.use("/api/v1/meetings", MeetingRouter);
 app.use("/api/v1/notifications", NotificationRouter);
 app.use("/api/v1/proposals", ProposalRouter);
@@ -97,6 +97,8 @@ app.use("/api/v1/escrow", EscrowRouter);
 app.use("/api/v1/requests", RequestRouter);
 app.use("/api/v1/provider-applications", ProviderApplicationRouter);
 app.use("/api/v1/projects", ProjectRouter);
+app.use("/api/v1/conversations", ConversationRouter);
+app.use("/api/v1/messages", MessageRouter);
 
 // 404 handler - MUST be after all routes
 app.use(notFoundHandler);
