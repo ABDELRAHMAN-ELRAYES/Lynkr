@@ -3,7 +3,6 @@ import multer, { diskStorage, StorageEngine, FileFilterCallback } from "multer";
 import path from "path";
 import AppError from "../utils/app-error";
 import fs from "fs";
-import config from "../config/config";
 
 // Define the  allowed extensions which are supported.
 // Files size in (MB)
@@ -62,16 +61,14 @@ const getFileCategory = (fileMimeType: string) => {
 };
 // Helper function for file cleanup
 const cleanupFile = (filePath: string) => {
-  fs.unlink(filePath, (error) => {
-    if (error) {
-      // console.error(`Error deleting file: ${filePath}`, error);
-    }
+  fs.unlink(filePath, (_error) => {
+    // Silently handle cleanup errors
   });
 };
 // validateUploadedFileSize : validate the file size not exceed the max available size before storing it.
 export const validateUploadedFileSize = (
   request: Request,
-  response: Response,
+  _response: Response,
   next: NextFunction
 ) => {
   const file = request.file;
@@ -85,7 +82,7 @@ export const validateUploadedFileSize = (
   const fileCategory = getFileCategory(fileMimeType);
 
   if (!fileCategory) {
-    fs.unlink(file.path, (error) => {});
+    fs.unlink(file.path, (_error) => { });
     next(new AppError(400, "Uploaded file is not supported."));
     return;
   }
@@ -103,7 +100,7 @@ export const validateUploadedFileSize = (
 //validateUploadedMoreThanOneFileSize: Validate Multiple Files size
 export const validateUploadedMoreThanOneFileSize = (
   request: Request,
-  response: Response,
+  _response: Response,
   next: NextFunction
 ) => {
   const fields = request.files as { [key: string]: Express.Multer.File[] };
@@ -158,7 +155,7 @@ const getAllowedFiles = (fileMimeType: string) => {
 };
 
 const fileFilter = (
-  request: Request,
+  _request: Request,
   file: Express.Multer.File,
   cb: FileFilterCallback
 ) => {
@@ -188,21 +185,17 @@ if (!fs.existsSync(UPLOAD_DIR)) {
 // Setup Storage Engine
 const storage: StorageEngine = diskStorage({
   destination: (
-    request: Request,
-    file: Express.Multer.File,
+    _request: Request,
+    _file: Express.Multer.File,
     cb: (error: Error | null, destination: string) => void
   ): void => {
-    cb(null,UPLOAD_DIR);
+    cb(null, UPLOAD_DIR);
   },
   filename: (
-    request: Request,
+    _request: Request,
     file: Express.Multer.File,
     cb: (error: Error | null, filename: string) => void
   ): void => {
-    // if (!request.user || !request.user.id) {
-    //   cb(new Error("You aren't authenticated, login and  try again"), "");
-    //   return;
-    // }
     const fileMimeType = file.mimetype.split("/");
     const fileType = fileMimeType[0];
     const fileExtenstion = path.extname(file.originalname);

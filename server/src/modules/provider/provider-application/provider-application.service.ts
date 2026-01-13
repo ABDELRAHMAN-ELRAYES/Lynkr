@@ -50,14 +50,14 @@ class ProviderApplicationService {
     /**
      * Get current user's application history
      */
-    static async getMyApplications(userId: string, next: NextFunction) {
+    static async getMyApplications(userId: string, _next: NextFunction) {
         return await this.repository.getApplicationsByUserId(userId);
     }
 
     /**
      * Get all pending applications (Admin)
      */
-    static async getPendingApplications(next: NextFunction) {
+    static async getPendingApplications(_next: NextFunction) {
         return await this.repository.getPendingApplications();
     }
 

@@ -9,7 +9,7 @@ class SubscriptionService {
         return await this.repository.getAllPlans();
     }
 
-    static async createSubscription(data: any, next: NextFunction) {
+    static async createSubscription(data: object, _next: NextFunction) {
         return await this.repository.createSubscription(data);
     }
 
@@ -26,7 +26,7 @@ class SubscriptionService {
         return subscription;
     }
 
-    static async updateSubscription(id: string, data: any, next: NextFunction) {
+    static async updateSubscription(id: string, data: object, _next: NextFunction) {
         return await this.repository.updateSubscription(id, data);
     }
 }

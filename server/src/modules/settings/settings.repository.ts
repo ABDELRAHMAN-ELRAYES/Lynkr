@@ -21,28 +21,17 @@ class SettingsRepository {
         return this.prisma;
     }
 
-    async getAllSettings(): Promise<any[]> {
-        try {
-            return await this.prisma.settings.findMany();
-        } catch (error) {
-            throw new AppError(500, "Failed to get settings");
-        }
+    // TODO: Add Settings model to Prisma schema
+    async getAllSettings(): Promise<object[]> {
+        throw new AppError(501, "Settings module not implemented");
     }
 
-    async getSettingById(id: string): Promise<any> {
-        try {
-            return await this.prisma.settings.findUnique({ where: { id } });
-        } catch (error) {
-            throw new AppError(500, "Failed to get setting");
-        }
+    async getSettingById(_id: string): Promise<object | null> {
+        throw new AppError(501, "Settings module not implemented");
     }
 
-    async updateSetting(id: string, data: any): Promise<any> {
-        try {
-            return await this.prisma.settings.update({ where: { id }, data: data as any });
-        } catch (error) {
-            throw new AppError(500, "Failed to update setting");
-        }
+    async updateSetting(_id: string, _data: object): Promise<object> {
+        throw new AppError(501, "Settings module not implemented");
     }
 }
 

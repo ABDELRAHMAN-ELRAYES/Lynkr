@@ -170,11 +170,11 @@ class SessionService {
         return session;
     }
 
-    static async getMySessions(userId: string, next: NextFunction) {
+    static async getMySessions(userId: string, _next: NextFunction) {
         return await this.sessionRepo.getSessionsByUserId(userId);
     }
 
-    static async getInstructorSessions(instructorId: string, next: NextFunction) {
+    static async getInstructorSessions(instructorId: string, _next: NextFunction) {
         return await this.sessionRepo.getSessionsByInstructorId(instructorId);
     }
 
@@ -320,7 +320,7 @@ class SessionService {
         };
     }
 
-    static async leaveSession(sessionId: string, userId: string, next: NextFunction) {
+    static async leaveSession(sessionId: string, userId: string, _next: NextFunction) {
         await this.sessionRepo.updateAttendanceLeft(sessionId, userId);
 
         return { message: "Left session successfully" };

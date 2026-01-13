@@ -18,7 +18,7 @@ class SettingsService {
         return setting;
     }
 
-    static async updateSetting(id: string, data: any, next: NextFunction) {
+    static async updateSetting(id: string, data: object, _next: NextFunction) {
         return await this.repository.updateSetting(id, data);
     }
 }

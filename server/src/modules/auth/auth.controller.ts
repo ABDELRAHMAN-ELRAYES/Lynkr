@@ -138,7 +138,7 @@ export const resetPassword = catchAsync(
 
 // Logout the current user
 export const logout = catchAsync(
-  async (request: Request, response: Response, next: NextFunction) => {
+  async (_request: Request, response: Response, _next: NextFunction) => {
     AuthenticationService.logout();
     response.cookie("jwt", "logged-out", {
       expires: new Date(Date.now() + 10),

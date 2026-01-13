@@ -1,11 +1,7 @@
 import pug from "pug";
 import path from "path";
 
-type TemplateOptions = {
-  url: string;
-  name: string;
-};
-export const renderEmailTemplate = (type: string, templateData: any) => {
+export const renderEmailTemplate = (type: string, templateData: object) => {
   let emailTemplateName = "welcome.pug";
   switch (type) {
     case "welcome":

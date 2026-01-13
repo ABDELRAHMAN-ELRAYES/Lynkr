@@ -3,7 +3,7 @@ import { catchAsync } from "../../utils/catch-async";
 import SubscriptionService from "./subscription.service";
 
 export const getAllPlans = catchAsync(
-    async (request: Request, response: Response, next: NextFunction) => {
+    async (_request: Request, response: Response, _next: NextFunction) => {
         const plans = await SubscriptionService.getAllPlans();
         response.status(200).json({ status: "success", data: { plans } });
     }
@@ -17,7 +17,7 @@ export const createSubscription = catchAsync(
 );
 
 export const getAllSubscriptions = catchAsync(
-    async (request: Request, response: Response, next: NextFunction) => {
+    async (_request: Request, response: Response, _next: NextFunction) => {
         const subscriptions = await SubscriptionService.getAllSubscriptions();
         response.status(200).json({ status: "success", data: { subscriptions } });
     }

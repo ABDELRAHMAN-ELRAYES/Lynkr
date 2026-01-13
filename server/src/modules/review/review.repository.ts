@@ -21,44 +21,25 @@ class ReviewRepository {
         return this.prisma;
     }
 
-    async createReview(data: any): Promise<any> {
-        try {
-            return await this.prisma.review.create({ data: data as any });
-        } catch (error) {
-            throw new AppError(500, "Failed to create review");
-        }
+    // TODO: Add Review model to Prisma schema
+    async createReview(_data: object): Promise<object> {
+        throw new AppError(501, "Review module not implemented");
     }
 
-    async getAllReviews(): Promise<any[]> {
-        try {
-            return await this.prisma.review.findMany();
-        } catch (error) {
-            throw new AppError(500, "Failed to get reviews");
-        }
+    async getAllReviews(): Promise<object[]> {
+        throw new AppError(501, "Review module not implemented");
     }
 
-    async getReviewById(id: string): Promise<any> {
-        try {
-            return await this.prisma.review.findUnique({ where: { id } });
-        } catch (error) {
-            throw new AppError(500, "Failed to get review");
-        }
+    async getReviewById(_id: string): Promise<object | null> {
+        throw new AppError(501, "Review module not implemented");
     }
 
-    async updateReview(id: string, data: any): Promise<any> {
-        try {
-            return await this.prisma.review.update({ where: { id }, data: data as any });
-        } catch (error) {
-            throw new AppError(500, "Failed to update review");
-        }
+    async updateReview(_id: string, _data: object): Promise<object> {
+        throw new AppError(501, "Review module not implemented");
     }
 
-    async deleteReview(id: string): Promise<any> {
-        try {
-            return await this.prisma.review.delete({ where: { id } });
-        } catch (error) {
-            throw new AppError(500, "Failed to delete review");
-        }
+    async deleteReview(_id: string): Promise<object> {
+        throw new AppError(501, "Review module not implemented");
     }
 }
 

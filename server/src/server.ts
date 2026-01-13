@@ -19,7 +19,7 @@ const PORT = config.port || 8080;
 
 httpServer.listen(PORT, () => {
     console.log(`Server is running on port [${PORT}]`);
-    console.log(`Environment: ${config.nodeEnv}`);
+    console.log(`Environment: ${config.env}`);
     console.log(`WebSocket server initialized`);
 
     // Start scheduled jobs

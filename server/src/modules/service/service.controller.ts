@@ -10,7 +10,7 @@ export const createService = catchAsync(
 );
 
 export const getAllServices = catchAsync(
-    async (request: Request, response: Response, next: NextFunction) => {
+    async (_request: Request, response: Response, _next: NextFunction) => {
         const services = await ServiceService.getAllServices();
         response.status(200).json({ status: "success", data: { services } });
     }

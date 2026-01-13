@@ -1,7 +1,7 @@
 import { NextFunction } from "express";
-import AppError from "../../../../utils/app-error";
+import AppError from "../../../utils/app-error";
 import ProjectRepository from "./project.repository";
-import EscrowRepository from "../../money-system/escrow/escrow.repository";
+import EscrowRepository from "../money-system/escrow/escrow.repository";
 import { ICreateProjectData } from "./types/IProject";
 
 
@@ -62,11 +62,11 @@ class ProjectService {
         return project;
     }
 
-    static async getClientProjects(clientId: string, next: NextFunction) {
+    static async getClientProjects(clientId: string, _next: NextFunction) {
         return await this.projectRepo.getProjectsByClientId(clientId);
     }
 
-    static async getProviderProjects(providerProfileId: string, next: NextFunction) {
+    static async getProviderProjects(providerProfileId: string, _next: NextFunction) {
         return await this.projectRepo.getProjectsByProviderId(providerProfileId);
     }
 

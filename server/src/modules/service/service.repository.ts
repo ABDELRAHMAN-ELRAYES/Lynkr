@@ -21,44 +21,25 @@ class ServiceRepository {
         return this.prisma;
     }
 
-    async createService(data: any): Promise<any> {
-        try {
-            return await this.prisma.service.create({ data: data as any });
-        } catch (error) {
-            throw new AppError(500, "Failed to create service");
-        }
+    // TODO: Add Service model to Prisma schema
+    async createService(_data: object): Promise<object> {
+        throw new AppError(501, "Service module not implemented");
     }
 
-    async getAllServices(): Promise<any[]> {
-        try {
-            return await this.prisma.service.findMany();
-        } catch (error) {
-            throw new AppError(500, "Failed to get services");
-        }
+    async getAllServices(): Promise<object[]> {
+        throw new AppError(501, "Service module not implemented");
     }
 
-    async getServiceById(id: string): Promise<any> {
-        try {
-            return await this.prisma.service.findUnique({ where: { id } });
-        } catch (error) {
-            throw new AppError(500, "Failed to get service");
-        }
+    async getServiceById(_id: string): Promise<object | null> {
+        throw new AppError(501, "Service module not implemented");
     }
 
-    async updateService(id: string, data: any): Promise<any> {
-        try {
-            return await this.prisma.service.update({ where: { id }, data: data as any });
-        } catch (error) {
-            throw new AppError(500, "Failed to update service");
-        }
+    async updateService(_id: string, _data: object): Promise<object> {
+        throw new AppError(501, "Service module not implemented");
     }
 
-    async deleteService(id: string): Promise<any> {
-        try {
-            return await this.prisma.service.delete({ where: { id } });
-        } catch (error) {
-            throw new AppError(500, "Failed to delete service");
-        }
+    async deleteService(_id: string): Promise<object> {
+        throw new AppError(501, "Service module not implemented");
     }
 }
 

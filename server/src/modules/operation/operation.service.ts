@@ -5,7 +5,7 @@ import AppError from "../../utils/app-error";
 class OperationService {
     private static repository = OperationRepository.getInstance();
 
-    static async createOperation(data: any, next: NextFunction) {
+    static async createOperation(data: object, _next: NextFunction) {
         return await this.repository.createOperation(data);
     }
 
@@ -22,11 +22,11 @@ class OperationService {
         return operation;
     }
 
-    static async updateOperation(id: string, data: any, next: NextFunction) {
+    static async updateOperation(id: string, data: object, _next: NextFunction) {
         return await this.repository.updateOperation(id, data);
     }
 
-    static async deleteOperation(id: string, next: NextFunction) {
+    static async deleteOperation(id: string, _next: NextFunction) {
         return await this.repository.deleteOperation(id);
     }
 }

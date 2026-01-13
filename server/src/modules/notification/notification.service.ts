@@ -4,7 +4,7 @@ import { NextFunction } from "express";
 class NotificationService {
     private static repository = NotificationRepository.getInstance();
 
-    static async createNotification(data: any) {
+    static async createNotification(data: object) {
         return await this.repository.createNotification(data);
     }
 
@@ -12,11 +12,11 @@ class NotificationService {
         return await this.repository.getUserNotifications(userId);
     }
 
-    static async markAsRead(id: string, next: NextFunction) {
+    static async markAsRead(id: string, _next: NextFunction) {
         return await this.repository.markAsRead(id);
     }
 
-    static async deleteNotification(id: string, next: NextFunction) {
+    static async deleteNotification(id: string, _next: NextFunction) {
         return await this.repository.deleteNotification(id);
     }
 }

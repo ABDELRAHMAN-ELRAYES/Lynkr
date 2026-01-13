@@ -2,7 +2,7 @@ import { NextFunction, Request, Response } from "express";
 import ProposalService from "./proposal.service";
 import { ICreateProposalData } from "./types/IProposal";
 
-export const createProposal = async (req: Request, res: Response, next: NextFunction) => {
+export const createProposal = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     const proposalData: ICreateProposalData = {
         requestId: req.body.requestId,
         providerProfileId: "", // Will be filled by service from user ID
@@ -16,14 +16,14 @@ export const createProposal = async (req: Request, res: Response, next: NextFunc
     const newProposal = await ProposalService.createProposal((req.user as any).id, proposalData, next);
 
     if (newProposal) {
-        return res.status(201).json({
+        res.status(201).json({
             status: "success",
             data: newProposal,
         });
     }
 };
 
-export const getProposalsByRequest = async (req: Request, res: Response, next: NextFunction) => {
+export const getProposalsByRequest = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     const proposals = await ProposalService.getProposalsByRequestId(req.params.requestId, (req.user as any).id, next);
     if (proposals) {
         res.status(200).json({
@@ -33,7 +33,7 @@ export const getProposalsByRequest = async (req: Request, res: Response, next: N
     }
 };
 
-export const getProposal = async (req: Request, res: Response, next: NextFunction) => {
+export const getProposal = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     const proposal = await ProposalService.getProposalById(req.params.id, (req.user as any).id, next);
     if (proposal) {
         res.status(200).json({
@@ -43,7 +43,7 @@ export const getProposal = async (req: Request, res: Response, next: NextFunctio
     }
 };
 
-export const acceptProposal = async (req: Request, res: Response, next: NextFunction) => {
+export const acceptProposal = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     const proposal = await ProposalService.acceptProposal(req.params.id, (req.user as any).id, next);
     if (proposal) {
         res.status(200).json({
@@ -54,7 +54,7 @@ export const acceptProposal = async (req: Request, res: Response, next: NextFunc
     }
 };
 
-export const rejectProposal = async (req: Request, res: Response, next: NextFunction) => {
+export const rejectProposal = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     const proposal = await ProposalService.rejectProposal(req.params.id, (req.user as any).id, next);
     if (proposal) {
         res.status(200).json({
@@ -65,7 +65,7 @@ export const rejectProposal = async (req: Request, res: Response, next: NextFunc
     }
 };
 
-export const updateProposal = async (req: Request, res: Response, next: NextFunction) => {
+export const updateProposal = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     const updateData = { ...req.body, files: req.files };
     const proposal = await ProposalService.updateProposal(req.params.id, updateData, (req.user as any).id, next);
     if (proposal) {
@@ -76,7 +76,7 @@ export const updateProposal = async (req: Request, res: Response, next: NextFunc
     }
 };
 
-export const deleteProposal = async (req: Request, res: Response, next: NextFunction) => {
+export const deleteProposal = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     const result = await ProposalService.deleteProposal(req.params.id, (req.user as any).id, next);
     if (result) {
         res.status(204).json({

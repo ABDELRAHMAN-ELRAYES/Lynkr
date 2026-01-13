@@ -4,7 +4,7 @@ dotenv.config();
 
 interface Config {
     port: number;
-    nodeEnv: string;
+    env: string;
     databaseUrl: string;
     jwt: {
         secret: string;
@@ -61,7 +61,7 @@ interface Config {
 
 const config: Config = {
     port: parseInt(process.env.PORT || "8080", 10),
-    nodeEnv: process.env.NODE_ENV || "development",
+    env: process.env.NODE_ENV || "development",
     databaseUrl: process.env.DATABASE_URL || "",
     jwt: {
         secret: process.env.JWT_SECRET || "your-secret-key-change-this",

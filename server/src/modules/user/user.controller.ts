@@ -58,7 +58,7 @@ export const deleteUser = catchAsync(
  * get all users
  */
 export const getAllUsers = catchAsync(
-    async (request: Request, response: Response, next: NextFunction) => {
+    async (request: Request, response: Response, _next: NextFunction) => {
         const role: UserRole = request.query.role as UserRole;
         const users = await UserService.getAllUsers(role);
         if (!users.length) return;
@@ -132,7 +132,7 @@ export const updateUserProfilePassword = catchAsync(
 
 // Create batch users
 export const createBatchUsers = catchAsync(
-    async (request: Request, response: Response, next: NextFunction) => {
+    async (request: Request, response: Response, _next: NextFunction) => {
         const users = request.body.users;
         const newUsers = await UserService.createBatchUsers(users);
         response.status(200).json({
@@ -187,7 +187,7 @@ export const getBatchUsers = catchAsync(
 );
 
 export const getMinBatchUsers = catchAsync(
-    async (request: Request, response: Response, next: NextFunction) => {
+    async (request: Request, response: Response, _next: NextFunction) => {
         const { role = "USER" } = request.query as Record<string, string>;
 
         const result = await UserService.getMinBatchUsers(role);
@@ -201,7 +201,7 @@ export const getMinBatchUsers = catchAsync(
 
 // * Get users statistics
 export const getUsersStatistics = catchAsync(
-    async (request: Request, response: Response, next: NextFunction) => {
+    async (_request: Request, response: Response, _next: NextFunction) => {
         const users = await UserService.getUsersStatistics();
 
         response.status(200).json({

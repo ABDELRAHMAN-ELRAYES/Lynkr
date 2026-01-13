@@ -21,44 +21,25 @@ class SubscriptionRepository {
         return this.prisma;
     }
 
-    async getAllPlans(): Promise<any[]> {
-        try {
-            return await this.prisma.plan.findMany();
-        } catch (error) {
-            throw new AppError(500, "Failed to get plans");
-        }
+    // TODO: Add Plan and Subscription models to Prisma schema
+    async getAllPlans(): Promise<object[]> {
+        throw new AppError(501, "Subscription module not implemented");
     }
 
-    async createSubscription(data: any): Promise<any> {
-        try {
-            return await this.prisma.subscription.create({ data: data as any });
-        } catch (error) {
-            throw new AppError(500, "Failed to create subscription");
-        }
+    async createSubscription(_data: object): Promise<object> {
+        throw new AppError(501, "Subscription module not implemented");
     }
 
-    async getAllSubscriptions(): Promise<any[]> {
-        try {
-            return await this.prisma.subscription.findMany();
-        } catch (error) {
-            throw new AppError(500, "Failed to get subscriptions");
-        }
+    async getAllSubscriptions(): Promise<object[]> {
+        throw new AppError(501, "Subscription module not implemented");
     }
 
-    async getSubscriptionById(id: string): Promise<any> {
-        try {
-            return await this.prisma.subscription.findUnique({ where: { id } });
-        } catch (error) {
-            throw new AppError(500, "Failed to get subscription");
-        }
+    async getSubscriptionById(_id: string): Promise<object | null> {
+        throw new AppError(501, "Subscription module not implemented");
     }
 
-    async updateSubscription(id: string, data: any): Promise<any> {
-        try {
-            return await this.prisma.subscription.update({ where: { id }, data: data as any });
-        } catch (error) {
-            throw new AppError(500, "Failed to update subscription");
-        }
+    async updateSubscription(_id: string, _data: object): Promise<object> {
+        throw new AppError(501, "Subscription module not implemented");
     }
 }
 

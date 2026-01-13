@@ -83,11 +83,11 @@ class RequestService {
         return request;
     }
 
-    static async getRequestsByClientId(clientId: string, next: NextFunction) {
+    static async getRequestsByClientId(clientId: string, _next: NextFunction) {
         return await this.repository.getRequestsByClientId(clientId);
     }
 
-    static async getRequestsForProvider(providerId: string, serviceCategories: string[], next: NextFunction) {
+    static async getRequestsForProvider(providerId: string, serviceCategories: string[], _next: NextFunction) {
         return await this.repository.getRequestsForProvider(providerId, serviceCategories);
     }
 

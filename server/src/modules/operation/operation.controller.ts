@@ -10,7 +10,7 @@ export const createOperation = catchAsync(
 );
 
 export const getAllOperations = catchAsync(
-    async (request: Request, response: Response, next: NextFunction) => {
+    async (_request: Request, response: Response, _next: NextFunction) => {
         const operations = await OperationService.getAllOperations();
         response.status(200).json({ status: "success", data: { operations } });
     }

@@ -247,7 +247,7 @@ class UserService {
             status?: boolean;
         },
         currentUserEmail: string,
-        next: NextFunction
+        _next: NextFunction
     ) {
         const excluded: string[] = [currentUserEmail];
         const { users, total } = await this.userRepository.getBatchUsers(

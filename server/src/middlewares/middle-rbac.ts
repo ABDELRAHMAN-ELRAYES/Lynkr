@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 
 export const requireRole = (...allowedRoles: string[]) => {
-  return (req: Request, res: Response, next: NextFunction) => {
+  return (req: Request, res: Response, next: NextFunction): Response | void => {
     if (!req.user) {
       return res.status(401).json({ message: "Unauthorized: No user found" });
     }
@@ -15,7 +15,7 @@ export const requireRole = (...allowedRoles: string[]) => {
 };
 
 export const requirePrivilege = (...privs: string[]) => {
-  return (req: Request, res: Response, next: NextFunction) => {
+  return (req: Request, res: Response, next: NextFunction): Response | void => {
     if (!req.user) {
       return res.status(401).json({ message: "Unauthorized: No user found" });
     }

@@ -12,7 +12,7 @@ import {
     getProjectActivities
 } from "./project.controller";
 import { AuthMiddleware } from "../../../middlewares/auth.middleware";
-import upload, { validateUploadedFileSize } from "../../../../middlewares/file-upload";
+import upload, { validateUploadedFileSize } from "../../../middlewares/file-upload";
 
 const ProjectRouter = Router();
 

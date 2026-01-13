@@ -21,42 +21,21 @@ class NotificationRepository {
         return this.prisma;
     }
 
-    async createNotification(data: any): Promise<any> {
-        try {
-            return await this.prisma.notification.create({ data: data as any });
-        } catch (error) {
-            throw new AppError(500, "Failed to create notification");
-        }
+    // TODO: Add Notification model to Prisma schema
+    async createNotification(_data: object): Promise<object> {
+        throw new AppError(501, "Notification module not implemented");
     }
 
-    async getUserNotifications(userId: string): Promise<any[]> {
-        try {
-            return await this.prisma.notification.findMany({
-                where: { userId },
-                orderBy: { createdAt: "desc" },
-            });
-        } catch (error) {
-            throw new AppError(500, "Failed to get notifications");
-        }
+    async getUserNotifications(_userId: string): Promise<object[]> {
+        throw new AppError(501, "Notification module not implemented");
     }
 
-    async markAsRead(id: string): Promise<any> {
-        try {
-            return await this.prisma.notification.update({
-                where: { id },
-                data: { read: true } as any,
-            });
-        } catch (error) {
-            throw new AppError(500, "Failed to mark notification as read");
-        }
+    async markAsRead(_id: string): Promise<object> {
+        throw new AppError(501, "Notification module not implemented");
     }
 
-    async deleteNotification(id: string): Promise<any> {
-        try {
-            return await this.prisma.notification.delete({ where: { id } });
-        } catch (error) {
-            throw new AppError(500, "Failed to delete notification");
-        }
+    async deleteNotification(_id: string): Promise<object> {
+        throw new AppError(501, "Notification module not implemented");
     }
 }
 

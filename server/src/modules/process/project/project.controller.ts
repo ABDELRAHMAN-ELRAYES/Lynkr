@@ -1,9 +1,9 @@
 import { Request, Response, NextFunction } from "express";
 import ProjectService from "./project.service";
-import { catchAsync } from "../../../../utils/catch-async";
-import { IUser } from "../../../user/types/IUser"; // Assuming IUser location
+import { catchAsync } from "../../../utils/catch-async";
+import { IUser } from "../../user/types/IUser";
 
-export const createProject = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
+export const createProject = catchAsync(async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     const { proposalId, providerProfileId, totalPrice } = req.body;
     const clientId = (req.user as IUser).id;
 
@@ -16,7 +16,7 @@ export const createProject = catchAsync(async (req: Request, res: Response, next
     );
 
     if (project) {
-        return res.status(201).json({
+        res.status(201).json({
             status: "success",
             message: "Project created successfully",
             data: project
@@ -24,21 +24,21 @@ export const createProject = catchAsync(async (req: Request, res: Response, next
     }
 });
 
-export const getProject = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
+export const getProject = catchAsync(async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     const project = await ProjectService.getProjectById(req.params.id, next);
 
     if (project) {
-        return res.status(200).json({
+        res.status(200).json({
             status: "success",
             data: project
         });
     }
 });
 
-export const getMyProjects = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
+export const getMyProjects = catchAsync(async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     const user = req.user as IUser;
 
-    let projects: any;
+    let projects: unknown;
     if (user.role === "CLIENT") {
         projects = await ProjectService.getClientProjects(user.id, next);
     } else if (user.providerProfile) {
@@ -48,21 +48,22 @@ export const getMyProjects = catchAsync(async (req: Request, res: Response, next
     }
 
     if (projects) {
-        return res.status(200).json({
+        res.status(200).json({
             status: "success",
             data: projects
         });
     }
 });
 
-export const markComplete = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
+export const markComplete = catchAsync(async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     const user = req.user as IUser;
 
     if (!user.providerProfile) {
-        return res.status(403).json({
+        res.status(403).json({
             status: "error",
             message: "Only providers can mark projects as complete"
         });
+        return;
     }
 
     const project = await ProjectService.markProjectComplete(
@@ -73,7 +74,7 @@ export const markComplete = catchAsync(async (req: Request, res: Response, next:
     );
 
     if (project) {
-        return res.status(200).json({
+        res.status(200).json({
             status: "success",
             message: "Project marked as complete",
             data: project
@@ -81,13 +82,13 @@ export const markComplete = catchAsync(async (req: Request, res: Response, next:
     }
 });
 
-export const confirmComplete = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
+export const confirmComplete = catchAsync(async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     const clientId = (req.user as IUser).id;
 
     const project = await ProjectService.confirmProjectComplete(req.params.id, clientId, next);
 
     if (project) {
-        return res.status(200).json({
+        res.status(200).json({
             status: "success",
             message: "Project completion confirmed. Funds released to provider.",
             data: project
@@ -95,13 +96,13 @@ export const confirmComplete = catchAsync(async (req: Request, res: Response, ne
     }
 });
 
-export const cancelProject = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
+export const cancelProject = catchAsync(async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     const clientId = (req.user as IUser).id;
 
     const project = await ProjectService.cancelProject(req.params.id, clientId, next);
 
     if (project) {
-        return res.status(200).json({
+        res.status(200).json({
             status: "success",
             message: "Project cancelled. Funds refunded.",
             data: project
@@ -111,15 +112,16 @@ export const cancelProject = catchAsync(async (req: Request, res: Response, next
 
 // ===== PROJECT FILES =====
 
-export const uploadProjectFile = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
+export const uploadProjectFile = catchAsync(async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     const user = req.user as IUser;
     const file = req.file;
 
     if (!file) {
-        return res.status(400).json({
+        res.status(400).json({
             status: "error",
             message: "No file uploaded"
         });
+        return;
     }
 
     // Pass file metadata directly to ProjectService
@@ -139,7 +141,7 @@ export const uploadProjectFile = catchAsync(async (req: Request, res: Response, 
     );
 
     if (projectFile) {
-        return res.status(201).json({
+        res.status(201).json({
             status: "success",
             message: "File uploaded successfully",
             data: projectFile
@@ -147,7 +149,7 @@ export const uploadProjectFile = catchAsync(async (req: Request, res: Response, 
     }
 });
 
-export const getProjectFiles = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
+export const getProjectFiles = catchAsync(async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     const user = req.user as IUser;
 
     const files = await ProjectService.getProjectFiles(
@@ -158,20 +160,20 @@ export const getProjectFiles = catchAsync(async (req: Request, res: Response, ne
     );
 
     if (files) {
-        return res.status(200).json({
+        res.status(200).json({
             status: "success",
             data: files
         });
     }
 });
 
-export const deleteProjectFile = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
+export const deleteProjectFile = catchAsync(async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     const userId = (req.user as IUser).id;
 
     const result = await ProjectService.deleteProjectFile(req.params.fileId, userId, next);
 
     if (result) {
-        return res.status(200).json({
+        res.status(200).json({
             status: "success",
             message: "File deleted successfully"
         });
@@ -180,7 +182,7 @@ export const deleteProjectFile = catchAsync(async (req: Request, res: Response, 
 
 // ===== PROJECT ACTIVITIES =====
 
-export const getProjectActivities = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
+export const getProjectActivities = catchAsync(async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     const user = req.user as IUser;
 
     const activities = await ProjectService.getProjectActivities(
@@ -191,7 +193,7 @@ export const getProjectActivities = catchAsync(async (req: Request, res: Respons
     );
 
     if (activities) {
-        return res.status(200).json({
+        res.status(200).json({
             status: "success",
             data: activities
         });

@@ -82,7 +82,7 @@ class AuthenticationService {
         };
         emailObj
             .send("signup-verification", "عملية التحقق من التسجيل", templateData)
-            .catch((error) =>
+            .catch((_error) =>
                 next(
                     new AppError(
                         500,
@@ -141,7 +141,7 @@ class AuthenticationService {
         };
         emailObj
             .send("welcome", "مرحباً بك في Operest", templateData)
-            .catch((error) =>
+            .catch((_error) =>
                 next(new AppError(500, "حدث خطأ ما أثناء محاولة إرسال بريد التحقق"))
             );
         // Delete cashed data

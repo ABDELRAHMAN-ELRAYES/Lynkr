@@ -5,7 +5,7 @@ import { NextFunction, Request, Response } from "express";
 // A Middleware to compress the images
 export const compressImages = async (
   request: Request,
-  response: Response,
+  _response: Response,
   next: NextFunction
 ) => {
   try {
@@ -48,13 +48,14 @@ export const compressImages = async (
           file.path = compressedPath;
           file.filename = path.basename(compressedPath);
           file.mimetype = "image/webp";
-        } catch (err) {
+        } catch (_err) {
+          // Silently handle compression errors
         }
       })
     );
 
     next();
-  } catch (error) {
+  } catch (_error) {
     next();
   }
 };

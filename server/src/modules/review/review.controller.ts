@@ -10,7 +10,7 @@ export const createReview = catchAsync(
 );
 
 export const getAllReviews = catchAsync(
-    async (request: Request, response: Response, next: NextFunction) => {
+    async (_request: Request, response: Response, _next: NextFunction) => {
         const reviews = await ReviewService.getAllReviews();
         response.status(200).json({ status: "success", data: { reviews } });
     }

@@ -21,25 +21,25 @@ class AdminRepository {
         return this.prisma;
     }
 
-    async getDashboardStats(): Promise<any> {
+    async getDashboardStats(): Promise<object> {
         try {
-            const [totalUsers, totalOperations, totalTransactions] = await Promise.all([
+            const [totalUsers, totalProjects, totalPayments] = await Promise.all([
                 this.prisma.user.count(),
-                this.prisma.operation.count(),
-                this.prisma.transaction.count(),
+                this.prisma.project.count(),
+                this.prisma.payment.count(),
             ]);
 
             return {
                 totalUsers,
-                totalOperations,
-                totalTransactions,
+                totalProjects,
+                totalPayments,
             };
         } catch (error) {
             throw new AppError(500, "Failed to get dashboard stats");
         }
     }
 
-    async getAllUsers(): Promise<any[]> {
+    async getAllUsers(): Promise<object[]> {
         try {
             return await this.prisma.user.findMany();
         } catch (error) {

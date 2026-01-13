@@ -3,7 +3,7 @@ import { catchAsync } from "../../utils/catch-async";
 import NotificationService from "./notification.service";
 
 export const getUserNotifications = catchAsync(
-    async (request: Request, response: Response, next: NextFunction) => {
+    async (request: Request, response: Response, _next: NextFunction) => {
         const userId = (request as any).user?.userId;
         const notifications = await NotificationService.getUserNotifications(userId);
         response.status(200).json({ status: "success", data: { notifications } });

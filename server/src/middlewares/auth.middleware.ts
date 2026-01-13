@@ -6,7 +6,7 @@ import { IUser } from "../modules/user/types/IUser";
 import { AdminPrivilege, UserRole } from "../enum/UserRole";
 
 export class AuthMiddleware {
-    static async protect(request: Request, response: Response, next: NextFunction) {
+    static async protect(request: Request, _response: Response, next: NextFunction) {
         // Extract the jwt from browser cookies
         const jwt = request.cookies.jwt;
         // Check if there is a jwt
@@ -41,7 +41,7 @@ export class AuthMiddleware {
         allowedRoles: UserRole[],
         requiredPrivileges: AdminPrivilege[] = []
     ) {
-        return (request: Request, response: Response, next: NextFunction) => {
+        return (request: Request, _response: Response, next: NextFunction) => {
             const user = request.user as IUser;
 
             if (!user) {

@@ -21,12 +21,12 @@ const getDevelopmentErrorMessage = (error: AppError) => {
 // handle any error in the server
 export const globalErrorHandler = (
   error: AppError,
-  request: Request,
+  _request: Request,
   response: Response,
-  next: NextFunction
+  _next: NextFunction
 ) => {
   const { statusCode } = error;
-  
+
   const responseObject =
     config.env === 'development'
       ? getDevelopmentErrorMessage(error)
@@ -38,7 +38,7 @@ export const globalErrorHandler = (
 export const notFoundHandler = (
   request: Request,
   response: Response,
-  next: NextFunction
+  _next: NextFunction
 ) => {
   const url = `http://${request.host}${request.originalUrl}`;
   response.status(404).json({

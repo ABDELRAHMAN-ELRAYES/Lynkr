@@ -5,7 +5,7 @@ import AppError from "../../utils/app-error";
 class ReviewService {
     private static repository = ReviewRepository.getInstance();
 
-    static async createReview(data: any, next: NextFunction) {
+    static async createReview(data: object, _next: NextFunction) {
         return await this.repository.createReview(data);
     }
 
@@ -22,11 +22,11 @@ class ReviewService {
         return review;
     }
 
-    static async updateReview(id: string, data: any, next: NextFunction) {
+    static async updateReview(id: string, data: object, _next: NextFunction) {
         return await this.repository.updateReview(id, data);
     }
 
-    static async deleteReview(id: string, next: NextFunction) {
+    static async deleteReview(id: string, _next: NextFunction) {
         return await this.repository.deleteReview(id);
     }
 }

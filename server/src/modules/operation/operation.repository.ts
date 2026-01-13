@@ -1,13 +1,10 @@
-import PrismaClientSingleton from "../../data-server-clients/prisma-client";
-import { PrismaClient } from "@prisma/client";
 import AppError from "../../utils/app-error";
 
 class OperationRepository {
-    private prisma: PrismaClient;
     static instance: OperationRepository;
 
     private constructor() {
-        this.prisma = PrismaClientSingleton.getPrismaClient();
+        // PrismaClient is available but not directly needed for stub methods
     }
 
     static getInstance(): OperationRepository {
@@ -17,28 +14,25 @@ class OperationRepository {
         return OperationRepository.instance;
     }
 
-    async createOperation(data: any): Promise<any> {
-        try {
-            return await this.prisma.operation.create({ data: data as any });
-        } catch (error) {
-            throw new AppError(500, "Failed to create operation");
-        }
+    // TODO: Add Operation model to Prisma schema
+    async createOperation(_data: object): Promise<object> {
+        throw new AppError(501, "Operation module not implemented");
     }
 
-    async getAllOperations(): Promise<any[]> {
-        return await this.prisma.operation.findMany();
+    async getAllOperations(): Promise<object[]> {
+        throw new AppError(501, "Operation module not implemented");
     }
 
-    async getOperationById(id: string): Promise<any> {
-        return await this.prisma.operation.findUnique({ where: { id } });
+    async getOperationById(_id: string): Promise<object | null> {
+        throw new AppError(501, "Operation module not implemented");
     }
 
-    async updateOperation(id: string, data: any): Promise<any> {
-        return await this.prisma.operation.update({ where: { id }, data: data as any });
+    async updateOperation(_id: string, _data: object): Promise<object> {
+        throw new AppError(501, "Operation module not implemented");
     }
 
-    async deleteOperation(id: string): Promise<any> {
-        return await this.prisma.operation.delete({ where: { id } });
+    async deleteOperation(_id: string): Promise<object> {
+        throw new AppError(501, "Operation module not implemented");
     }
 }
 

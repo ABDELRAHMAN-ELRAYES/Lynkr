@@ -5,7 +5,7 @@ import AppError from "../../utils/app-error";
 class ServiceService {
     private static serviceRepository = ServiceRepository.getInstance();
 
-    static async createService(data: any, next: NextFunction) {
+    static async createService(data: object, _next: NextFunction) {
         return await this.serviceRepository.createService(data);
     }
 
@@ -22,11 +22,11 @@ class ServiceService {
         return service;
     }
 
-    static async updateService(id: string, data: any, next: NextFunction) {
+    static async updateService(id: string, data: object, _next: NextFunction) {
         return await this.serviceRepository.updateService(id, data);
     }
 
-    static async deleteService(id: string, next: NextFunction) {
+    static async deleteService(id: string, _next: NextFunction) {
         return await this.serviceRepository.deleteService(id);
     }
 }

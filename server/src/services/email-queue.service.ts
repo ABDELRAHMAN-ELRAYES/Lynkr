@@ -12,12 +12,12 @@ const emailQueue = new Queue("email", {
 
 // Email transporter
 const transporter = nodemailer.createTransport({
-    host: config.email.host,
-    port: config.email.port,
-    secure: config.email.secure,
+    host: config.mail.host,
+    port: config.mail.port,
+    secure: config.mail.secure,
     auth: {
-        user: config.email.user,
-        pass: config.email.password,
+        user: config.mail.user,
+        pass: config.mail.password,
     },
 });
 
@@ -27,7 +27,7 @@ emailQueue.process(async (job) => {
 
     try {
         await transporter.sendMail({
-            from: config.email.from,
+            from: config.mail.from,
             to,
             subject,
             html,

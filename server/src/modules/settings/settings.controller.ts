@@ -3,7 +3,7 @@ import { catchAsync } from "../../utils/catch-async";
 import SettingsService from "./settings.service";
 
 export const getAllSettings = catchAsync(
-    async (request: Request, response: Response, next: NextFunction) => {
+    async (_request: Request, response: Response, _next: NextFunction) => {
         const settings = await SettingsService.getAllSettings();
         response.status(200).json({ status: "success", data: { settings } });
     }

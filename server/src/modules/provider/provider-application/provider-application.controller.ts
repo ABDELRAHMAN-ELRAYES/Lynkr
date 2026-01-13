@@ -4,12 +4,12 @@ import ProviderApplicationService from "./provider-application.service";
 /**
  * Submit a new provider application
  */
-export const submitApplication = async (req: Request, res: Response, next: NextFunction) => {
+export const submitApplication = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     const userId = (req.user as any).id;
     const application = await ProviderApplicationService.submitApplication(userId, next);
 
     if (application) {
-        return res.status(201).json({
+        res.status(201).json({
             status: "success",
             message: "Application submitted successfully",
             data: application,
@@ -20,12 +20,12 @@ export const submitApplication = async (req: Request, res: Response, next: NextF
 /**
  * Get current user's application history
  */
-export const getMyApplications = async (req: Request, res: Response, next: NextFunction) => {
+export const getMyApplications = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     const userId = (req.user as any).id;
     const applications = await ProviderApplicationService.getMyApplications(userId, next);
 
     if (applications) {
-        return res.status(200).json({
+        res.status(200).json({
             status: "success",
             data: applications,
         });
@@ -35,11 +35,11 @@ export const getMyApplications = async (req: Request, res: Response, next: NextF
 /**
  * Get all pending applications (Admin only)
  */
-export const getPendingApplications = async (req: Request, res: Response, next: NextFunction) => {
+export const getPendingApplications = async (_req: Request, res: Response, next: NextFunction): Promise<void> => {
     const applications = await ProviderApplicationService.getPendingApplications(next);
 
     if (applications) {
-        return res.status(200).json({
+        res.status(200).json({
             status: "success",
             data: applications,
         });
@@ -49,11 +49,11 @@ export const getPendingApplications = async (req: Request, res: Response, next: 
 /**
  * Get single application by ID (Admin only)
  */
-export const getApplicationById = async (req: Request, res: Response, next: NextFunction) => {
+export const getApplicationById = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     const application = await ProviderApplicationService.getApplicationById(req.params.id, next);
 
     if (application) {
-        return res.status(200).json({
+        res.status(200).json({
             status: "success",
             data: application,
         });
@@ -63,12 +63,12 @@ export const getApplicationById = async (req: Request, res: Response, next: Next
 /**
  * Approve application (Admin only)
  */
-export const approveApplication = async (req: Request, res: Response, next: NextFunction) => {
+export const approveApplication = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     const adminId = (req.user as any).id;
     const result = await ProviderApplicationService.approveApplication(req.params.id, adminId, next);
 
     if (result) {
-        return res.status(200).json({
+        res.status(200).json({
             status: "success",
             message: result.message,
         });
@@ -78,7 +78,7 @@ export const approveApplication = async (req: Request, res: Response, next: Next
 /**
  * Reject application (Admin only)
  */
-export const rejectApplication = async (req: Request, res: Response, next: NextFunction) => {
+export const rejectApplication = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     const adminId = (req.user as any).id;
     const { reason } = req.body;
 
@@ -90,7 +90,7 @@ export const rejectApplication = async (req: Request, res: Response, next: NextF
     );
 
     if (result) {
-        return res.status(200).json({
+        res.status(200).json({
             status: "success",
             message: result.message,
         });
