@@ -11,13 +11,13 @@ import {
     deleteProjectFile,
     getProjectActivities
 } from "./project.controller";
-import { protect } from "../../../auth/auth.controller";
+import { AuthMiddleware } from "../../../middlewares/auth.middleware";
 import upload, { validateUploadedFileSize } from "../../../../middlewares/file-upload";
 
 const ProjectRouter = Router();
 
 // All routes require authentication
-ProjectRouter.use(protect);
+ProjectRouter.use(AuthMiddleware.protect);
 
 // Create project from accepted proposal
 ProjectRouter.post("/", createProject);

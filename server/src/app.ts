@@ -27,6 +27,8 @@ import ProviderApplicationRouter from "./modules/provider/provider-application/p
 import ProjectRouter from "./modules/process/project/project.route";
 import ConversationRouter from "./modules/messaging/conversation/conversation.route";
 import MessageRouter from "./modules/messaging/message/message.route";
+import SlotRouter from "./modules/teaching/slot/slot.route";
+import SessionRouter from "./modules/teaching/session/session.route";
 import { bodyParser, cookieParserMiddleware, corsMiddleware, formParser } from "./middlewares/middlewares";
 
 // Seed default admin user
@@ -99,6 +101,8 @@ app.use("/api/v1/provider-applications", ProviderApplicationRouter);
 app.use("/api/v1/projects", ProjectRouter);
 app.use("/api/v1/conversations", ConversationRouter);
 app.use("/api/v1/messages", MessageRouter);
+app.use("/api/v1/teaching/slots", SlotRouter);
+app.use("/api/v1/teaching/sessions", SessionRouter);
 
 // 404 handler - MUST be after all routes
 app.use(notFoundHandler);

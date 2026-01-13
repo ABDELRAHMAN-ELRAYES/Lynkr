@@ -107,6 +107,8 @@ model ProviderProfile {
     providerApplications ProviderApplication[]
     // ProviderProfile -> Project (One -> Many)
     projects             Project[]
+    // ProviderProfile -> TeachingSlot (One -> Many)
+    teachingSlots        TeachingSlot[]
 
     @@map("provider_profiles")
 }
@@ -302,6 +304,8 @@ model File {
     proposalFiles ProposalFile[]
     // File -> ProjectFile (One -> Many)
     projectFiles  ProjectFile[]
+    // File -> SessionFile (One -> Many)
+    sessionFiles  SessionFile[]
 
     @@map("files")
 }
@@ -359,6 +363,8 @@ model Payment {
     payer          User            @relation("ClientPayments", fields: [payerId], references: [id])
     // Payment -> ProjectPayment (One -> One)
     projectPayment ProjectPayment?
+    // Payment -> SessionPayment (One -> One)
+    sessionPayment SessionPayment?
 
     @@map("payments")
 }
@@ -542,4 +548,148 @@ model Meeting {
     guest   User    @relation("MeetingGuest", fields: [guestId], references: [id])
 
     @@map("meetings")
+}
+
+// ============================================
+// Module 7: Teaching & Scheduling
+// ============================================
+
+model TeachingSlot {
+    id                String   @id @default(uuid())
+    providerProfileId String   @map("provider_profile_id")
+    slotDate          DateTime @map("slot_date") @db.Date
+    startTime         String   @map("start_time")
+    endTime           String   @map("end_time")
+    durationMinutes   Int      @map("duration_minutes")
+    sessionType       String   @map("session_type") // ONE_TO_ONE, GROUP
+    maxParticipants   Int      @default(1) @map("max_participants")
+    timezone          String   @default("UTC")
+    createdAt         DateTime @default(now()) @map("created_at")
+    updatedAt         DateTime @updatedAt @map("updated_at")
+
+    // Relations
+    // TeachingSlot -> ProviderProfile (Many -> One)
+    providerProfile ProviderProfile  @relation(fields: [providerProfileId], references: [id], onDelete: Cascade)
+    // TeachingSlot -> TeachingSession (One -> One)
+    session         TeachingSession?
+
+    @@map("teaching_slots")
+}
+
+model TeachingSession {
+    id           String    @id @default(uuid())
+    slotId       String    @unique @map("slot_id")
+    instructorId String    @map("instructor_id")
+    status       String    @default("SCHEDULED") // SCHEDULED, IN_PROGRESS, COMPLETED, CANCELLED, NO_SHOW
+    channelName  String?   @unique @map("channel_name")
+    startedAt    DateTime? @map("started_at")
+    completedAt  DateTime? @map("completed_at")
+    createdAt    DateTime  @default(now()) @map("created_at")
+    updatedAt    DateTime  @updatedAt @map("updated_at")
+
+    // Relations
+    // TeachingSession -> TeachingSlot (One -> One)
+    slot         TeachingSlot         @relation(fields: [slotId], references: [id])
+    // TeachingSession -> SessionParticipant (One -> Many)
+    participants SessionParticipant[]
+    // TeachingSession -> SessionAttendance (One -> Many)
+    attendances  SessionAttendance[]
+    // TeachingSession -> SessionFile (One -> Many)
+    files        SessionFile[]
+    // TeachingSession -> SessionConversation (One -> One)
+    conversation SessionConversation?
+
+    @@map("teaching_sessions")
+}
+
+model SessionParticipant {
+    id        String   @id @default(uuid())
+    sessionId String   @map("session_id")
+    userId    String   @map("user_id")
+    status    String   @default("BOOKED") // BOOKED, CANCELLED, REFUNDED
+    bookedAt  DateTime @default(now()) @map("booked_at")
+
+    // Relations
+    // SessionParticipant -> TeachingSession (Many -> One)
+    session        TeachingSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+    // SessionParticipant -> SessionPayment (One -> One)
+    sessionPayment SessionPayment?
+
+    @@unique([sessionId, userId])
+    @@map("session_participants")
+}
+
+// Join table: Payment <-> SessionParticipant
+model SessionPayment {
+    id            String @id @default(uuid())
+    paymentId     String @unique @map("payment_id")
+    participantId String @unique @map("participant_id")
+
+    // Relations
+    // SessionPayment -> Payment (One -> One)
+    payment     Payment            @relation(fields: [paymentId], references: [id], onDelete: Cascade)
+    // SessionPayment -> SessionParticipant (One -> One)
+    participant SessionParticipant @relation(fields: [participantId], references: [id], onDelete: Cascade)
+
+    @@map("session_payments")
+}
+
+model SessionAttendance {
+    id        String    @id @default(uuid())
+    sessionId String    @map("session_id")
+    userId    String    @map("user_id")
+    joinedAt  DateTime  @default(now()) @map("joined_at")
+    leftAt    DateTime? @map("left_at")
+
+    // Relations
+    // SessionAttendance -> TeachingSession (Many -> One)
+    session TeachingSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+
+    @@map("session_attendances")
+}
+
+// Join table: File <-> TeachingSession
+model SessionFile {
+    id         String   @id @default(uuid())
+    sessionId  String   @map("session_id")
+    fileId     String   @map("file_id")
+    uploaderId String   @map("uploader_id")
+    createdAt  DateTime @default(now()) @map("created_at")
+
+    // Relations
+    // SessionFile -> TeachingSession (Many -> One)
+    session TeachingSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+    // SessionFile -> File (Many -> One)
+    file    File            @relation(fields: [fileId], references: [id], onDelete: Cascade)
+
+    @@map("session_files")
+}
+
+// Chat for 1-to-1 sessions only
+model SessionConversation {
+    id        String   @id @default(uuid())
+    sessionId String   @unique @map("session_id")
+    createdAt DateTime @default(now()) @map("created_at")
+
+    // Relations
+    // SessionConversation -> TeachingSession (One -> One)
+    session  TeachingSession  @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+    // SessionConversation -> SessionMessage (One -> Many)
+    messages SessionMessage[]
+
+    @@map("session_conversations")
+}
+
+model SessionMessage {
+    id             String   @id @default(uuid())
+    conversationId String   @map("conversation_id")
+    senderId       String   @map("sender_id")
+    content        String   @db.Text
+    createdAt      DateTime @default(now()) @map("created_at")
+
+    // Relations
+    // SessionMessage -> SessionConversation (Many -> One)
+    conversation SessionConversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+
+    @@map("session_messages")
 }
