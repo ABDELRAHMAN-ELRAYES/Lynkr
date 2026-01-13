@@ -1,103 +1,118 @@
 ## Module Goal (Execution Perspective)
 
-Enable **teaching providers** to define available time slots and conduct **live group or 1-on-1 video sessions** with clients/students, while maintaining clear scheduling, visibility, and participant limits.
+Ensure **timely, reliable, and context-aware notifications** for all user-facing events, keeping users informed of critical actions and status changes across the platform.
 
 ---
 
-## 1. Availability Management Tasks
+## 1. Notification Types Tasks
 
-### 1.1 Define Time Slots
+### 1.1 System Events
 
-* Allow teaching providers to create weekly recurring availability:
+* Account-related:
 
-  * Day(s) of week
-  * Start and end times
-* Allow multiple time slots per day
-* Validate overlapping time slots and prevent conflicts
-* Show time zone clearly for scheduling
+  * Registration completed
+  * Email verified
+  * Password reset
+  * Role/status changes
+* Provider application updates:
 
-### 1.2 Slot Editing & Deletion
+  * Application submitted
+  * Approved / Rejected
+* Request-related:
 
-* Allow providers to update or delete future slots
-* Past or ongoing slots cannot be modified
-* Notify affected clients/students if slot changes
+  * New direct request received
+  * Public request posted
+  * Proposal received
+  * Proposal accepted/rejected
+  * Request expired or cancelled
+* Project-related:
 
----
-
-## 2. Booking Tasks
-
-### 2.1 Slot Selection by Clients
-
-* Display provider availability in an intuitive calendar format
-* Allow clients to select preferred slot(s)
-* Prevent double-booking
-* Confirm booking with both provider and client
-
-### 2.2 Booking Confirmation
-
-* Upon booking:
-
-  * Reserve the slot
-  * Notify both parties
-  * Lock slot against other requests
-* Provide option to cancel (Phase 1: limited to X hours before session)
+  * Project created
+  * Milestone or deliverable updates (Phase 1 basic)
+  * Project completion (Phase 1 basic)
 
 ---
 
-## 3. Session Execution Tasks
+### 1.2 Communication Messages
 
-### 3.1 Video Session Launch
+* Trigger notifications for:
 
-* Allow provider to start session at scheduled time
-* Include:
-
-  * Maximum participants (Phase 1: 20)
-  * Audio/video interaction
-* Display participant list
-* Prevent unauthorized users from joining
-
-### 3.2 Session End Handling
-
-* Mark session as completed
-* Record attendance for participants
-* Notify participants of session completion
+  * New message in request/project context
+  * Attachment uploads (if implemented)
+* Ensure sender/recipient visibility context is enforced
 
 ---
 
-## 4. Communication Integration
+## 2. Delivery Channels Tasks
 
-* Enable in-session messaging or chat (Phase 1: text-only)
-* Allow file sharing during session (optional)
-* Integrate with Module 5 messaging if needed
+### 2.1 Real-Time Notifications
+
+* Display notifications within the platform interface
+* Ensure visibility on login or active session
+* Maintain read/unread status
+
+### 2.2 Email Notifications
+
+* Send email for critical events (Phase 1: registration, proposal acceptance, application decisions)
+* Include essential context in the email
+* Avoid sending redundant or excessive messages
+
+---
+
+## 3. Notification Lifecycle Tasks
+
+### 3.1 Creation
+
+* Generate notification automatically upon event trigger
+* Attach:
+
+  * Relevant entity (request, project, proposal)
+  * Timestamp
+  * Event type and description
+
+### 3.2 Read/Unread Handling
+
+* Track read/unread state per user
+* Mark as read upon viewing notification
+* Ensure read state does not affect delivery for other channels
+
+### 3.3 Expiration & Archival
+
+* Retain notifications for a configurable period (Phase 1: platform default)
+* Remove expired or obsolete notifications from active list
+* Allow historical review if needed (Phase 2 enhancement)
+
+---
+
+## 4. Context & Access Tasks
+
+* Ensure only relevant users receive the notification:
+
+  * Request notifications → associated client and approved providers
+  * Project notifications → associated client and provider(s)
+  * System notifications → intended recipients only
+* Avoid leakage of sensitive or irrelevant data
 
 ---
 
 ## 5. Error & Edge Case Handling
 
-* Client tries to book a past slot
-* Provider cancels a scheduled session
-* Session start delayed or provider offline
-* Exceeding maximum participant limit
-* Network or session failure during session
+* User offline during notification trigger
+* Duplicate notifications due to repeated events
+* Missing event context
+* User unsubscribed from email notifications
+* Expired entities (deleted request/project) triggering notifications
 
 ---
 
-## 6. Notifications Tasks
+## 6. Module Completion Criteria
 
-* Notify provider of new bookings or cancellations
-* Notify client of confirmed slot, cancellations, or session reminders
-* Optionally send session start alerts
+Module 7 is complete when:
 
----
+* Notifications are generated reliably for all Phase 1 events
+* Users receive notifications via platform and email channels
+* Read/unread state is maintained correctly
+* Only relevant recipients are notified
+* Edge cases (offline, deleted entities) are handled gracefully
+* Notifications provide sufficient context for immediate user action
 
-## 7. Module Completion Criteria
-
-Module 9 is complete when:
-
-* Providers can define weekly availability with multiple slots
-* Clients can view availability and book slots reliably
-* Bookings prevent conflicts and double-bookings
-* Scheduled sessions launch and enforce participant limits
-* Session completion and attendance are recorded
-* Notifications for bookings and cancellations are sent
-* Edge cases are handled gracefully

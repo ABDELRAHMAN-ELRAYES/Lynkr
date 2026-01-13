@@ -1,11 +1,10 @@
 // Payment Types - No Prisma dependencies
 
-export type PaymentType = "FULL" | "INITIAL" | "FINAL";
+export type PaymentType = "FULL" | "INITIAL" | "FINAL" | "SESSION";
 export type PaymentStatus = "PENDING" | "COMPLETED" | "REFUNDED" | "CANCELLED";
 
 export interface IPayment {
     id: string;
-    projectId: string;
     payerId: string;
     amount: number;
     currency: string;
@@ -18,11 +17,14 @@ export interface IPayment {
 }
 
 export interface ICreatePaymentData {
-    projectId: string;
     payerId: string;
     amount: number;
     currency?: string;
     paymentType: PaymentType;
+}
+
+export interface ICreateProjectPaymentData extends ICreatePaymentData {
+    projectId: string;
 }
 
 export interface IUpdatePaymentData {
@@ -36,4 +38,10 @@ export interface IPaymentIntent {
     paymentIntentId: string;
     amount: number;
     currency: string;
+}
+
+export interface IProjectPayment {
+    id: string;
+    paymentId: string;
+    projectId: string;
 }

@@ -1,7 +1,7 @@
 import PrismaClientSingleton from "../../../../data-server-clients/prisma-client";
 import { PrismaClient } from "@prisma/client";
 import AppError from "../../../../utils/app-error";
-import { ICreatePaymentData, IUpdatePaymentData } from "./types/IPayment";
+import { ICreatePaymentData, ICreateProjectPaymentData, IUpdatePaymentData } from "./types/IPayment";
 
 class PaymentRepository {
     private prisma: PrismaClient;
@@ -18,18 +18,17 @@ class PaymentRepository {
         return PaymentRepository.instance;
     }
 
+    // Create a generic payment
     async createPayment(data: ICreatePaymentData) {
         try {
             return await this.prisma.payment.create({
                 data: {
-                    projectId: data.projectId,
                     payerId: data.payerId,
                     amount: data.amount,
                     currency: data.currency || "USD",
                     paymentType: data.paymentType
                 },
                 include: {
-                    project: true,
                     payer: {
                         select: { id: true, firstName: true, lastName: true, email: true }
                     }
@@ -40,14 +39,49 @@ class PaymentRepository {
         }
     }
 
+    // Create payment linked to a project (using join table)
+    async createProjectPayment(data: ICreateProjectPaymentData) {
+        try {
+            return await this.prisma.payment.create({
+                data: {
+                    payerId: data.payerId,
+                    amount: data.amount,
+                    currency: data.currency || "USD",
+                    paymentType: data.paymentType,
+                    projectPayment: {
+                        create: {
+                            projectId: data.projectId
+                        }
+                    }
+                },
+                include: {
+                    payer: {
+                        select: { id: true, firstName: true, lastName: true, email: true }
+                    },
+                    projectPayment: {
+                        include: {
+                            project: true
+                        }
+                    }
+                }
+            });
+        } catch (error) {
+            throw new AppError(500, "Failed to create project payment");
+        }
+    }
+
     async getPaymentById(id: string) {
         try {
             return await this.prisma.payment.findUnique({
                 where: { id },
                 include: {
-                    project: true,
                     payer: {
                         select: { id: true, firstName: true, lastName: true, email: true }
+                    },
+                    projectPayment: {
+                        include: {
+                            project: true
+                        }
                     }
                 }
             });
@@ -59,7 +93,14 @@ class PaymentRepository {
     async getPaymentsByProjectId(projectId: string) {
         try {
             return await this.prisma.payment.findMany({
-                where: { projectId },
+                where: {
+                    projectPayment: {
+                        projectId
+                    }
+                },
+                include: {
+                    projectPayment: true
+                },
                 orderBy: { createdAt: "desc" }
             });
         } catch (error) {
@@ -71,7 +112,13 @@ class PaymentRepository {
         try {
             return await this.prisma.payment.findMany({
                 where: { payerId },
-                include: { project: true },
+                include: {
+                    projectPayment: {
+                        include: {
+                            project: true
+                        }
+                    }
+                },
                 orderBy: { createdAt: "desc" }
             });
         } catch (error) {
@@ -94,7 +141,13 @@ class PaymentRepository {
         try {
             return await this.prisma.payment.findFirst({
                 where: { stripePaymentId },
-                include: { project: true }
+                include: {
+                    projectPayment: {
+                        include: {
+                            project: true
+                        }
+                    }
+                }
             });
         } catch (error) {
             throw new AppError(500, "Failed to get payment by Stripe ID");

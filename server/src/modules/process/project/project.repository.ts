@@ -1,6 +1,6 @@
-import PrismaClientSingleton from "../../../../data-server-clients/prisma-client";
+import PrismaClientSingleton from "../../../data-server-clients/prisma-client";
 import { PrismaClient } from "@prisma/client";
-import AppError from "../../../../utils/app-error";
+import AppError from "../../../utils/app-error";
 import { ICreateProjectData, IUpdateProjectData } from "./types/IProject";
 import { ICreateProjectFileData, ICreateActivityData } from "./types/IProjectWorkspace";
 
@@ -64,7 +64,11 @@ class ProjectRepository {
                     },
                     acceptedProposal: true,
                     escrow: true,
-                    payments: true,
+                    projectPayments: {
+                        include: {
+                            payment: true
+                        }
+                    },
                     files: {
                         include: {
                             file: true,

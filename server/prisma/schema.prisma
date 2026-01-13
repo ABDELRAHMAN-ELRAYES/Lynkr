@@ -344,11 +344,10 @@ model ProposalFile {
 
 model Payment {
     id              String    @id @default(uuid())
-    projectId       String    @map("project_id")
     payerId         String    @map("payer_id")
     amount          Decimal
     currency        String    @default("USD")
-    paymentType     String    @map("payment_type") // FULL, INITIAL, FINAL
+    paymentType     String    @map("payment_type") // FULL, INITIAL, FINAL, SESSION
     status          String    @default("PENDING") // PENDING, COMPLETED, REFUNDED, CANCELLED
     stripePaymentId String?   @map("stripe_payment_id")
     paidAt          DateTime? @map("paid_at")
@@ -356,12 +355,27 @@ model Payment {
     updatedAt       DateTime  @updatedAt @map("updated_at")
 
     // Relations
-    // Payment -> Project (Many -> One)
-    project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
     // Payment -> User (Many -> One)
-    payer   User    @relation("ClientPayments", fields: [payerId], references: [id])
+    payer          User            @relation("ClientPayments", fields: [payerId], references: [id])
+    // Payment -> ProjectPayment (One -> One)
+    projectPayment ProjectPayment?
 
     @@map("payments")
+}
+
+// Join table: Payment <-> Project
+model ProjectPayment {
+    id        String @id @default(uuid())
+    paymentId String @unique @map("payment_id")
+    projectId String @map("project_id")
+
+    // Relations
+    // ProjectPayment -> Payment (One -> One)
+    payment Payment @relation(fields: [paymentId], references: [id], onDelete: Cascade)
+    // ProjectPayment -> Project (Many -> One)
+    project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+    @@map("project_payments")
 }
 
 model Escrow {
@@ -407,8 +421,8 @@ model Project {
     acceptedProposal Proposal          @relation(fields: [acceptedProposalId], references: [id])
     // Project -> Escrow (One -> One)
     escrow           Escrow?
-    // Project -> Payment (One -> Many)
-    payments         Payment[]
+    // Project -> ProjectPayment (One -> Many)
+    projectPayments  ProjectPayment[]
     // Project -> ProjectFile (One -> Many)
     files            ProjectFile[]
     // Project -> ProjectActivity (One -> Many)
