@@ -49,6 +49,10 @@ model User {
     participant2Conversations Conversation[]        @relation("Participant2Conversations")
     // User -> Message (One -> Many) - as sender
     sentMessages              Message[]             @relation("SentMessages")
+    // User -> Meeting (One -> Many) - as host
+    hostedMeetings            Meeting[]             @relation("MeetingHost")
+    // User -> Meeting (One -> Many) - as guest
+    guestMeetings             Meeting[]             @relation("MeetingGuest")
 
     @@map("users")
 }
@@ -411,6 +415,8 @@ model Project {
     activities       ProjectActivity[]
     // Project -> Conversation (One -> One)
     conversation     Conversation?
+    // Project -> Meeting (One -> Many)
+    meetings         Meeting[]
 
     @@map("projects")
 }
@@ -493,4 +499,33 @@ model Message {
     sender       User         @relation("SentMessages", fields: [senderId], references: [id])
 
     @@map("messages")
+}
+
+// ============================================
+// Module 6B: Video Meetings (Agora)
+// ============================================
+
+model Meeting {
+    id          String    @id @default(uuid())
+    projectId   String    @map("project_id")
+    hostId      String    @map("host_id")
+    guestId     String    @map("guest_id")
+    channelName String    @unique @map("channel_name")
+    status      String    @default("PENDING") // PENDING, ACTIVE, COMPLETED, CANCELLED
+    scheduledAt DateTime? @map("scheduled_at")
+    startedAt   DateTime? @map("started_at")
+    endedAt     DateTime? @map("ended_at")
+    duration    Int? // In seconds
+    createdAt   DateTime  @default(now()) @map("created_at")
+    updatedAt   DateTime  @updatedAt @map("updated_at")
+
+    // Relations
+    // Meeting -> Project (Many -> One)
+    project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+    // Meeting -> User (Many -> One) - host
+    host    User    @relation("MeetingHost", fields: [hostId], references: [id])
+    // Meeting -> User (Many -> One) - guest
+    guest   User    @relation("MeetingGuest", fields: [guestId], references: [id])
+
+    @@map("meetings")
 }
