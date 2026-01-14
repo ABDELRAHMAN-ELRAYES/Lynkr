@@ -59,6 +59,12 @@ model User {
     reviewsReceived           Review[]              @relation("ReviewsReceived")
     // User -> Notification (One -> Many)
     notifications             Notification[]
+    // User -> Report (One -> Many) - reports submitted
+    reportsSubmitted          Report[]              @relation("ReportsSubmitted")
+    // User -> Report (One -> Many) - reports received
+    reportsReceived           Report[]              @relation("ReportsReceived")
+    // User -> ReportAction (One -> Many) - admin actions taken
+    adminActions              ReportAction[]        @relation("AdminActions")
 
     @@map("users")
 }
@@ -314,6 +320,8 @@ model File {
     projectFiles  ProjectFile[]
     // File -> SessionFile (One -> Many)
     sessionFiles  SessionFile[]
+    // File -> ReportFile (One -> Many)
+    reportFiles   ReportFile[]
 
     @@map("files")
 }
@@ -790,4 +798,66 @@ model Notification {
 
     @@index([userId, isRead])
     @@map("notifications")
+}
+
+// ============================================
+// Module 10: Reporting & Moderation
+// ============================================
+
+model Report {
+    id           String   @id @default(uuid())
+    reporterId   String   @map("reporter_id")
+    targetUserId String?  @map("target_user_id")
+    targetType   String   @map("target_type") // USER, PROJECT, SESSION, REQUEST
+    targetId     String   @map("target_id")
+    category     String // FRAUD, ABUSE, SERVICE_FAILURE, POLICY_VIOLATION, TECHNICAL
+    description  String   @db.Text
+    status       String   @default("SUBMITTED") // SUBMITTED, UNDER_REVIEW, RESOLVED, DISMISSED
+    createdAt    DateTime @default(now()) @map("created_at")
+    updatedAt    DateTime @updatedAt @map("updated_at")
+
+    // Relations
+    // Report -> User (Many -> One) - reporter
+    reporter   User           @relation("ReportsSubmitted", fields: [reporterId], references: [id])
+    // Report -> User (Many -> One) - target user
+    targetUser User?          @relation("ReportsReceived", fields: [targetUserId], references: [id])
+    // Report -> ReportFile (One -> Many)
+    files      ReportFile[]
+    // Report -> ReportAction (One -> Many)
+    actions    ReportAction[]
+
+    @@map("reports")
+}
+
+// Join table: Report <-> File
+model ReportFile {
+    id        String   @id @default(uuid())
+    reportId  String   @map("report_id")
+    fileId    String   @map("file_id")
+    createdAt DateTime @default(now()) @map("created_at")
+
+    // Relations
+    // ReportFile -> Report (Many -> One)
+    report Report @relation(fields: [reportId], references: [id], onDelete: Cascade)
+    // ReportFile -> File (Many -> One)
+    file   File   @relation(fields: [fileId], references: [id], onDelete: Cascade)
+
+    @@map("report_files")
+}
+
+model ReportAction {
+    id         String   @id @default(uuid())
+    reportId   String   @map("report_id")
+    adminId    String   @map("admin_id")
+    actionType String   @map("action_type") // STATUS_CHANGE, WARNING, SUSPEND, BAN
+    details    String?  @db.Text
+    createdAt  DateTime @default(now()) @map("created_at")
+
+    // Relations
+    // ReportAction -> Report (Many -> One)
+    report Report @relation(fields: [reportId], references: [id], onDelete: Cascade)
+    // ReportAction -> User (Many -> One) - admin
+    admin  User   @relation("AdminActions", fields: [adminId], references: [id])
+
+    @@map("report_actions")
 }

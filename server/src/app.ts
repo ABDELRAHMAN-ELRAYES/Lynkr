@@ -29,6 +29,7 @@ import ConversationRouter from "./modules/messaging/conversation/conversation.ro
 import MessageRouter from "./modules/messaging/message/message.route";
 import SlotRouter from "./modules/teaching/slot/slot.route";
 import SessionRouter from "./modules/teaching/session/session.route";
+import ReportRouter from "./modules/report/report.route";
 import { bodyParser, cookieParserMiddleware, corsMiddleware, formParser } from "./middlewares/middlewares";
 
 // Seed default admin user
@@ -103,6 +104,7 @@ app.use("/api/v1/conversations", ConversationRouter);
 app.use("/api/v1/messages", MessageRouter);
 app.use("/api/v1/teaching/slots", SlotRouter);
 app.use("/api/v1/teaching/sessions", SessionRouter);
+app.use("/api/v1/reports", ReportRouter);
 
 // 404 handler
 app.use(notFoundHandler);
