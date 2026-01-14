@@ -1,23 +1,61 @@
 import { Router } from "express";
 import {
     getAllPlans,
-    createSubscription,
+    getPlanById,
+    createPlan,
+    updatePlan,
+    purchaseSubscription,
+    getMyActiveSubscription,
+    getMySubscriptions,
     getAllSubscriptions,
-    getSubscription,
-    updateSubscription,
+    cancelSubscription,
 } from "./subscription.controller";
-import { protect } from "../auth/auth.controller";
+import { protect, checkPermissions } from "../auth/auth.controller";
+import { UserRole } from "../../enum/UserRole";
 
 const SubscriptionRouter = Router();
 
+// Public: Get available plans
 SubscriptionRouter.get("/plans", getAllPlans);
 
-SubscriptionRouter.route("/")
-    .post(protect, createSubscription)
-    .get(protect, getAllSubscriptions);
+// Public: Get plan by ID
+SubscriptionRouter.get("/plans/:id", getPlanById);
 
-SubscriptionRouter.route("/:id")
-    .get(protect, getSubscription)
-    .put(protect, updateSubscription);
+// Protected routes
+SubscriptionRouter.use(protect);
+
+// Provider: Purchase subscription
+SubscriptionRouter.post("/purchase", purchaseSubscription);
+
+// Provider: Get my active subscription
+SubscriptionRouter.get("/my", getMyActiveSubscription);
+
+// Provider: Get my subscription history
+SubscriptionRouter.get("/my/history", getMySubscriptions);
+
+// Provider: Cancel subscription
+SubscriptionRouter.patch("/:id/cancel", cancelSubscription);
+
+// ===== Admin Routes =====
+// Create plan
+SubscriptionRouter.post(
+    "/plans",
+    checkPermissions([UserRole.ADMIN, UserRole.SUPER_ADMIN]),
+    createPlan
+);
+
+// Update plan
+SubscriptionRouter.patch(
+    "/plans/:id",
+    checkPermissions([UserRole.ADMIN, UserRole.SUPER_ADMIN]),
+    updatePlan
+);
+
+// Get all subscriptions
+SubscriptionRouter.get(
+    "/admin/all",
+    checkPermissions([UserRole.ADMIN, UserRole.SUPER_ADMIN]),
+    getAllSubscriptions
+);
 
 export default SubscriptionRouter;

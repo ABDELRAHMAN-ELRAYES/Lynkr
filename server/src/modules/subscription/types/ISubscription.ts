@@ -1,26 +1,66 @@
-export type ISubscription = {
+// Subscription Types for Module 11: Subscription Plans
+
+// Subscription status
+export type SubscriptionStatus = "PENDING" | "ACTIVE" | "EXPIRED" | "CANCELLED";
+
+// Payment status
+export type PaymentStatus = "PENDING" | "PAID" | "FAILED";
+
+// Subscription plan interface
+export interface ISubscriptionPlan {
     id: string;
-    userId: string;
-    planId: string;
-    status: string;
-    startDate: Date;
-    endDate?: Date;
+    name: string;
+    description?: string | null;
+    price: number;
+    durationDays: number;
+    visibilityBoost: number;
+    isActive: boolean;
     createdAt: Date;
     updatedAt: Date;
-};
+}
 
-export type IPlan = {
+// Provider subscription interface
+export interface IProviderSubscription {
     id: string;
+    providerProfileId: string;
+    planId: string;
+    status: SubscriptionStatus;
+    paymentStatus: PaymentStatus;
+    startDate?: Date | null;
+    endDate?: Date | null;
+    createdAt: Date;
+    updatedAt: Date;
+    plan?: ISubscriptionPlan;
+}
+
+// Input for creating a plan (admin)
+export interface ICreatePlanData {
     name: string;
     description?: string;
     price: number;
-    duration: number;
-    features?: string[];
-};
+    durationDays: number;
+    visibilityBoost?: number;
+}
 
-export type CreateSubscriptionRequest = {
-    userId: string;
+// Input for updating a plan (admin)
+export interface IUpdatePlanData {
+    name?: string;
+    description?: string;
+    price?: number;
+    durationDays?: number;
+    visibilityBoost?: number;
+    isActive?: boolean;
+}
+
+// Input for purchasing a subscription
+export interface IPurchaseSubscriptionData {
+    providerProfileId: string;
     planId: string;
-};
+}
 
-export type SubscriptionResponse = ISubscription;
+// Query params
+export interface ISubscriptionQueryParams {
+    page?: number;
+    limit?: number;
+    status?: SubscriptionStatus;
+}

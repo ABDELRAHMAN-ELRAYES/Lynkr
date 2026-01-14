@@ -10,7 +10,6 @@ import { globalErrorHandler, notFoundHandler } from "./middlewares/error-handler
 // Import all route modules
 import AuthRouter from "./modules/auth/auth.route";
 import UserRouter from "./modules/user/user.route";
-import OperationRouter from "./modules/operation/operation.route";
 import PaymentRouter from "./modules/process/money-system/payment/payment.route";
 import ServiceRouter from "./modules/service/service.route";
 import SubscriptionRouter from "./modules/subscription/subscription.route";
@@ -86,7 +85,6 @@ app.use(
 app.use("/api/v1/auth", AuthRouter);
 app.use("/api/v1/users", UserRouter);
 app.use("/api/v1/profiles", ProfileRouter);
-app.use("/api/v1/operations", OperationRouter);
 app.use("/api/v1/payments", PaymentRouter);
 app.use("/api/v1/services", ServiceRouter);
 app.use("/api/v1/subscriptions", SubscriptionRouter);
