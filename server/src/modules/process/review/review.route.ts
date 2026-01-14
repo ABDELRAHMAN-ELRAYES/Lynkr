@@ -9,7 +9,7 @@ import {
     checkProjectReviewEligibility,
     checkSessionReviewEligibility,
 } from "./review.controller";
-import { protect } from "../auth/auth.controller";
+import { protect } from "../../auth/auth.controller";
 
 const ReviewRouter = Router();
 

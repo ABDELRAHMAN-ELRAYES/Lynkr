@@ -57,6 +57,8 @@ model User {
     reviewsGiven              Review[]              @relation("ReviewsGiven")
     // User -> Review (One -> Many) - reviews received
     reviewsReceived           Review[]              @relation("ReviewsReceived")
+    // User -> Notification (One -> Many)
+    notifications             Notification[]
 
     @@map("users")
 }
@@ -763,4 +765,29 @@ model SessionReview {
 
     @@unique([reviewId, sessionId])
     @@map("session_reviews")
+}
+
+// ============================================
+// Module 9: Notifications & Activity Feed
+// ============================================
+
+model Notification {
+    id         String   @id @default(uuid())
+    userId     String   @map("user_id")
+    title      String
+    message    String   @db.Text
+    type       String // MESSAGE, PROPOSAL, PROJECT, PAYMENT, REVIEW, SESSION, SYSTEM
+    category   String // COMMUNICATION, REQUESTS_PROPOSALS, PAYMENTS, PROJECT_SESSION, REVIEWS, SYSTEM
+    entityId   String?  @map("entity_id")
+    entityType String?  @map("entity_type")
+    isRead     Boolean  @default(false) @map("is_read")
+    createdAt  DateTime @default(now()) @map("created_at")
+    updatedAt  DateTime @updatedAt @map("updated_at")
+
+    // Relations
+    // Notification -> User (Many -> One)
+    user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+    @@index([userId, isRead])
+    @@map("notifications")
 }

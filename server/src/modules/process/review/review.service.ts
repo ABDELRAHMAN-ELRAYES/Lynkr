@@ -1,6 +1,6 @@
 import ReviewRepository from "./review.repository";
 import { NextFunction } from "express";
-import AppError from "../../utils/app-error";
+import AppError from "../../../utils/app-error";
 import { ReviewType } from "./types/IReview";
 
 class ReviewService {

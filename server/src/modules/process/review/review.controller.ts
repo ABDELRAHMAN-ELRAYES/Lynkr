@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from "express";
-import { catchAsync } from "../../utils/catch-async";
+import { catchAsync } from "../../../utils/catch-async";
 import ReviewService from "./review.service";
 
 // ===== PROJECT REVIEWS =====

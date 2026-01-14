@@ -14,7 +14,7 @@ import OperationRouter from "./modules/operation/operation.route";
 import PaymentRouter from "./modules/process/money-system/payment/payment.route";
 import ServiceRouter from "./modules/service/service.route";
 import SubscriptionRouter from "./modules/subscription/subscription.route";
-import ReviewRouter from "./modules/review/review.route";
+import ReviewRouter from "./modules/process/review/review.route";
 import SettingsRouter from "./modules/settings/settings.route";
 import AdminRouter from "./modules/admin/admin.route";
 import MeetingRouter from "./modules/meeting/meeting.route";
@@ -104,10 +104,10 @@ app.use("/api/v1/messages", MessageRouter);
 app.use("/api/v1/teaching/slots", SlotRouter);
 app.use("/api/v1/teaching/sessions", SessionRouter);
 
-// 404 handler - MUST be after all routes
+// 404 handler
 app.use(notFoundHandler);
 
-// Global error handler - MUST be last
+// Global error handler
 app.use(globalErrorHandler);
 
 export default app;
