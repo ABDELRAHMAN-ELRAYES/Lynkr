@@ -53,6 +53,10 @@ model User {
     hostedMeetings            Meeting[]             @relation("MeetingHost")
     // User -> Meeting (One -> Many) - as guest
     guestMeetings             Meeting[]             @relation("MeetingGuest")
+    // User -> Review (One -> Many) - reviews given
+    reviewsGiven              Review[]              @relation("ReviewsGiven")
+    // User -> Review (One -> Many) - reviews received
+    reviewsReceived           Review[]              @relation("ReviewsReceived")
 
     @@map("users")
 }
@@ -83,6 +87,8 @@ model ProviderProfile {
     hourlyRate       Decimal? @map("hourly_rate")
     availableBalance Decimal  @default(0) @map("available_balance")
     isApproved       Boolean  @default(false) @map("is_approved")
+    averageRating    Decimal? @map("average_rating")
+    totalReviews     Int      @default(0) @map("total_reviews")
     createdAt        DateTime @default(now()) @map("created_at")
     updatedAt        DateTime @updatedAt @map("updated_at")
 
@@ -437,6 +443,8 @@ model Project {
     conversation     Conversation?
     // Project -> Meeting (One -> Many)
     meetings         Meeting[]
+    // Project -> ProjectReview (One -> Many)
+    reviews          ProjectReview[]
 
     @@map("projects")
 }
@@ -598,6 +606,8 @@ model TeachingSession {
     files        SessionFile[]
     // TeachingSession -> SessionConversation (One -> One)
     conversation SessionConversation?
+    // TeachingSession -> SessionReview (One -> Many)
+    reviews      SessionReview[]
 
     @@map("teaching_sessions")
 }
@@ -692,4 +702,65 @@ model SessionMessage {
     conversation SessionConversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
 
     @@map("session_messages")
+}
+
+// ============================================
+// Module 8: Ratings & Reviews
+// ============================================
+
+// Base review model containing common fields
+model Review {
+    id           String   @id @default(uuid())
+    reviewerId   String   @map("reviewer_id")
+    targetUserId String   @map("target_user_id")
+    rating       Int // 1-5 stars
+    comment      String?  @db.Text
+    reviewType   String   @map("review_type") // CLIENT_TO_PROVIDER, PROVIDER_TO_CLIENT
+    status       String   @default("SUBMITTED") // SUBMITTED, EXPIRED
+    createdAt    DateTime @default(now()) @map("created_at")
+    updatedAt    DateTime @updatedAt @map("updated_at")
+
+    // Relations
+    // Review -> User (Many -> One) - reviewer
+    reviewer      User           @relation("ReviewsGiven", fields: [reviewerId], references: [id])
+    // Review -> User (Many -> One) - target
+    targetUser    User           @relation("ReviewsReceived", fields: [targetUserId], references: [id])
+    // Review -> ProjectReview (One -> One)
+    projectReview ProjectReview?
+    // Review -> SessionReview (One -> One)
+    sessionReview SessionReview?
+
+    @@map("reviews")
+}
+
+// Join table: Review <-> Project
+model ProjectReview {
+    id        String @id @default(uuid())
+    reviewId  String @unique @map("review_id")
+    projectId String @map("project_id")
+
+    // Relations
+    // ProjectReview -> Review (One -> One)
+    review  Review  @relation(fields: [reviewId], references: [id], onDelete: Cascade)
+    // ProjectReview -> Project (Many -> One)
+    project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+    @@unique([reviewId, projectId])
+    @@map("project_reviews")
+}
+
+// Join table: Review <-> TeachingSession
+model SessionReview {
+    id        String @id @default(uuid())
+    reviewId  String @unique @map("review_id")
+    sessionId String @map("session_id")
+
+    // Relations
+    // SessionReview -> Review (One -> One)
+    review  Review          @relation(fields: [reviewId], references: [id], onDelete: Cascade)
+    // SessionReview -> TeachingSession (Many -> One)
+    session TeachingSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+
+    @@unique([reviewId, sessionId])
+    @@map("session_reviews")
 }
