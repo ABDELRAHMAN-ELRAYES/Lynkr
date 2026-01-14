@@ -1,99 +1,40 @@
-## Module Goal (Execution Perspective)
+## Module 11: Subscription & Monetization
 
-Enable **providers to purchase subscription plans** that give them **priority visibility** in search results and filters, ensuring fair, transparent, and trackable exposure boosts.
-
----
-
-## 1. Subscription Plan Management Tasks
-
-### 1.1 Plan Definition
-
-* Admin defines multiple subscription tiers:
-
-  * Duration (e.g., 1 month, 3 months)
-  * Visibility boost level
-  * Feature inclusion (optional Phase 2)
-* Provide clear description and pricing per plan
-* Ensure plans can be activated, paused, or deactivated
-
-### 1.2 Provider Plan Selection
-
-* Allow providers to view available plans
-* Enable selection and purchase of a plan
-* Display:
-
-  * Price
-  * Duration
-  * Benefits (priority listing, featured badges)
-* Prevent purchasing multiple overlapping plans unless allowed
+**Implementation Task Deep Dive**
 
 ---
 
-## 2. Visibility & Priority Listing Tasks
+## 1. Subscription Plans
 
-### 2.1 Search Result Prioritization
+*   **Plan Management**: Admin CRUD for subscription plans (Name, Price, Duration).
+*   **Visibility**: Toggle plans active/inactive.
 
-* Boost providers in search and discovery based on:
+## 2. Subscription Management
 
-  * Active subscription plan
-  * Plan tier (higher-tier → higher visibility)
-* Ensure normal provider ranking rules still apply (rating, relevance)
+*   **Purchase Flow**:
+    *   Checks for existing active subscriptions.
+    *   Creates a `PENDING` subscription record.
+    *   **Payment Integration**: Currently **SIMULATED**. The code marks payment as `PAID` immediately without validating a Stripe transaction or calling `PaymentService`.
+    *   **Activation**: Sets `startDate` and `endDate` automatically.
+*   **Cancellation**: Allows providers to cancel active subscriptions.
 
-### 2.2 Expiration Handling
+## 3. Expiration Handling
 
-* Automatically downgrade providers to standard visibility when plan expires
-* Notify providers of plan expiration in advance
-* Allow plan renewal
-
-### 2.3 Badges & Identification
-
-* Optionally display “Featured” or “Priority” badge for subscribed providers
-* Ensure badges are visible in search results and profile view
+*   **Cron Logic**: Service methods `processExpiredSubscriptions` and `sendExpirationWarnings` exist to handle status transitions and notifications.
+*   **Notifications**: System notifies users of Activation, Cancellation, Upcoming Expiration, and Actual Expiration.
 
 ---
 
-## 3. Billing & Payment Tasks
+## 4. Implementation Status (Updated)
 
-* Integrate with Payments & Escrow module for subscription purchase
-* Record:
+**Implemented:**
 
-  * Plan purchased
-  * Start and end dates
-  * Payment status
-* Notify provider upon successful payment
-* Prevent plan activation if payment fails
+*   **Plan & Subscription CRUD**: Core data models and management logic are in place.
+*   **Expiration Logic**: Logic for identifying and processing expired subscriptions is written.
+*   **Notification Integration**: Proper alerts for all lifecycle events.
 
----
+**Missing Functionalities:**
 
-## 4. Notifications & Reminders Tasks
-
-* Notify providers when:
-
-  * Plan is about to expire
-  * Plan is successfully activated
-  * Payment fails or renewal needed
-* Optional: Notify clients of “featured provider” in search results (Phase 2)
-
----
-
-## 5. Error & Edge Case Handling
-
-* Provider attempts to purchase multiple overlapping plans
-* Expired plans not automatically deactivated
-* Payment failures during subscription purchase
-* Provider profile suspended while subscription active
-* Manual adjustments by admin (graceful handling)
-
----
-
-## 6. Module Completion Criteria
-
-Module 11 is complete when:
-
-* Providers can view and purchase subscription plans
-* Subscribed providers appear with **priority visibility** in search and filters
-* Expiration and renewal workflows function correctly
-* Billing and notifications are handled reliably
-* Edge cases (payment failure, overlap, suspension) are handled gracefully
-
-
+*   **Real Payment Integration**: The `purchaseSubscription` method has a `TODO` for Payment integration. It effectively gives free subscriptions right now. It needs to create a Stripe PaymentIntent (similar to Session/Project modules) and verify it before activating.
+*   **Recurring Billing**: Phase 1 scope seems to be manual renewal (fixed duration), which is implemented. Auto-renewal (Stripe Subscriptions) is not implemented (Phase 2).
+*   **Job Scheduling**: While `processExpiredSubscriptions` exists, I need to confirm the cron job file exists and is running to ensure these methods are actually called daily.

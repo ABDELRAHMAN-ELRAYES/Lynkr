@@ -1,3 +1,9 @@
+## Module 3: Search & Discovery
+
+**Implementation Task Deep Dive**
+
+---
+
 ## Module Goal (Execution Perspective)
 
 Enable clients to **discover providers efficiently** using name search, category filtering, ratings, pricing, and other relevant criteria, while ensuring that only **approved providers** are visible.
@@ -119,3 +125,19 @@ Module 3 is complete when:
 * Search results are paginated and clear
 * Edge cases are gracefully handled
 
+---
+
+## 8. Implementation Status (Updated)
+
+**Implemented:**
+
+*   **Service Definition**: `ServiceService` allows creating services and skills, which are the basis for categories.
+*   **Basic Listing**: `ProfileService.getAllProviderProfiles` supports filtering by `approvedOnly`.
+
+**Missing Functionalities:**
+
+*   **Search Engine**: No implementation for searching providers by **Name**, **Service Category**, **Price**, or **Rating**. The current API returns a simple list.
+*   **Advanced Filtering**: No query parameters are handled for price ranges, skills, or language proficiency.
+*   **Sorting**: No sorting logic (e.g., by rating, price, date) is implemented in the repository or controller.
+*   **Pagination**: `getAllProviderProfiles` returns all records without pagination support (page/limit/cursor).
+*   **Search Logging**: No analytics or audit logging for search queries.

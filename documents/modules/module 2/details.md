@@ -1,3 +1,9 @@
+## Module 2: Provider Onboarding & Profile
+
+**Implementation Task Deep Dive**
+
+---
+
 ## Module Goal (Execution Perspective)
 
 Enable qualified users to apply as service providers, submit comprehensive professional profiles, and pass a controlled review process before gaining provider privileges—while ensuring data completeness, consistency, and trustworthiness.
@@ -232,3 +238,19 @@ Module 2 is complete when:
 * No provider access is granted before approval
 * Provider data is consistent and auditable
 
+---
+
+## 12. Implementation Status (Updated)
+
+**Implemented:**
+
+*   **Profile Creation**: `ProfileService.createProviderProfile` maps and aggregates Title, Bio, Hourly Rate, Skills, Services, Experience, Education, and Languages.
+*   **Application Flow**: `ProviderApplicationService` handles submission, checking pending status, and enforcing a 30-day cooldown for rejections.
+*   **Admin Review**: `approveApplication` and `rejectApplication` logic is implemented, including role updates (`PROVIDER_APPROVED` / `PROVIDER_REJECTED`) and logging review decisions.
+*   **Sub-modules**: dedicated services for Experience, Education, etc., supporting CRUD.
+
+**Missing Functionalities:**
+
+*   **Availability Management**: `ProfileService` handles `hourlyRate`, but detailed availability (days/times) is not evident in the profile creation flow or core profile data structure. It may be part of a separate module (Teaching) but is missing from the core profile setup here.
+*   **File Uploads**: The service layer (`profile.service.ts`) does not show explicit handling of file uploads (Certifications, Portfolio) in the creation payload. This logic is likely missing or handled entirely in the controller/middleware without service-level persistence of file metadata in the profile record (needs verification).
+*   **Draft Saving**: No explicit "Draft" status or flow seen; application submission seems to be an all-or-nothing action on top of an existing profile.

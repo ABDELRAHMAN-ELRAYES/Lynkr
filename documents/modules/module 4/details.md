@@ -1,3 +1,9 @@
+## Module 4: Requests & Proposals
+
+**Implementation Task Deep Dive**
+
+---
+
 ## Module Goal (Execution Perspective)
 
 Provide a **structured pre-contract engagement system** where clients submit requests, providers respond with proposals, and agreements are finalized before project execution or payments.
@@ -57,7 +63,7 @@ Provide a **structured pre-contract engagement system** where clients submit req
 
 ---
 
-### 2.2 Proposal Validity & Constraints
+## 2.2 Proposal Validity & Constraints
 
 * Proposals cannot be edited post-submission
 * Proposals expire if request expires
@@ -145,3 +151,19 @@ Module 4 is complete when:
 * Notifications are consistently triggered
 * Edge cases are gracefully handled
 
+---
+
+## 8. Implementation Status (Updated)
+
+**Implemented:**
+
+*   **Request Lifecycle**: `RequestService` handles Direct and Public requests, including 3-day deadline logic and status transitions (`PENDING`, `PUBLIC`, `ACCEPTED`, `CANCELLED`).
+*   **Proposal Management**: `ProposalService` enables providers to submit proposals, enforcing exclusivity (one per request) and checks request status.
+*   **Approval Workflow**: `acceptProposal` updates the winning proposal status, auto-rejects all others, sets the Request to `ACCEPTED`, and sends socket notifications.
+*   **Notifications**: Socket events (`proposal:new`, `proposal:accepted`, `proposal:rejected`) are wired up.
+
+**Missing Functionalities:**
+
+*   **Project Creation**: Accepting a proposal *ends* the request workflow but does not appear to automatically trigger the creation of a **Project** record or initialize the **Escrow**. The user is left at "Proposal Accepted" state without a seamless transition to execution.
+*   **Auto-Publish Scheduler**: `publishExpiredRequests` logic exists in `RequestService`, but no corresponding cron job file was found in `server/src/jobs` to actually execute this periodically.
+*   **Drafts**: `RequestService` mentions `DRAFT` status check in update, but creation flow defaults to `PENDING` or `PUBLIC`; explicit draft creation/saving endpoints might be implicit or shared but not clearly distinguished in the main creation flow.

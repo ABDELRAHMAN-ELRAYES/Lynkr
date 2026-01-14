@@ -1,167 +1,41 @@
-# Module 9: Notifications & Activity Feed
+## Module 9: Notifications & Activity Feed
+
+**Implementation Task Deep Dive**
 
 ---
 
-## 1. Module Objective
+## 1. Notification System
 
-The objective of the Notifications & Activity Feed module is to ensure **timely, reliable, and consistent communication** between the system and users. This module informs users of critical events, state changes, and required actions across the platform.
+### 1.1 Triggering & Delivery
 
-This module ensures that:
+*   **Service Layer Integration**: Dedicated `NotificationService` provides helper methods (`sendProposalNotification`, `sendProjectNotification`, etc.) used by other modules to trigger alerts.
+*   **Real-time Delivery**: Integrated with `SocketService` to broadcast notifications immediately to online users via Socket.IO.
+*   **Persistence**: All notifications are stored in the database for history/offline retrieval.
 
-- Users are always aware of actions affecting them
-- Time-sensitive events are not missed
-- Communication is auditable and traceable
-- Real-time and asynchronous channels are coordinated
+### 1.2 User Interaction
 
----
-
-## 2. Module Scope Definition
-
-### Included Capabilities
-
-- Real-time in-app notifications
-- Email notifications
-- Activity feed per user
-- Notification categorization
-- Read/unread tracking
-- Notification delivery guarantees
-
-### Explicitly Excluded (Phase 1)
-
-- Push notifications (mobile)
-- User-customizable notification preferences
-- SMS or WhatsApp notifications
-- Marketing or promotional messaging
+*   **Retrieval**: Endpoints to fetch user notifications with pagination.
+*   **Read Status**: Tracking for `isRead` status, with endpoints to mark single or all notifications as read.
+*   **Unread Count**: Dedicated method to fetch the badge count.
 
 ---
 
-## 3. User Types Involved
+## 2. Activity Feed
 
-- **Client**: Receives updates related to requests, projects, payments
-- **Provider**: Receives updates related to proposals, projects, sessions
-- **System**: Generates and delivers notifications
-- **Admin**: Receives system-level alerts (limited)
+*   **Feed Construction**: The current implementation treats the Notification list effectively as the Activity Feed. It tracks `type`, `category`, and `entityId`, allowing for filtered views if needed.
+*   **Categorization**: Categories (Security, Requests, Payments, etc.) are derived from the notification type.
 
 ---
 
-## 4. Notification Categories
+## 3. Implementation Status (Updated)
 
-- Authentication & Security
-- Requests & Proposals
-- Payments & Escrow
-- Project & Teaching Sessions
-- Ratings & Reviews
-- System Announcements
+**Implemented:**
 
----
+*   **Full Notification Lifecycle**: Create, Send (Socket), Store, Retrieve, Mark Read.
+*   **Cross-Module Integration**: Helper methods are ready and used by Reports and other modules.
+*   **Real-time**: Socket integration is verified.
 
-## 5. Activity Feed
+**Missing Functionalities:**
 
-### Purpose
-
-The activity feed provides a **chronological log of significant events** for a user, acting as a historical reference beyond transient notifications.
-
-### Feed Characteristics
-
-- Ordered by timestamp (most recent first)
-- Immutable entries
-- Filterable by category
-
----
-
-## 6. Core Scenarios
-
-### 6.1 Real-Time In-App Notification
-
-**Scenario**
-
-1. A triggering event occurs (e.g., proposal received)
-2. System generates a notification
-3. Notification appears instantly in the user interface
-
-**Acceptance Criteria**
-
-- Notification delivery within acceptable latency
-- Notification links to relevant entity
-
----
-
-### 6.2 Email Notification
-
-**Scenario**
-
-1. Critical event occurs (e.g., payment required)
-2. System sends an email notification
-3. Email content reflects current system state
-
-**Rules**
-
-- Email is sent only once per event
-- Email failures are logged
-
----
-
-### 6.3 Notification Read Tracking
-
-**Scenario**
-
-1. User views a notification
-2. Notification state changes to `Read`
-
----
-
-## 7. Notification Lifecycle
-
-### Notification States
-
-- Generated
-- Delivered
-- Read
-- Archived
-
----
-
-## 8. Event Triggers (Non-Exhaustive)
-
-- Account verification completed
-- Provider application approved or rejected
-- Request sent or published
-- Proposal submitted or accepted
-- Payment required or confirmed
-- Project status change
-- Session scheduled or cancelled
-- Review request available
-
----
-
-## 9. Error & Edge Case Handling
-
-### Covered Scenarios
-
-- Duplicate notifications for same event
-- Email delivery failure
-- Notification generated for deleted entity
-- Out-of-order event arrival
-
----
-
-## 10. Dependencies
-
-- IAM module
-- All functional modules as event sources
-- Email delivery service
-- Real-time messaging infrastructure
-
----
-
-## 11. Module Exit Criteria
-
-This module is considered complete when:
-
-- All critical user actions generate notifications
-- In-app and email notifications are consistent
-- Activity feed reflects accurate event history
-- Read/unread state is tracked correctly
-- Notification failures are logged
-
-At this point, the platform achieves **operational transparency and responsiveness** across Phase 1.
+*   **Email Redundancy**: The `NotificationService` currently *only* handles DB storage and Socket broadcast. It does not appear to trigger Email sending (unlike `AuthService` which uses `Email` class). Critical events (like "Account Banned" or "Payment Received") should likely trigger emails, which might be missing here if not handled at the controller/caller level.
+*   **Grouped Notifications**: Logic to group similar notifications (e.g., "5 people liked your profile") is not present; each event creates a separate row.

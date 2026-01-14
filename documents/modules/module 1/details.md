@@ -231,3 +231,22 @@ Module 1 is complete when:
 * Security recovery flows work end-to-end
 * No unauthorized role actions are possible
 
+---
+
+## 10. Implementation Status (Updated)
+
+**Implemented:**
+
+*   **Registration**: Full flow with OTP verification (`auth.service.ts` -> `register`, `registerVerification`).
+*   **Login**: Email/Password login (`auth.service.ts` -> `login`).
+*   **Password Reset**: Request link and reset flow (`forgetPassword`, `resetPassword`).
+*   **User Management**: `UserService` handles creation, update (profile details), status updates, and role updates.
+*   **Role Management**: Basic RBAC via `AuthMiddleware` and `getRolePrivileges`.
+
+**Missing Functionalities:**
+
+*   **Google OAuth**: No implementation found in `auth` module or utils.
+*   **Audit Logging**: No dedicated audit logging service or calls found for critical identity events (login, role change, etc.).
+*   **Phone Change OTP**: Phone update exists in `updateUserProfile` but without OTP verification.
+*   **Session Management**: JWT based, but "Logout from all devices" or tracking active sessions per device is not explicitly implemented (just cookie clearing).
+*   **Explicit Provider Application Flow**: While `updateUserRole` exists, the specific user-facing flow/endpoint for "Apply as Provider" (state transition from Client -> Pending) seems to rely on generic update or is handled in the Provider module (need to confirm overlap).

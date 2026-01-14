@@ -1,10 +1,10 @@
-## Module Goal (Execution Perspective)
+## Module 6: Messaging, Meetings & Collaboration
 
-Enable a **clean transition from accepted proposal to active project**, locking agreed terms and establishing a clear foundation for project execution and downstream workflows.
+**Implementation Task Deep Dive**
 
 ---
 
-## 1. Project Creation Tasks
+## 1. Project Creation & Setup (Cross-Module Integration)
 
 ### 1.1 Trigger Conditions
 
@@ -15,94 +15,61 @@ Enable a **clean transition from accepted proposal to active project**, locking 
   * Provider is approved
   * Request status allows conversion to project
 
----
+### 1.2 Data Capture & Term Locking
 
-### 1.2 Project Data Capture
+* Capture critical project information (price, scope, deadline)
+* Lock proposal details to prevent retroactive changes
+* Assign unique Project ID
 
-* Capture critical project information from the accepted proposal:
+### 1.3 Communication Context Setup
 
-  * Agreed price (hourly or fixed)
-  * Estimated duration
-  * Scope/description
-  * Participants (client + provider)
-* Assign project a unique identifier for tracking
-* Record creation timestamp
+* **Auto-create Conversation**: A dedicated conversation channel must be created immediately upon project creation.
+* **Participant Association**: Associate Client and Provider(s) with the conversation.
 
 ---
 
-### 1.3 Status Initialization
+## 2. Messaging System (Module 6A)
 
-* Set initial project status to **Active**
-* Track sub-statuses (Phase 1: minimal):
+### 2.1 Contextual Messaging
 
-  * Pending first deliverable
-  * Ongoing
-  * Completed (Phase 2)
+* Messages sent **only within active Project context**
+* Sender/Receiver validation (must be project participants)
+* Chronological ordering and history persistence
 
----
+### 2.2 Real-Time Features
 
-## 2. Term Locking & Validation Tasks
-
-### 2.1 Term Freezing
-
-* Once the project is created:
-
-  * Lock proposal details (price, scope, estimated delivery)
-  * Prevent retroactive changes unless admin intervenes
-* Notify participants that terms are fixed
-
-### 2.2 Conflict Checks
-
-* Ensure no duplicate active projects exist for the same request
-* Validate participants are still approved and active
-* Prevent creation if provider is suspended
+* **Real-time Delivery**: Instant message broadcasting via WebSocket (Socket.IO).
+* **Typing Indicators**: Real-time status updates (`conversation:typing`).
+* **Read Receipts**: Message read status events (`message:read`, `conversation:read`).
 
 ---
 
-## 3. Project Participants Tasks
+## 3. Video Meetings (Module 6B - Agora)
 
-* Associate client and provider(s) with project
-* Display roles and permissions clearly within the project context
-* Provide participant list for messaging and engagement
+### 3.1 Meeting Management
 
----
+* **Create/Schedule**: Host (Provider/Client) can schedule or start instant meetings.
+* **Token Generation**: Secure Agora RtcToken generation on the server.
+* **Signaling**: Socket events for Inviting (`meeting:invite`), Accepting (`meeting:accept`), and Declining (`meeting:decline`) calls.
+* **Session Tracking**: Track start time, end time, and duration.
 
-## 4. Engagement Milestone Tasks (Phase 1)
+### 3.2 Access Control
 
-* Basic milestone representation:
-
-  * Start date
-  * Estimated end date
-* Optional Phase 1: placeholder for payment triggers and deliverables
+* Only project participants can generate tokens for the specific meeting channel.
+* Token expiration enforcement (1 hour).
 
 ---
 
-## 5. Notifications & Communication Tasks
+## 4. Implementation Status (Updated)
 
-* Notify client and provider upon project creation
-* Indicate project details, scope, and locked terms
-* Trigger messaging context setup (Module 5 integration)
+**Implemented:**
 
----
+*   **Real-time Meetings**: `MeetingService` is fully implemented with Agora SDK integration. It handles token generation, secure channel creation, status tracking (`PENDING`, `ACTIVE`, `COMPLETED`), and socket signaling (`invite`, `accept`, `start`, `end`).
+*   **Conversation Logic**: `ConversationService` manages conversation creation and access control (participants only).
+*   **Project Integration**: `ProjectService` handles the creation of the Project record from a Proposal.
 
-## 6. Error & Edge Case Handling
+**Missing Functionalities:**
 
-* Proposal accepted after request expiration
-* Provider becomes inactive during project creation
-* Duplicate project creation attempts
-* Missing proposal details
-* Network or session interruptions during creation
-
----
-
-## 7. Module Completion Criteria
-
-Module 6 is complete when:
-
-* Accepted proposals reliably convert into active projects
-* Project terms are locked and immutable
-* Participants are clearly associated
-* Basic project timeline is set
-* Notifications are triggered for both parties
-* Edge cases are gracefully handled
-
+*   **Auto-Conversation Creation**: While `ProjectService` creates the Project and Escrow, it **does not** appear to automatically call `ConversationService.createConversation`. This means a project might be created without an initialized chat channel unless handled by a higher-level controller or orchestration layer.
+*   **Message Service Verification**: I verified `ConversationService` but assumed `MessageService` (sending actual text) is implemented based on the directory structure.
+*   **Notification Integration**: While Socket events are firing, persistent Notification records (for offline viewing/history outside of chat) might be partial (TODO comments seen in other modules).

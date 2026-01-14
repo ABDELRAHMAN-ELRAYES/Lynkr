@@ -1,165 +1,44 @@
-# Module 10: Reporting & Moderation
+## Module 10: Reporting & Moderation
+
+**Implementation Task Deep Dive**
 
 ---
 
-## 1. Module Objective
+## 1. Reporting System
 
-The objective of the Reporting & Moderation module is to provide **basic platform governance and user protection mechanisms**. This module enables users to report issues, misconduct, or disputes and allows administrators to review and take controlled actions.
+### 1.1 Submission
 
-This module ensures that:
+*   **Report Creation**: Users can submit reports with category, description, and target (User/Project/etc.).
+*   **Validation**: Enforces description length and required fields.
+*   **Feedback**: Automatically notifies the reporter via `NotificationService` that the report is received.
 
-- Users have a clear channel to raise concerns
-- Reports are structured and traceable
-- Administrative intervention is auditable
-- Platform integrity is maintained without overreach
+### 1.2 Admin Workflow
 
----
-
-## 2. Module Scope Definition
-
-### Included Capabilities
-
-- User-generated reports and complaints
-- Report categorization and severity levels
-- Report lifecycle management
-- Admin review dashboard (read/write)
-- Admin actions (warnings, suspensions)
-- Audit trail for moderation actions
-
-### Explicitly Excluded (Phase 1)
-
-- Automated moderation or AI flagging
-- Dispute resolution workflows
-- Appeal processes
-- Financial arbitration
-- Law enforcement escalation
+*   **Status Management**: Admins can transition reports through a defined workflow (`SUBMITTED` -> `UNDER_REVIEW` -> `RESOLVED` / `DISMISSED`).
+*   **Action Logging**: Every status change or action is logged in `ReportAction` table for audit trails.
 
 ---
 
-## 3. User Types Involved
+## 2. Moderation Actions
 
-- **Client**: Submits reports
-- **Provider**: Submits reports
-- **Admin**: Reviews reports and takes actions
-- **System**: Records events and enforces outcomes
+### 2.1 Enforcement Actions
 
----
-
-## 4. Report Types
-
-### Supported Categories
-
-- Fraud or scam suspicion
-- Abusive or inappropriate behavior
-- Failure to deliver service
-- Policy violation
-- Technical issue
-
-Each report must be associated with:
-
-- A reporting user
-- A reported entity (user, project, session)
-- A category
-- A textual description
+*   **Warning**: Sends a system notification to the target user.
+*   **Suspension**: Updates user status to `SUSPENDED` and notifies them.
+*   **Ban**: Updates user status to `BANNED` (permanently suspended) and notifies them.
+*   **Notification**: Both the reporter and the target (if punished) receive system notifications about the outcome.
 
 ---
 
-## 5. Report Lifecycle
+## 3. Implementation Status (Updated)
 
-### Report States
+**Implemented:**
 
-- Submitted
-- Under Review
-- Resolved
-- Dismissed
+*   **Full Reporting Lifecycle**: Submission, Admin View, Status Updates, Outcomes.
+*   **Action Execution**: The service directly modifies User status (Suspend/Ban) and integrates with Notifications.
+*   **Audit Logging**: All admin actions are recorded.
 
----
+**Missing Functionalities:**
 
-## 6. Core Scenarios
-
-### 6.1 Submitting a Report
-
-**Scenario**
-
-1. User selects "Report" from a relevant context (project, chat, profile)
-2. User selects report category
-3. User provides description
-4. Report is submitted
-
-**Acceptance Criteria**
-
-- Report is immutable after submission
-- User receives confirmation
-
----
-
-### 6.2 Admin Review
-
-**Scenario**
-
-1. Admin views report queue
-2. Admin opens report details
-3. Admin reviews context and history
-
-**Rules**
-
-- Reports are ordered by submission time
-- Admin actions require justification
-
----
-
-### 6.3 Admin Actions
-
-**Available Actions**
-
-- Issue warning to user
-- Temporarily suspend account
-- Permanently ban account
-- Mark report as resolved or dismissed
-
-**Rules**
-
-- Actions are logged
-- Affected user is notified
-
----
-
-## 7. Visibility Rules
-
-- Report content is visible only to admins
-- Reported users cannot see reporter identity
-- Report status is visible to reporting user
-
----
-
-## 8. Error & Edge Case Handling
-
-### Covered Scenarios
-
-- Duplicate reports for same issue
-- Report submitted without valid entity
-- Admin attempts invalid state transition
-- Report submitted after entity deletion
-
----
-
-## 9. Dependencies
-
-- IAM module (admin roles)
-- Project Workspace & Chat modules (context)
-- Notification system
-- Audit logging subsystem
-
----
-
-## 10. Module Exit Criteria
-
-This module is considered complete when:
-
-- Users can submit structured reports
-- Admins can review and act on reports
-- Moderation actions are enforced
-- All actions are auditable and logged
-- Users are notified of outcomes
-
-At this point, Phase 1 includes **baseline governance and safety controls**.
+*   **Content Takedown**: The `takeAction` method currently focuses on *User* punishment. It does not have logic to "Delete Project" or "Hide Profile" directly from the Report context, though Admins might do that via other modules.
+*   **Automated Triggers**: No auto-suspension thresholds (e.g., "Suspend after 5 reports") enabled in Phase 1 (as per scope).
