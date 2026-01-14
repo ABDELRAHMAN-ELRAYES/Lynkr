@@ -1,6 +1,7 @@
 import PrismaClientSingleton from "../../data-server-clients/prisma-client";
 import { PrismaClient } from "@prisma/client";
 import AppError from "../../utils/app-error";
+import { ICreateServiceData, IUpdateServiceData, ICreateSkillData } from "./types/IService";
 
 class ServiceRepository {
     private prisma: PrismaClient;
@@ -21,25 +22,102 @@ class ServiceRepository {
         return this.prisma;
     }
 
-    // TODO: Add Service model to Prisma schema
-    async createService(_data: object): Promise<object> {
-        throw new AppError(501, "Service module not implemented");
+    // ===== SERVICE OPERATIONS =====
+
+    async createService(data: ICreateServiceData) {
+        try {
+            return await this.prisma.service.create({
+                data: {
+                    name: data.name,
+                    description: data.description
+                }
+            });
+        } catch (error) {
+            throw new AppError(500, "Failed to create service");
+        }
     }
 
-    async getAllServices(): Promise<object[]> {
-        throw new AppError(501, "Service module not implemented");
+    async getAllServices(activeOnly: boolean = true) {
+        try {
+            const where = activeOnly ? { isActive: true } : {};
+            return await this.prisma.service.findMany({
+                where,
+                include: { skills: { where: { isActive: true } } },
+                orderBy: { name: "asc" }
+            });
+        } catch (error) {
+            throw new AppError(500, "Failed to get services");
+        }
     }
 
-    async getServiceById(_id: string): Promise<object | null> {
-        throw new AppError(501, "Service module not implemented");
+    async getServiceById(id: string) {
+        try {
+            return await this.prisma.service.findUnique({
+                where: { id },
+                include: { skills: { where: { isActive: true } } }
+            });
+        } catch (error) {
+            throw new AppError(500, "Failed to get service");
+        }
     }
 
-    async updateService(_id: string, _data: object): Promise<object> {
-        throw new AppError(501, "Service module not implemented");
+    async updateService(id: string, data: IUpdateServiceData) {
+        try {
+            return await this.prisma.service.update({
+                where: { id },
+                data
+            });
+        } catch (error) {
+            throw new AppError(500, "Failed to update service");
+        }
     }
 
-    async deleteService(_id: string): Promise<object> {
-        throw new AppError(501, "Service module not implemented");
+    async deleteService(id: string) {
+        try {
+            return await this.prisma.service.update({
+                where: { id },
+                data: { isActive: false }
+            });
+        } catch (error) {
+            throw new AppError(500, "Failed to delete service");
+        }
+    }
+
+    // ===== SKILL OPERATIONS =====
+
+    async createSkill(data: ICreateSkillData) {
+        try {
+            return await this.prisma.skill.create({
+                data: {
+                    name: data.name,
+                    serviceId: data.serviceId
+                }
+            });
+        } catch (error) {
+            throw new AppError(500, "Failed to create skill");
+        }
+    }
+
+    async getSkillsByServiceId(serviceId: string) {
+        try {
+            return await this.prisma.skill.findMany({
+                where: { serviceId, isActive: true },
+                orderBy: { name: "asc" }
+            });
+        } catch (error) {
+            throw new AppError(500, "Failed to get skills");
+        }
+    }
+
+    async deleteSkill(id: string) {
+        try {
+            return await this.prisma.skill.update({
+                where: { id },
+                data: { isActive: false }
+            });
+        } catch (error) {
+            throw new AppError(500, "Failed to delete skill");
+        }
     }
 }
 

@@ -1,18 +1,35 @@
-export type IService = {
+// Service & Skill Types
+
+export interface IService {
     id: string;
     name: string;
-    description?: string;
-    category?: string;
-    basePrice?: number;
+    description?: string | null;
+    isActive: boolean;
     createdAt: Date;
     updatedAt: Date;
-};
+    skills?: ISkill[];
+}
 
-export type CreateServiceRequest = {
+export interface ISkill {
+    id: string;
+    name: string;
+    serviceId: string;
+    isActive: boolean;
+    createdAt: Date;
+}
+
+export interface ICreateServiceData {
     name: string;
     description?: string;
-    category?: string;
-    basePrice?: number;
-};
+}
 
-export type ServiceResponse = IService;
+export interface ICreateSkillData {
+    name: string;
+    serviceId: string;
+}
+
+export interface IUpdateServiceData {
+    name?: string;
+    description?: string;
+    isActive?: boolean;
+}

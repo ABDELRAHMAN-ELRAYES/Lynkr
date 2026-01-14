@@ -90,6 +90,7 @@ model AdminPrivilege {
 model ProviderProfile {
     id               String   @id @default(uuid())
     userId           String   @unique @map("user_id")
+    serviceId        String?  @map("service_id") // Single service the provider specializes in
     title            String? // Professional title
     bio              String?  @db.Text
     hourlyRate       Decimal? @map("hourly_rate")
@@ -103,8 +104,8 @@ model ProviderProfile {
     // Relations
     // ProviderProfile -> User (One -> One)
     user                 User                   @relation(fields: [userId], references: [id], onDelete: Cascade)
-    // ProviderProfile -> ProviderService (One -> Many)
-    services             ProviderService[]
+    // ProviderProfile -> Service (Many -> One)
+    service              Service?               @relation(fields: [serviceId], references: [id])
     // ProviderProfile -> ProviderSkill (One -> Many)
     skills               ProviderSkill[]
     // ProviderProfile -> ProviderExperience (One -> Many)
@@ -125,8 +126,44 @@ model ProviderProfile {
     teachingSlots        TeachingSlot[]
     // ProviderProfile -> ProviderSubscription (One -> Many)
     subscriptions        ProviderSubscription[]
+    providerServices     ProviderService[]
 
     @@map("provider_profiles")
+}
+
+// ============================================
+// Service & Skill Master Tables
+// ============================================
+
+model Service {
+    id          String   @id @default(uuid())
+    name        String   @unique
+    description String?
+    isActive    Boolean  @default(true) @map("is_active")
+    createdAt   DateTime @default(now()) @map("created_at")
+    updatedAt   DateTime @updatedAt @map("updated_at")
+
+    // Relations
+    // Service -> Skill (One -> Many)
+    skills           Skill[]
+    // Service -> ProviderProfile (One -> Many)
+    providerProfiles ProviderProfile[]
+
+    @@map("services")
+}
+
+model Skill {
+    id        String   @id @default(uuid())
+    name      String
+    serviceId String   @map("service_id")
+    isActive  Boolean  @default(true) @map("is_active")
+    createdAt DateTime @default(now()) @map("created_at")
+
+    // Relations
+    // Skill -> Service (Many -> One)
+    service Service @relation(fields: [serviceId], references: [id], onDelete: Cascade)
+
+    @@map("skills")
 }
 
 model ProviderService {
