@@ -67,9 +67,9 @@
 *   **Real-time Meetings**: `MeetingService` is fully implemented with Agora SDK integration. It handles token generation, secure channel creation, status tracking (`PENDING`, `ACTIVE`, `COMPLETED`), and socket signaling (`invite`, `accept`, `start`, `end`).
 *   **Conversation Logic**: `ConversationService` manages conversation creation and access control (participants only).
 *   **Project Integration**: `ProjectService` handles the creation of the Project record from a Proposal.
+*   **Auto-Conversation Creation**: `createProjectFromProposal` now automatically creates a Conversation channel for client and provider.
 
 **Missing Functionalities:**
 
-*   **Auto-Conversation Creation**: While `ProjectService` creates the Project and Escrow, it **does not** appear to automatically call `ConversationService.createConversation`. This means a project might be created without an initialized chat channel unless handled by a higher-level controller or orchestration layer.
-*   **Message Service Verification**: I verified `ConversationService` but assumed `MessageService` (sending actual text) is implemented based on the directory structure.
-*   **Notification Integration**: While Socket events are firing, persistent Notification records (for offline viewing/history outside of chat) might be partial (TODO comments seen in other modules).
+*   None - All Module 6 core features are implemented.
+

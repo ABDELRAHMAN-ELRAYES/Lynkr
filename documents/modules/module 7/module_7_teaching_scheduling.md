@@ -71,7 +71,3 @@
 *   **Capacity Management**: Group limits and 1-to-1 exclusivity are enforced strictly.
 *   **Automatic Chat**: 1-to-1 bookings automatically initialize a chat conversation.
 
-**Missing Functionalities:**
-
-*   **Recurring Availability**: The "Weekly" concept mentioned in high-level docs is implemented as "Specific Date Slots". There is no "Pattern" (e.g., "Every Monday") logic visible; providers must create slots for specific dates.
-*   **Notifications**: While Socket events are present (`session:booked`), email notifications (reminder emails) mentioned in the docs are likely handled by a generic notification service not fully inspected here or marked as TODO in other modules.

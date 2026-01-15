@@ -4,9 +4,12 @@ import { ICreateRequestData, IUpdateRequestData, IRequestRepositoryData } from "
 import AppError from "@/utils/app-error";
 import { UserRole } from "@/enum/UserRole";
 import { IUser } from "@/modules/user/types/IUser";
+import NotificationService from "@/modules/notification/notification.service";
+import ProfileRepository from "@/modules/provider/profile/profile.repository";
 
 class RequestService {
     private static repository = RequestRepository.getInstance();
+    private static profileRepo = ProfileRepository.getInstance();
 
     /**
      * Create a new request (Direct or Public)
@@ -53,8 +56,17 @@ class RequestService {
             // TODO: Handle file attachments if any
             // if (data.files && data.files.length > 0) { ... }
 
-            // TODO: Notify provider if direct request
-            // if (request.targetProviderId) { notifyProvider(...) }
+            // Notify provider if direct request
+            if (request.targetProviderId) {
+                const providerProfile = await this.profileRepo.getProviderProfileById(request.targetProviderId);
+                if (providerProfile) {
+                    await NotificationService.sendSystemNotification(
+                        providerProfile.userId,
+                        "New Request Received",
+                        `You have received a new service request: "${request.title}"`
+                    );
+                }
+            }
 
             return request;
         } catch (error) {
@@ -132,7 +144,25 @@ class RequestService {
 
         for (const req of expiredRequests) {
             await this.repository.updateRequestStatus(req.id, "PUBLIC", true);
-            // TODO: Notify client and original provider
+
+            // Notify client that request is now public
+            await NotificationService.sendSystemNotification(
+                req.clientId,
+                "Request Published Publicly",
+                `Your request "${req.title}" has been published publicly as the deadline passed.`
+            );
+
+            // Notify original provider that request expired
+            if (req.targetProviderId) {
+                const providerProfile = await this.profileRepo.getProviderProfileById(req.targetProviderId);
+                if (providerProfile) {
+                    await NotificationService.sendSystemNotification(
+                        providerProfile.userId,
+                        "Request Deadline Expired",
+                        `The request "${req.title}" has expired and is now open to other providers.`
+                    );
+                }
+            }
         }
     }
 }

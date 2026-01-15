@@ -32,7 +32,6 @@ The following background maintenance tasks are logic-ready but not scheduled:
 
 1.  **Request Auto-Publishing**: `RequestService` has logic to publish pending requests, but no Cron job calls it.
 2.  **Subscription Expiration**: Logic to expire subscriptions exists but runs manually/never.
-3.  **Review Expiration**: No logic or job exists to lock reviews after X days.
 
 ---
 
@@ -40,25 +39,11 @@ The following background maintenance tasks are logic-ready but not scheduled:
 
 These are non-functional gaps that affect scalability, maintenance, and security.
 
-### 1. Local File Storage (Scalability Risk)
-*   **State**: Files are uploaded to a local `uploads/` directory and served via `express.static`.
-*   **Risk**: If deployed to a serverless env (AWS Lambda/Vercel) or multiple instances, files will be lost or unsynchronized. Disk space is limited.
-*   **Recommendation**: Migrate to Cloud Storage (AWS S3, Cloudinary, or Google Cloud Storage).
-
-### 2. Manual Input Validation (Maintenance Risk)
-*   **State**: API inputs are validated manually inside Services/Controllers (e.g., `if (!data.email)...`). No standard schema validation (Zod/Joi).
-*   **Risk**: Inconsistent error messages, repetitive code, potential security holes if a check is missed.
-*   **Recommendation**: Implement a Validation Middleware using **Zod** or **Joi** attached to routes.
 
 ### 3. Limited Observability (Debugging Risk)
 *   **State**: Uses `console.log` and `morgan` (HTTP logs). No structured application logging (Winston/Bunyan) or error context.
 *   **Risk**: Difficult to debug production issues or trace complex flows across modules.
 *   **Recommendation**: Implement **Winston** logger and replace `console` calls.
-
-### 4. Rate Limiting Coverage
-*   **State**: `rateLimit` middleware exists but is **not globally applied** in `app.ts`. It is also **not used** in sensitive routes like `auth.route.ts` (Login/Register).
-*   **Risk**: Vulnerable to Brute Force attacks on Login and DDoS on heavy endpoints.
-*   **Recommendation**: Apply specific rate limiters to Auth routes and a general limiter to `app.use("/api", ...)`.
 
 ---
 

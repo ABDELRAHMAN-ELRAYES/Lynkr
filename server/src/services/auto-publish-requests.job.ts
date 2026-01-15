@@ -1,5 +1,6 @@
 import cron from "node-cron";
 import PrismaClientSingleton from "../data-server-clients/prisma-client";
+import NotificationService from "../modules/notification/notification.service";
 
 const prisma = PrismaClientSingleton.getPrismaClient();
 
@@ -20,7 +21,7 @@ async function publishExpiredRequests() {
             include: {
                 client: { select: { email: true, firstName: true } },
                 targetProvider: {
-                    include: { user: { select: { email: true, firstName: true } } }
+                    include: { user: { select: { id: true, email: true, firstName: true } } }
                 }
             }
         });
@@ -33,9 +34,21 @@ async function publishExpiredRequests() {
 
             console.log(`[Auto-Publish] Request ${request.id} published to public`);
 
-            // TODO: Send notifications
-            // await notifyClient(request.clientId, "Your request has been published publicly.");
-            // await notifyProvider(request.targetProviderId, "The request has expired and is now public.");
+            // Notify client that request is now public
+            await NotificationService.sendSystemNotification(
+                request.clientId,
+                "Request Published Publicly",
+                `Your request "${request.title}" has been auto-published as the provider response deadline passed.`
+            );
+
+            // Notify original provider that request expired
+            if (request.targetProvider?.user?.id) {
+                await NotificationService.sendSystemNotification(
+                    request.targetProvider.user.id,
+                    "Request Deadline Expired",
+                    `The request "${request.title}" has expired and is now open to other providers.`
+                );
+            }
         }
 
         if (expiredRequests.length > 0) {

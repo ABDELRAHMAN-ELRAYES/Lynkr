@@ -104,7 +104,7 @@ class ProviderApplicationRepository {
                     },
                     providerProfile: {
                         include: {
-                            services: true,
+                            service: true,
                             skills: true,
                             experiences: true,
                             education: true,

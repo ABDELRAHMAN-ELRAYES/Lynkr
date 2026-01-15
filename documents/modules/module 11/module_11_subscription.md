@@ -36,5 +36,4 @@
 **Missing Functionalities:**
 
 *   **Real Payment Integration**: The `purchaseSubscription` method has a `TODO` for Payment integration. It effectively gives free subscriptions right now. It needs to create a Stripe PaymentIntent (similar to Session/Project modules) and verify it before activating.
-*   **Recurring Billing**: Phase 1 scope seems to be manual renewal (fixed duration), which is implemented. Auto-renewal (Stripe Subscriptions) is not implemented (Phase 2).
 *   **Job Scheduling**: While `processExpiredSubscriptions` exists, I need to confirm the cron job file exists and is running to ensure these methods are actually called daily.

@@ -37,8 +37,3 @@
 *   **Full Reporting Lifecycle**: Submission, Admin View, Status Updates, Outcomes.
 *   **Action Execution**: The service directly modifies User status (Suspend/Ban) and integrates with Notifications.
 *   **Audit Logging**: All admin actions are recorded.
-
-**Missing Functionalities:**
-
-*   **Content Takedown**: The `takeAction` method currently focuses on *User* punishment. It does not have logic to "Delete Project" or "Hide Profile" directly from the Report context, though Admins might do that via other modules.
-*   **Automated Triggers**: No auto-suspension thresholds (e.g., "Suspend after 5 reports") enabled in Phase 1 (as per scope).

@@ -3,7 +3,7 @@ import { IExperience, ICreateExperienceData } from "../../experience/types/IExpe
 import { IEducation, ICreateEducationData } from "../../education/types/IEducation";
 import { ILanguage, ICreateLanguageData } from "../../language/types/ILanguage";
 import { ISkill } from "../../skill/types/ISkill";
-import { IProviderService } from "../../provider-service/types/IProviderService";
+import { IService } from "../../../service/types/IService";
 
 export interface IProviderProfile {
     id: string;
@@ -42,7 +42,8 @@ export interface IProfileResponse extends IProviderProfile {
         email: string;
         username?: string;
     };
-    services?: IProviderService[];
+    serviceId?: string;
+    service?: IService;
     skills?: ISkill[];
     experiences?: IExperience[];
     education?: IEducation[];
@@ -54,7 +55,7 @@ export interface ICreateProfileRepositoryData {
     title?: string;
     bio?: string;
     hourlyRate?: number;
-    services?: { serviceType: string }[];
+    serviceId?: string;
     skills?: { skillName: string }[];
     experiences?: {
         title: string;

@@ -42,8 +42,3 @@
 *   **Review Lifecycle**: Submission, validation, and storage are fully handled.
 *   **Stats Aggregation**: Automatic provider profile updates upon review submission.
 *   **Eligibility API**: Dedicated endpoints (`checkProjectReviewEligibility`, `checkSessionReviewEligibility`) allow frontend to check if a review button should be enabled.
-
-**Missing Functionalities:**
-
-*   **Review Expiration**: The "Review Expiration" state mentioned in the docs (e.g., locking reviews after X days) is not explicitly enforced in the service layer yet (no background job seen for this).
-*   **Moderation**: No specific moderation flags or workflows in the current service (Phase 1 exclusion mostly).

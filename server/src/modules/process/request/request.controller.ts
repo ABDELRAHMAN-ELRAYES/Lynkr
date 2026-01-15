@@ -68,8 +68,8 @@ export const getRequests = async (req: Request, res: Response, next: NextFunctio
             return next(new AppError(404, "Provider profile not found"));
         }
 
-        // Extract categories from profile services
-        const categories = profile.services?.map((s: any) => s.serviceType) || [];
+        // Extract category from profile service (single service)
+        const categories = profile.service ? [profile.service.name] : [];
 
         const requests = await RequestService.getRequestsForProvider(profile.id, categories, next);
         return res.status(200).json({ status: "success", data: requests });

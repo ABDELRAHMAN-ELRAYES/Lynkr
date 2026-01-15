@@ -38,4 +38,3 @@
 **Missing Functionalities:**
 
 *   **Email Redundancy**: The `NotificationService` currently *only* handles DB storage and Socket broadcast. It does not appear to trigger Email sending (unlike `AuthService` which uses `Email` class). Critical events (like "Account Banned" or "Payment Received") should likely trigger emails, which might be missing here if not handled at the controller/caller level.
-*   **Grouped Notifications**: Logic to group similar notifications (e.g., "5 people liked your profile") is not present; each event creates a separate row.

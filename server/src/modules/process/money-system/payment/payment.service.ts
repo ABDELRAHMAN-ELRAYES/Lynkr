@@ -5,6 +5,8 @@ import AppError from "../../../../utils/app-error";
 import PaymentRepository from "./payment.repository";
 import ProjectRepository from "./../../project/project.repository";
 import EscrowRepository from "../escrow/escrow.repository";
+import ProfileRepository from "./../../../provider/profile/profile.repository";
+import NotificationService from "./../../../notification/notification.service";
 import { PaymentType } from "./types/IPayment";
 
 const stripe = new Stripe(config.stripe.secretKey, {
@@ -15,6 +17,7 @@ class PaymentService {
     private static paymentRepo = PaymentRepository.getInstance();
     private static projectRepo = ProjectRepository.getInstance();
     private static escrowRepo = EscrowRepository.getInstance();
+    private static profileRepo = ProfileRepository.getInstance();
 
     static async createPaymentIntent(
         projectId: string,
@@ -147,6 +150,25 @@ class PaymentService {
             }
 
             await this.projectRepo.updateProject(project.id, updateData);
+
+            // Notify client
+            await NotificationService.sendPaymentNotification(
+                project.clientId,
+                "Payment Received",
+                `Your payment of $${Number(payment.amount).toFixed(2)} has been processed successfully.`,
+                payment.id
+            );
+
+            // Notify provider
+            const providerProfile = await this.profileRepo.getProviderProfileById(project.providerProfileId);
+            if (providerProfile) {
+                await NotificationService.sendPaymentNotification(
+                    providerProfile.userId,
+                    "Payment Received for Project",
+                    `Client has made a payment of $${Number(payment.amount).toFixed(2)} for your project.`,
+                    payment.id
+                );
+            }
         }
 
         console.log(`[Payment] Completed: ${payment.id} for project ${projectId}`);
@@ -159,6 +181,14 @@ class PaymentService {
         await this.paymentRepo.updatePayment(payment.id, {
             status: "CANCELLED"
         });
+
+        // Notify payer about failure
+        await NotificationService.sendPaymentNotification(
+            payment.payerId,
+            "Payment Failed",
+            "Your payment could not be processed. Please try again or use a different payment method.",
+            payment.id
+        );
 
         console.log(`[Payment] Failed: ${payment.id}`);
     }

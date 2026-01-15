@@ -1,4 +1,5 @@
 import ReviewRepository from "./review.repository";
+import NotificationService from "../../notification/notification.service";
 import { NextFunction } from "express";
 import AppError from "../../../utils/app-error";
 import { ReviewType } from "./types/IReview";
@@ -68,6 +69,14 @@ class ReviewService {
             await this.updateProviderRatingStats(project.providerProfile.id, targetUserId);
         }
 
+        // Notify the reviewee
+        await NotificationService.sendReviewNotification(
+            targetUserId,
+            "New Review Received",
+            `You received a ${rating}-star review for your completed project.`,
+            review.id
+        );
+
         return review;
     }
 
@@ -133,6 +142,14 @@ class ReviewService {
         if (reviewType === "CLIENT_TO_PROVIDER") {
             await this.updateProviderRatingStats(session.slot.providerProfile.id, targetUserId);
         }
+
+        // Notify the instructor
+        await NotificationService.sendReviewNotification(
+            targetUserId,
+            "New Session Review",
+            `You received a ${rating}-star review for your teaching session.`,
+            review.id
+        );
 
         return review;
     }

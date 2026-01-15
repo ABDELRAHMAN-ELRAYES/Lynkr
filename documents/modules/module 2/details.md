@@ -251,6 +251,5 @@ Module 2 is complete when:
 
 **Missing Functionalities:**
 
-*   **Availability Management**: `ProfileService` handles `hourlyRate`, but detailed availability (days/times) is not evident in the profile creation flow or core profile data structure. It may be part of a separate module (Teaching) but is missing from the core profile setup here.
 *   **File Uploads**: The service layer (`profile.service.ts`) does not show explicit handling of file uploads (Certifications, Portfolio) in the creation payload. This logic is likely missing or handled entirely in the controller/middleware without service-level persistence of file metadata in the profile record (needs verification).
-*   **Draft Saving**: No explicit "Draft" status or flow seen; application submission seems to be an all-or-nothing action on top of an existing profile.
+

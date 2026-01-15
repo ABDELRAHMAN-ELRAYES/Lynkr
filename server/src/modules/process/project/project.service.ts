@@ -2,12 +2,16 @@ import { NextFunction } from "express";
 import AppError from "../../../utils/app-error";
 import ProjectRepository from "./project.repository";
 import EscrowRepository from "../money-system/escrow/escrow.repository";
+import ConversationService from "../../messaging/conversation/conversation.service";
+import ProfileRepository from "../../provider/profile/profile.repository";
+import NotificationService from "../../notification/notification.service";
 import { ICreateProjectData } from "./types/IProject";
 
 
 class ProjectService {
     private static projectRepo = ProjectRepository.getInstance();
     private static escrowRepo = EscrowRepository.getInstance();
+    private static profileRepo = ProfileRepository.getInstance();
 
     // ===== Helper: Check project access =====
     private static async checkProjectAccess(projectId: string, userId: string, providerProfileId?: string) {
@@ -49,6 +53,17 @@ class ProjectService {
             projectId: project.id,
             depositAmount: totalPrice
         });
+
+        // Get provider's userId for conversation
+        const providerProfile = await this.profileRepo.getProviderProfileById(providerProfileId);
+        if (providerProfile) {
+            // Create conversation for project communication
+            await ConversationService.createConversation({
+                projectId: project.id,
+                participant1Id: clientId,
+                participant2Id: providerProfile.userId
+            }, next);
+        }
 
         // Fetch project with escrow
         return await this.projectRepo.getProjectById(project.id);
@@ -97,6 +112,14 @@ class ProjectService {
             details: "Provider marked project as completed"
         });
 
+        // Notify client
+        await NotificationService.sendProjectNotification(
+            project.clientId,
+            "Project Marked Complete",
+            "The provider has marked your project as complete. Please review and confirm.",
+            projectId
+        );
+
         return updatedProject;
     }
 
@@ -126,6 +149,17 @@ class ProjectService {
             action: "COMPLETION_CONFIRMED",
             details: "Client confirmed project completion. Funds released."
         });
+
+        // Notify provider
+        const providerProfile = await this.profileRepo.getProviderProfileById(project.providerProfileId);
+        if (providerProfile) {
+            await NotificationService.sendProjectNotification(
+                providerProfile.userId,
+                "Project Completed!",
+                "The client has confirmed completion. Funds have been released to your account.",
+                projectId
+            );
+        }
 
         return project;
     }
@@ -160,6 +194,17 @@ class ProjectService {
             action: "PROJECT_CANCELLED",
             details: "Client cancelled the project"
         });
+
+        // Notify provider
+        const providerProfile = await this.profileRepo.getProviderProfileById(project.providerProfileId);
+        if (providerProfile) {
+            await NotificationService.sendProjectNotification(
+                providerProfile.userId,
+                "Project Cancelled",
+                "The client has cancelled the project.",
+                projectId
+            );
+        }
 
         return updatedProject;
     }
@@ -202,6 +247,19 @@ class ProjectService {
             action: "FILE_UPLOADED",
             details: `Uploaded file: ${projectFile.file.filename}`
         });
+
+        // Notify other party
+        const otherUserId = project.clientId === uploaderId
+            ? (await this.profileRepo.getProviderProfileById(project.providerProfileId))?.userId
+            : project.clientId;
+        if (otherUserId) {
+            await NotificationService.sendProjectNotification(
+                otherUserId,
+                "New File Uploaded",
+                `A new file "${file.filename}" has been uploaded to the project.`,
+                projectId
+            );
+        }
 
         return projectFile;
     }

@@ -11,7 +11,6 @@ passport.use(
             clientSecret: config.google.clientSecret,
             callbackURL: config.google.callbackUrl,
         },
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         async (_accessToken: any, _refreshToken: any, profile: any, done: any) => {
             try {
                 const email = profile.emails?.[0]?.value;

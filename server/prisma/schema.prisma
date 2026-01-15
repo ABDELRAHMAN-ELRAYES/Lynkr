@@ -126,7 +126,6 @@ model ProviderProfile {
     teachingSlots        TeachingSlot[]
     // ProviderProfile -> ProviderSubscription (One -> Many)
     subscriptions        ProviderSubscription[]
-    providerServices     ProviderService[]
 
     @@map("provider_profiles")
 }
@@ -164,18 +163,6 @@ model Skill {
     service Service @relation(fields: [serviceId], references: [id], onDelete: Cascade)
 
     @@map("skills")
-}
-
-model ProviderService {
-    id                String @id @default(uuid())
-    providerProfileId String @map("provider_profile_id")
-    serviceType       String @map("service_type")
-
-    // Relations
-    // ProviderService -> ProviderProfile (Many -> One)
-    providerProfile ProviderProfile @relation(fields: [providerProfileId], references: [id], onDelete: Cascade)
-
-    @@map("provider_services")
 }
 
 model ProviderSkill {

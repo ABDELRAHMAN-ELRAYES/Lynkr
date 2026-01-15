@@ -1,9 +1,11 @@
 import ProfileRepository from "./profile.repository";
 import UserRepository from "../../user/user.repository";
+import NotificationService from "../../notification/notification.service";
 import { NextFunction } from "express";
 import AppError from "../../../utils/app-error";
 import { UserRole } from "../../../enum/UserRole";
 import { ICreateProfileData, IUpdateProfileData, ICreateProfileRepositoryData } from "./types/IProfile";
+import { ISearchParams, SortBy } from "./types/ISearch";
 
 class ProfileService {
     private static profileRepository = ProfileRepository.getInstance();
@@ -44,7 +46,7 @@ class ProfileService {
                 title: data.title,
                 bio: data.bio,
                 hourlyRate: data.hourlyRate,
-                services: data.serviceType ? [{ serviceType: data.serviceType }] : undefined,
+                serviceId: data.serviceType, // Now using serviceId directly
                 skills: data.skills?.map(name => ({ skillName: name })),
                 experiences,
                 education,
@@ -92,6 +94,21 @@ class ProfileService {
     }
 
     /**
+     * Search Provider Profiles with filters, sorting, and pagination
+     */
+    static async searchProviderProfiles(params: ISearchParams) {
+        const page = params.page || 1;
+        const limit = params.limit || 10;
+
+        return await this.profileRepository.searchProviderProfiles({
+            ...params,
+            sortBy: params.sortBy as SortBy,
+            page,
+            limit,
+        });
+    }
+
+    /**
      * Update Provider Profile
      */
     static async updateProviderProfile(profileId: string, data: IUpdateProfileData, next: NextFunction) {
@@ -123,6 +140,13 @@ class ProfileService {
                 data: { role: UserRole.PROVIDER_APPROVED },
             });
 
+            // Notify provider
+            await NotificationService.sendSystemNotification(
+                profile.userId,
+                "Profile Approved!",
+                "Congratulations! Your provider profile has been approved. You can now receive service requests."
+            );
+
             return { message: "Provider profile approved successfully" };
         } catch (error) {
             return next(new AppError(500, "Failed to approve provider profile"));
@@ -149,6 +173,13 @@ class ProfileService {
                 where: { id: profile.userId },
                 data: { role: UserRole.PROVIDER_REJECTED },
             });
+
+            // Notify provider
+            await NotificationService.sendSystemNotification(
+                profile.userId,
+                "Profile Not Approved",
+                "Your provider profile application was not approved. Please review and resubmit."
+            );
 
             return { message: "Provider profile rejected" };
         } catch (error) {

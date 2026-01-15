@@ -1,5 +1,6 @@
 import MeetingRepository from "./meeting.repository";
 import SocketService from "../../services/socket.service";
+import NotificationService from "../notification/notification.service";
 import { RtcTokenBuilder, RtcRole } from "agora-access-token";
 import config from "../../config/config";
 import { NextFunction } from "express";
@@ -63,7 +64,7 @@ class MeetingService {
             scheduledAt,
         });
 
-        // Notify guest about the meeting invite
+        // Notify guest about the meeting invite (real-time)
         this.socketService.sendToUser(data.guestId, "meeting:invite", {
             meetingId: meeting.id,
             projectId: meeting.projectId,
@@ -71,6 +72,13 @@ class MeetingService {
             host: meeting.host,
             scheduledAt: meeting.scheduledAt,
         });
+
+        // Persistent notification
+        await NotificationService.sendSystemNotification(
+            data.guestId,
+            "Meeting Invitation",
+            `${meeting.host?.firstName || "Someone"} has invited you to a video meeting.`
+        );
 
         return meeting;
     }
@@ -145,11 +153,18 @@ class MeetingService {
             startedAt: new Date(),
         });
 
-        // Notify guest that meeting started
+        // Notify guest that meeting started (real-time)
         this.socketService.sendToUser(meeting.guestId, "meeting:started", {
             meetingId: meeting.id,
             channelName: meeting.channelName,
         });
+
+        // Persistent notification
+        await NotificationService.sendSystemNotification(
+            meeting.guestId,
+            "Meeting Started",
+            "Your scheduled meeting has started. Join now!"
+        );
 
         return updatedMeeting;
     }
@@ -182,12 +197,20 @@ class MeetingService {
             duration,
         });
 
-        // Notify other participant that meeting ended
+        // Notify other participant that meeting ended (real-time)
         const otherUserId = meeting.hostId === userId ? meeting.guestId : meeting.hostId;
         this.socketService.sendToUser(otherUserId, "meeting:ended", {
             meetingId: meeting.id,
             duration,
         });
+
+        // Persistent notification
+        const durationMinutes = Math.floor(duration / 60);
+        await NotificationService.sendSystemNotification(
+            otherUserId,
+            "Meeting Ended",
+            `The meeting has ended. Duration: ${durationMinutes} minutes.`
+        );
 
         return updatedMeeting;
     }
@@ -212,11 +235,18 @@ class MeetingService {
             status: "CANCELLED",
         });
 
-        // Notify other participant
+        // Notify other participant (real-time)
         const otherUserId = meeting.hostId === userId ? meeting.guestId : meeting.hostId;
         this.socketService.sendToUser(otherUserId, "meeting:cancelled", {
             meetingId: meeting.id,
         });
+
+        // Persistent notification
+        await NotificationService.sendSystemNotification(
+            otherUserId,
+            "Meeting Cancelled",
+            "A scheduled meeting has been cancelled."
+        );
 
         return updatedMeeting;
     }
@@ -251,11 +281,18 @@ class MeetingService {
             return next(new AppError(403, "Only invited guest can accept"));
         }
 
-        // Notify host that guest accepted
+        // Notify host that guest accepted (real-time)
         this.socketService.sendToUser(meeting.hostId, "meeting:accepted", {
             meetingId: meeting.id,
             guestId: userId,
         });
+
+        // Persistent notification
+        await NotificationService.sendSystemNotification(
+            meeting.hostId,
+            "Meeting Accepted",
+            `${meeting.guest?.firstName || "The guest"} has accepted your meeting invite.`
+        );
 
         return meeting;
     }
@@ -276,11 +313,18 @@ class MeetingService {
             status: "CANCELLED",
         });
 
-        // Notify host that guest declined
+        // Notify host that guest declined (real-time)
         this.socketService.sendToUser(meeting.hostId, "meeting:declined", {
             meetingId: meeting.id,
             guestId: userId,
         });
+
+        // Persistent notification
+        await NotificationService.sendSystemNotification(
+            meeting.hostId,
+            "Meeting Declined",
+            `${meeting.guest?.firstName || "The guest"} has declined your meeting invite.`
+        );
 
         return updatedMeeting;
     }

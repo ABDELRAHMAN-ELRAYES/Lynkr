@@ -242,11 +242,10 @@ Module 1 is complete when:
 *   **Password Reset**: Request link and reset flow (`forgetPassword`, `resetPassword`).
 *   **User Management**: `UserService` handles creation, update (profile details), status updates, and role updates.
 *   **Role Management**: Basic RBAC via `AuthMiddleware` and `getRolePrivileges`.
+*   **Google OAuth**: Implemented via Passport.js (`passport.ts` -> Google Strategy, `auth.route.ts` -> `/google`, `/google/callback`).
+*   **Provider Application Flow**: Complete flow in `provider-application` module with role transitions (CLIENT → PROVIDER_PENDING on submit, PROVIDER_PENDING → PROVIDER_APPROVED/CLIENT on admin decision).
 
 **Missing Functionalities:**
 
-*   **Google OAuth**: No implementation found in `auth` module or utils.
-*   **Audit Logging**: No dedicated audit logging service or calls found for critical identity events (login, role change, etc.).
-*   **Phone Change OTP**: Phone update exists in `updateUserProfile` but without OTP verification.
-*   **Session Management**: JWT based, but "Logout from all devices" or tracking active sessions per device is not explicitly implemented (just cookie clearing).
-*   **Explicit Provider Application Flow**: While `updateUserRole` exists, the specific user-facing flow/endpoint for "Apply as Provider" (state transition from Client -> Pending) seems to rely on generic update or is handled in the Provider module (need to confirm overlap).
+*   None - All Module 1 features are implemented.
+

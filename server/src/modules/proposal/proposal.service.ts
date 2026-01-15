@@ -1,6 +1,8 @@
 import ProposalRepository from "./proposal.repository";
 import RequestRepository from "../process/request/request.repository";
 import ProfileRepository from "../provider/profile/profile.repository";
+import ProjectService from "../process/project/project.service";
+import NotificationService from "../notification/notification.service";
 import { NextFunction } from "express";
 import AppError from "../../utils/app-error";
 import SocketService from "../../services/socket.service";
@@ -44,7 +46,13 @@ class ProposalService {
             });
         }
 
-        // TODO: Create Notification record
+        // Create persistent Notification record
+        await NotificationService.sendProposalNotification(
+            request.clientId,
+            "New Proposal Received",
+            `${profile.user?.firstName} ${profile.user?.lastName} submitted a proposal for your request.`,
+            proposal.id
+        );
 
         return proposal;
     }
@@ -109,11 +117,29 @@ class ProposalService {
         // 3. Update Request status to ACCEPTED
         await this.requestRepository.updateRequestStatus(proposal.requestId, "ACCEPTED");
 
-        // 4. Notify provider
+        // 4. Create Project and Escrow
+        const project = await ProjectService.createProjectFromProposal(
+            proposal.request.clientId,
+            proposal.providerProfileId,
+            id,
+            Number(proposal.price),
+            next
+        );
+
+        // 5. Notify provider (real-time)
         this.socketService.sendToUser(proposal.providerProfile.userId, "proposal:accepted", {
             proposalId: id,
             requestId: proposal.requestId,
+            projectId: project?.id,
         });
+
+        // Persistent notification
+        await NotificationService.sendProposalNotification(
+            proposal.providerProfile.userId,
+            "Proposal Accepted!",
+            `Your proposal for "${proposal.request.title}" has been accepted. A project has been created.`,
+            id
+        );
 
         return acceptedProposal;
     }
@@ -130,11 +156,19 @@ class ProposalService {
 
         const rejectedProposal = await this.repository.updateProposalStatus(id, "REJECTED");
 
-        // Notify provider
+        // Notify provider (real-time)
         this.socketService.sendToUser(proposal.providerProfile.userId, "proposal:rejected", {
             proposalId: id,
             requestId: proposal.requestId,
         });
+
+        // Persistent notification
+        await NotificationService.sendProposalNotification(
+            proposal.providerProfile.userId,
+            "Proposal Not Selected",
+            `Your proposal for "${proposal.request.title}" was not selected.`,
+            id
+        );
 
         return rejectedProposal;
     }

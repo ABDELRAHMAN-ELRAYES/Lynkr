@@ -3,6 +3,7 @@ import { catchAsync } from "../../../utils/catch-async";
 import ProfileService from "./profile.service";
 import { IUser } from "../../user/types/IUser";
 import { ICreateProfileData, IUpdateProfileData } from "./types/IProfile";
+import { SortBy, SortOrder } from "./types/ISearch";
 
 /**
  * Create Provider Profile
@@ -66,6 +67,44 @@ export const getAllProviderProfiles = catchAsync(
         response.status(200).json({
             status: "success",
             data: { profiles, count: profiles.length },
+        });
+    }
+);
+
+/**
+ * Search Provider Profiles
+ */
+export const searchProviderProfiles = catchAsync(
+    async (request: Request, response: Response) => {
+        const {
+            q,
+            serviceId,
+            minPrice,
+            maxPrice,
+            minRating,
+            language,
+            sortBy,
+            sortOrder,
+            page,
+            limit,
+        } = request.query;
+
+        const result = await ProfileService.searchProviderProfiles({
+            q: q as string,
+            serviceId: serviceId as string,
+            minPrice: minPrice ? parseFloat(minPrice as string) : undefined,
+            maxPrice: maxPrice ? parseFloat(maxPrice as string) : undefined,
+            minRating: minRating ? parseFloat(minRating as string) : undefined,
+            language: language as string,
+            sortBy: sortBy as SortBy,
+            sortOrder: sortOrder as SortOrder,
+            page: page ? parseInt(page as string, 10) : 1,
+            limit: limit ? parseInt(limit as string, 10) : 10,
+        });
+
+        response.status(200).json({
+            status: "success",
+            data: result,
         });
     }
 );

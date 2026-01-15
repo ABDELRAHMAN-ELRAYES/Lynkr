@@ -2,6 +2,7 @@ import PrismaClientSingleton from "../../../data-server-clients/prisma-client";
 import { PrismaClient } from "@prisma/client";
 import AppError from "../../../utils/app-error";
 import { ICreateProfileRepositoryData, IUpdateProfileData } from "./types/IProfile";
+import { ISearchParamsRequired } from "./types/ISearch";
 
 class ProfileRepository {
     private prisma: PrismaClient;
@@ -32,7 +33,7 @@ class ProfileRepository {
                     title: data.title,
                     bio: data.bio,
                     hourlyRate: data.hourlyRate,
-                    services: data.services ? { create: data.services } : undefined,
+                    serviceId: data.serviceId,
                     skills: data.skills ? { create: data.skills } : undefined,
                     experiences: data.experiences ? { create: data.experiences } : undefined,
                     education: data.education ? { create: data.education } : undefined,
@@ -40,7 +41,7 @@ class ProfileRepository {
                 },
                 include: {
                     user: true,
-                    services: true,
+                    service: true,
                     skills: true,
                     experiences: true,
                     education: true,
@@ -58,7 +59,7 @@ class ProfileRepository {
                 where: { userId },
                 include: {
                     user: true,
-                    services: true,
+                    service: true,
                     skills: true,
                     experiences: true,
                     education: true,
@@ -76,7 +77,7 @@ class ProfileRepository {
                 where: { id },
                 include: {
                     user: true,
-                    services: true,
+                    service: true,
                     skills: true,
                     experiences: true,
                     education: true,
@@ -94,7 +95,7 @@ class ProfileRepository {
                 where: approvedOnly ? { isApproved: true } : undefined,
                 include: {
                     user: true,
-                    services: true,
+                    service: true,
                     skills: true,
                     experiences: true,
                     education: true,
@@ -106,6 +107,106 @@ class ProfileRepository {
         }
     }
 
+    async searchProviderProfiles(params: ISearchParamsRequired) {
+        try {
+            // Build where clause - only approved providers
+            const where: any = { isApproved: true };
+
+            // Search by name (user firstName or lastName)
+            if (params.q) {
+                where.user = {
+                    OR: [
+                        { firstName: { contains: params.q, mode: "insensitive" } },
+                        { lastName: { contains: params.q, mode: "insensitive" } },
+                    ],
+                };
+            }
+
+            // Filter by service
+            if (params.serviceId) {
+                where.serviceId = params.serviceId;
+            }
+
+            // Filter by price range
+            if (params.minPrice !== undefined || params.maxPrice !== undefined) {
+                where.hourlyRate = {};
+                if (params.minPrice !== undefined) {
+                    where.hourlyRate.gte = params.minPrice;
+                }
+                if (params.maxPrice !== undefined) {
+                    where.hourlyRate.lte = params.maxPrice;
+                }
+            }
+
+            // Filter by minimum rating
+            if (params.minRating !== undefined) {
+                where.averageRating = { gte: params.minRating };
+            }
+
+            // Filter by language
+            if (params.language) {
+                where.languages = {
+                    some: { language: { contains: params.language, mode: "insensitive" } },
+                };
+            }
+
+            // Build orderBy clause
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            let orderBy: any = { createdAt: "desc" }; // Default sort
+            const order = params.sortOrder || "asc";
+
+            switch (params.sortBy) {
+                case "name":
+                    orderBy = { user: { firstName: order } };
+                    break;
+                case "rating":
+                    orderBy = { averageRating: order };
+                    break;
+                case "price":
+                    orderBy = { hourlyRate: order };
+                    break;
+                case "date":
+                    orderBy = { createdAt: order };
+                    break;
+            }
+
+            // Get total count
+            const total = await this.prisma.providerProfile.count({ where });
+
+            // Get paginated results
+            const profiles = await this.prisma.providerProfile.findMany({
+                where,
+                include: {
+                    user: {
+                        select: {
+                            id: true,
+                            firstName: true,
+                            lastName: true,
+                            email: true,
+                            username: true,
+                        },
+                    },
+                    service: true,
+                    skills: true,
+                    languages: true,
+                },
+                orderBy,
+                skip: (params.page - 1) * params.limit,
+                take: params.limit,
+            });
+
+            return {
+                profiles,
+                total,
+                page: params.page,
+                limit: params.limit,
+                totalPages: Math.ceil(total / params.limit),
+            };
+        } catch (error) {
+            throw new AppError(500, "Failed to search provider profiles");
+        }
+    }
+
     async updateProviderProfile(profileId: string, data: IUpdateProfileData) {
         try {
             return await this.prisma.providerProfile.update({
@@ -113,7 +214,7 @@ class ProfileRepository {
                 data,
                 include: {
                     user: true,
-                    services: true,
+                    service: true,
                     skills: true,
                     experiences: true,
                     education: true,

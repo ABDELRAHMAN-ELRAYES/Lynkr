@@ -44,6 +44,9 @@ class ProviderApplicationService {
             providerProfileId: profile.id,
         });
 
+        // 5. Update user role to PROVIDER_PENDING
+        await UserService.updateUserRole(userId, UserRole.PROVIDER_PENDING);
+
         return application;
     }
 
@@ -131,6 +134,11 @@ class ProviderApplicationService {
             decision: "REJECTED",
             reason,
         });
+
+        // 3. Revert user role back to CLIENT
+        if (application.userId) {
+            await UserService.updateUserRole(application.userId, UserRole.CLIENT);
+        }
 
         return { message: "Application rejected" };
     }

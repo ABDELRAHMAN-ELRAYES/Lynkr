@@ -5,6 +5,7 @@ import AppError from "../../../utils/app-error";
 import SessionRepository from "./session.repository";
 import SlotRepository from "../slot/slot.repository";
 import PaymentRepository from "../../process/money-system/payment/payment.repository";
+import NotificationService from "../../notification/notification.service";
 import { randomUUID } from "crypto";
 
 const stripe = new Stripe(config.stripe.secretKey, {
@@ -149,6 +150,22 @@ class SessionService {
             paidAt: new Date()
         });
 
+        // Notify Student
+        await NotificationService.sendSystemNotification(
+            userId,
+            "Booking Confirmed",
+            `Your session for ${slot.startTime} on ${new Date(slot.slotDate).toDateString()} is confirmed.`
+        );
+
+        // Notify Instructor
+        if (slot.providerProfile?.user?.id) {
+            await NotificationService.sendSystemNotification(
+                slot.providerProfile.user.id,
+                "New Session Booking",
+                "A new student has booked a session with you."
+            );
+        }
+
         return await this.sessionRepo.getSessionById(session.id);
     }
 
@@ -193,6 +210,17 @@ class SessionService {
             return next(new AppError(400, `Session cannot be started. Current status: ${session.status}`));
         }
 
+        // Notify participants
+        for (const p of session.participants) {
+            if (p.status === "BOOKED") {
+                await NotificationService.sendSystemNotification(
+                    p.userId,
+                    "Session Started",
+                    "Your session has started. Please join now."
+                );
+            }
+        }
+
         return await this.sessionRepo.updateSessionStatus(sessionId, "IN_PROGRESS", {
             startedAt: new Date()
         });
@@ -211,6 +239,17 @@ class SessionService {
 
         if (session.status !== "IN_PROGRESS") {
             return next(new AppError(400, `Session cannot be completed. Current status: ${session.status}`));
+        }
+
+        // Notify participants
+        for (const p of session.participants) {
+            if (p.status === "BOOKED") {
+                await NotificationService.sendSystemNotification(
+                    p.userId,
+                    "Session Completed",
+                    "The session has been marked as completed."
+                );
+            }
         }
 
         return await this.sessionRepo.updateSessionStatus(sessionId, "COMPLETED", {
@@ -257,6 +296,13 @@ class SessionService {
                 }
 
                 await this.sessionRepo.updateParticipantStatus(p.id, "REFUNDED");
+
+                // Notify participant
+                await NotificationService.sendSystemNotification(
+                    p.userId,
+                    "Session Cancelled",
+                    "The instructor has cancelled the session. A refund has been issued."
+                );
             }
 
             return await this.sessionRepo.updateSessionStatus(sessionId, "CANCELLED");
@@ -279,6 +325,13 @@ class SessionService {
             }
 
             await this.sessionRepo.updateParticipantStatus(participant.id, "REFUNDED");
+
+            // Notify Instructor
+            await NotificationService.sendSystemNotification(
+                session.instructorId,
+                "Booking Cancelled",
+                "A student has cancelled their booking for your session."
+            );
 
             // Check if session should be cancelled (no remaining participants)
             const remainingParticipants = session.participants.filter(

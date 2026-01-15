@@ -4,6 +4,7 @@ import {
     getProviderProfileByUserId,
     getProviderProfileById,
     getAllProviderProfiles,
+    searchProviderProfiles,
     updateProviderProfile,
     approveProviderProfile,
     rejectProviderProfile,
@@ -16,6 +17,7 @@ const ProfileRouter = Router();
 
 // Public routes (approved profiles only)
 ProfileRouter.get("/", getAllProviderProfiles);
+ProfileRouter.get("/search", searchProviderProfiles);
 ProfileRouter.get("/:id", getProviderProfileById);
 
 // Protected routes - Providers can manage their own profiles
