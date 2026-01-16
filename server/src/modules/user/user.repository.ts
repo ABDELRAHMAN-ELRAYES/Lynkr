@@ -199,6 +199,7 @@ class UserRepository {
                 },
                 data: {
                     password,
+                    passwordChangedAt: new Date(),
                 },
             });
         } catch (error) {
@@ -236,7 +237,10 @@ class UserRepository {
         try {
             return await this.prisma.user.update({
                 where: { id: userId },
-                data: { password },
+                data: {
+                    password,
+                    passwordChangedAt: new Date(),
+                },
             });
         } catch (error) {
             throw new AppError(500, `User not found or update failed`);

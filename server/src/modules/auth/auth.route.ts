@@ -1,4 +1,4 @@
-import { Router,Request,Response } from "express";
+import { Router, Request, Response } from "express";
 import {
     getCurrentUserData,
     login,
@@ -9,9 +9,9 @@ import {
     forgetPassword,
     protect,
 } from "./auth.controller";
-import passport from "../../config/passport";
+import passport, { GoogleAuthResult } from "../../config/passport";
 import config from "../../config/config";
-import { signJWT } from "@/utils/jwt";
+import { signJWT, attachAuthCookie } from "@/utils/jwt";
 
 const AuthRouter = Router();
 
@@ -22,6 +22,7 @@ AuthRouter.route("/forget-password").post(forgetPassword);
 AuthRouter.route("/reset-password").post(resetPassword);
 AuthRouter.route("/logout").post(logout);
 AuthRouter.route("/me").get(protect, getCurrentUserData);
+
 // OAuth routes
 AuthRouter.get(
     "/google",
@@ -30,15 +31,35 @@ AuthRouter.get(
 
 AuthRouter.get(
     "/google/callback",
-    passport.authenticate("google", { session: false }),
-    (req:Request, res:Response) => {
-        const user = req.user as any;
+    passport.authenticate("google", { session: false, failureRedirect: `${config.webUrl}/auth/login?error=google_failed` }),
+    (req: Request, res: Response) => {
+        const googleData = req.user as unknown as GoogleAuthResult;
 
-        // Sign JWT and set cookie
-        const token = signJWT(user.id);
+        if (!googleData) {
+            return res.redirect(`${config.webUrl}/auth/login?error=no_data`);
+        }
 
-        // Redirect to frontend with token
-        res.redirect(`${config.webUrl || process.env.FRONTEND_URL}?token=${token}`);
+        if (!googleData.isNewUser && googleData.existingUser) {
+            // Existing user - log them in directly
+            const token = signJWT(googleData.existingUser.id);
+
+            // Set JWT cookie
+            attachAuthCookie(res, token);
+
+            // Redirect to frontend with success
+            return res.redirect(`${config.webUrl}/auth/callback?type=login&success=true`);
+        } else {
+            // New user - redirect to registration page with pre-filled data (email, firstName, lastName)
+            const userData = {
+                email: googleData.email,
+                firstName: googleData.firstName,
+                lastName: googleData.lastName,
+            };
+
+            const encodedData = Buffer.from(JSON.stringify(userData)).toString("base64");
+
+            return res.redirect(`${config.webUrl}/auth/callback?type=register&data=${encodedData}`);
+        }
     }
 );
 

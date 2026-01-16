@@ -146,6 +146,40 @@ class EscrowRepository {
             throw new AppError(500, "Failed to get provider balance");
         }
     }
+
+    async createWithdrawal(providerProfileId: string, amount: number) {
+        try {
+            // Deduct from provider's available balance
+            const profile = await this.prisma.providerProfile.update({
+                where: { id: providerProfileId },
+                data: {
+                    availableBalance: { decrement: amount }
+                },
+                select: {
+                    id: true,
+                    availableBalance: true
+                }
+            });
+
+            // Return withdrawal info (in production, would create actual record)
+            return {
+                id: `wth_${Date.now()}`,
+                providerProfileId,
+                amount,
+                status: "PENDING",
+                remainingBalance: profile.availableBalance,
+                createdAt: new Date()
+            };
+        } catch (error) {
+            throw new AppError(500, "Failed to create withdrawal");
+        }
+    }
+
+    async getWithdrawalHistory(_providerProfileId: string) {
+        // Note: Requires a Withdrawal model in Prisma schema for full implementation
+        // For now, return empty array - can be enhanced when model is added
+        return [];
+    }
 }
 
 export default EscrowRepository;

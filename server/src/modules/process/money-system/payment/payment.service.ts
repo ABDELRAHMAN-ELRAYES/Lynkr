@@ -7,11 +7,13 @@ import ProjectRepository from "./../../project/project.repository";
 import EscrowRepository from "../escrow/escrow.repository";
 import ProfileRepository from "./../../../provider/profile/profile.repository";
 import NotificationService from "./../../../notification/notification.service";
+import SubscriptionRepository from "./../../../subscription/subscription.repository";
 import { PaymentType } from "./types/IPayment";
 
 const stripe = new Stripe(config.stripe.secretKey, {
     apiVersion: "2025-02-24.acacia",
 });
+
 
 class PaymentService {
     private static paymentRepo = PaymentRepository.getInstance();
@@ -122,7 +124,13 @@ class PaymentService {
             paidAt: new Date()
         });
 
-        // Get projectId from the join table
+        // Handle subscription payments
+        if (payment.paymentType === "SUBSCRIPTION") {
+            await this.handleSubscriptionPaymentSuccess(payment, paymentIntent);
+            return;
+        }
+
+        // Handle project payments - Get projectId from the join table
         const projectId = payment.projectPayment?.projectId;
         if (!projectId) return;
 
@@ -174,6 +182,54 @@ class PaymentService {
         console.log(`[Payment] Completed: ${payment.id} for project ${projectId}`);
     }
 
+    private static async handleSubscriptionPaymentSuccess(payment: any, paymentIntent: Stripe.PaymentIntent) {
+        try {
+            // Get subscriptionId from payment intent metadata
+            const subscriptionId = paymentIntent.metadata?.subscriptionId;
+            if (!subscriptionId) {
+                console.log(`[Payment] Subscription payment ${payment.id} missing subscriptionId in metadata`);
+                return;
+            }
+
+            const subscriptionRepo = SubscriptionRepository.getInstance();
+            const subscription = await subscriptionRepo.getSubscriptionById(subscriptionId);
+
+            if (!subscription) {
+                console.log(`[Payment] Subscription ${subscriptionId} not found`);
+                return;
+            }
+
+            if (subscription.status !== "PENDING") {
+                console.log(`[Payment] Subscription ${subscriptionId} is not pending, current status: ${subscription.status}`);
+                return;
+            }
+
+            // Activate the subscription
+            const startDate = new Date();
+            const endDate = new Date();
+            endDate.setDate(endDate.getDate() + subscription.plan.durationDays);
+
+            await subscriptionRepo.updateSubscription(subscriptionId, {
+                status: "ACTIVE",
+                paymentStatus: "PAID",
+                startDate,
+                endDate
+            });
+
+            // Notify provider of successful subscription
+            await NotificationService.createNotification({
+                userId: subscription.providerProfile.userId,
+                title: "Subscription Activated",
+                message: `Your ${subscription.plan.name} subscription is now active until ${endDate.toLocaleDateString()}.`,
+                type: "SYSTEM"
+            });
+
+            console.log(`[Payment] Subscription ${subscriptionId} activated for provider ${subscription.providerProfile.userId}`);
+        } catch (error) {
+            console.error(`[Payment] Failed to process subscription payment:`, error);
+        }
+    }
+
     private static async handlePaymentFailure(paymentIntent: Stripe.PaymentIntent) {
         const payment = await this.paymentRepo.getPaymentByStripeId(paymentIntent.id);
         if (!payment) return;
@@ -195,3 +251,4 @@ class PaymentService {
 }
 
 export default PaymentService;
+

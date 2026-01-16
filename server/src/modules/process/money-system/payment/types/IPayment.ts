@@ -1,6 +1,6 @@
 // Payment Types - No Prisma dependencies
 
-export type PaymentType = "FULL" | "INITIAL" | "FINAL" | "SESSION";
+export type PaymentType = "FULL" | "INITIAL" | "FINAL" | "SESSION" | "SUBSCRIPTION";
 export type PaymentStatus = "PENDING" | "COMPLETED" | "REFUNDED" | "CANCELLED";
 
 export interface IPayment {

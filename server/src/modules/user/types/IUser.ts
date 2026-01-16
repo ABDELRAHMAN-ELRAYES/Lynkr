@@ -24,6 +24,8 @@ export type IUser = {
     password: string;
     role: string; // UserRole enum value as string
     active: boolean;
+    emailVerified: boolean;
+    passwordChangedAt: Date | null;
     createdAt: Date;
     updatedAt: Date;
     avatar?: string;

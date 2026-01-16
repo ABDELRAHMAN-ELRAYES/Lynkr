@@ -26,12 +26,26 @@ export class AuthMiddleware {
                 )
             );
         }
-        const { id } = data;
+        const { id, iat } = data;
         // Add user data to the response
         const user = await UserService.getUser(id, next);
         if (!user) return;
 
-        // TODO: check if the user changed the password after the token is set (Log him out)
+        // Check if the user changed the password after the token was issued
+        if (user.passwordChangedAt && iat) {
+            const passwordChangedTimestamp = Math.floor(
+                new Date(user.passwordChangedAt).getTime() / 1000
+            );
+            if (passwordChangedTimestamp > iat) {
+                return next(
+                    new AppError(
+                        401,
+                        "تم تغيير كلمة المرور. يرجى تسجيل الدخول مرة أخرى."
+                    )
+                );
+            }
+        }
+
         request.user = user as IUser;
         next();
     }

@@ -1,11 +1,13 @@
 import express from "express";
 import morgan from "morgan";
 import path from "path";
+import helmet from "helmet";
 import config from "./config/config";
 import UserRepository from "./modules/user/user.repository";
 import { hash } from "./utils/hashing-handler";
 import { UserRole } from "./enum/UserRole";
 import { globalErrorHandler, notFoundHandler } from "./middlewares/error-handler";
+import { generalApiLimiter, authLimiter } from "./middlewares/rate-limit.middleware";
 
 // Import all route modules
 import AuthRouter from "./modules/auth/auth.route";
@@ -65,6 +67,22 @@ export const ROOT_DIR: string = process.cwd();
 
 const app = express();
 
+// Security middleware
+app.use(helmet({
+    contentSecurityPolicy: {
+        directives: {
+            defaultSrc: ["'self'"],
+            styleSrc: ["'self'", "'unsafe-inline'"],
+            scriptSrc: ["'self'"],
+            imgSrc: ["'self'", "data:", "blob:"],
+        },
+    },
+    crossOriginEmbedderPolicy: false, // Allow cross-origin embedding for uploads
+}));
+
+// Rate limiting
+app.use("/api/", generalApiLimiter);
+
 // Middleware setup
 app.use(corsMiddleware);
 app.use(formParser);
@@ -81,7 +99,7 @@ app.use(
 
 
 // API Routes
-app.use("/api/v1/auth", AuthRouter);
+app.use("/api/v1/auth", authLimiter, AuthRouter);
 app.use("/api/v1/users", UserRouter);
 app.use("/api/v1/profiles", ProfileRouter);
 app.use("/api/v1/payments", PaymentRouter);

@@ -1,5 +1,8 @@
 import NotificationRepository from "./notification.repository";
+import UserRepository from "../user/user.repository";
 import SocketService from "../../services/socket.service";
+import Email from "../../utils/email/email";
+import config from "../../config/config";
 import { NextFunction } from "express";
 import AppError from "../../utils/app-error";
 import {
@@ -8,8 +11,12 @@ import {
     getDefaultCategory
 } from "./types/INotification";
 
+// Critical notification types that should also send email
+const CRITICAL_TYPES = ["PAYMENT", "SYSTEM"];
+
 class NotificationService {
     private static repository = NotificationRepository.getInstance();
+    private static userRepository = UserRepository.getInstance();
     private static socketService = SocketService.getInstance();
 
     // ===== CREATE NOTIFICATION =====
@@ -21,6 +28,7 @@ class NotificationService {
         type?: string;
         entityId?: string;
         entityType?: string;
+        sendEmail?: boolean;
     }) {
         // Use MESSAGE as default type for backward compatibility with messaging module
         const notificationType = (data.type || "MESSAGE") as any;
@@ -41,6 +49,12 @@ class NotificationService {
         // Real-time: Send notification to user via Socket.IO
         this.broadcastNotification(data.userId, notification);
 
+        // Email: Send for critical notifications or if explicitly requested
+        const shouldSendEmail = data.sendEmail || CRITICAL_TYPES.includes(notificationType);
+        if (shouldSendEmail) {
+            await this.sendEmailNotification(data.userId, data.title, data.message);
+        }
+
         return notification;
     }
 
@@ -49,6 +63,19 @@ class NotificationService {
             this.socketService.sendNotification(userId, notification);
         } catch (error) {
             console.error("Failed to broadcast notification:", error);
+        }
+    }
+
+    private static async sendEmailNotification(userId: string, title: string, message: string) {
+        try {
+            const user = await this.userRepository.getUserById(userId);
+            if (user?.email) {
+                const email = new Email(config.mail.from || "noreply@lynkr.com", user.email);
+                await email.send("notification", title, { title, message, name: user.firstName });
+            }
+        } catch (error) {
+            console.error("Failed to send email notification:", error);
+            // Don't fail the notification if email fails
         }
     }
 

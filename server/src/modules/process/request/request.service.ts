@@ -53,9 +53,6 @@ class RequestService {
 
             const request = await this.repository.createRequest(repositoryData);
 
-            // TODO: Handle file attachments if any
-            // if (data.files && data.files.length > 0) { ... }
-
             // Notify provider if direct request
             if (request.targetProviderId) {
                 const providerProfile = await this.profileRepo.getProviderProfileById(request.targetProviderId);

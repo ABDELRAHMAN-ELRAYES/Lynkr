@@ -1,11 +1,21 @@
 import SubscriptionRepository from "./subscription.repository";
 import NotificationService from "../notification/notification.service";
+import PaymentRepository from "../process/money-system/payment/payment.repository";
+import ProfileRepository from "../provider/profile/profile.repository";
+import Stripe from "stripe";
+import config from "../../config/config";
 import { NextFunction } from "express";
 import AppError from "../../utils/app-error";
 import { ICreatePlanData, IUpdatePlanData } from "./types/ISubscription";
 
+
+const stripe = new Stripe(config.stripe.secretKey, {
+    apiVersion: "2025-02-24.acacia",
+});
+
 class SubscriptionService {
     private static repository = SubscriptionRepository.getInstance();
+    private static paymentRepo = PaymentRepository.getInstance();
 
     // ===== PLAN OPERATIONS =====
 
@@ -54,6 +64,15 @@ class SubscriptionService {
         userId: string,
         next: NextFunction
     ) {
+        // Verify the user owns this provider profile
+        const profile = await ProfileRepository.getInstance().getProviderProfileById(providerProfileId);
+        if (!profile) {
+            return next(new AppError(404, "Provider profile not found"));
+        }
+        if (profile.userId !== userId) {
+            return next(new AppError(403, "Cannot purchase subscription for another provider's profile"));
+        }
+
         // Check if plan exists and is active
         const plan = await this.repository.getPlanById(planId);
         if (!plan) {
@@ -75,13 +94,59 @@ class SubscriptionService {
             planId
         });
 
-        // TODO: Integrate with Payment module here
-        // For now, simulate immediate payment success
+        // Create Stripe PaymentIntent
+        const paymentIntent = await stripe.paymentIntents.create({
+            amount: Math.round(Number(plan.price) * 100), // Convert to cents
+            currency: "usd",
+            metadata: {
+                subscriptionId: subscription.id,
+                planId,
+                type: "SUBSCRIPTION"
+            }
+        });
+
+        // Create payment record
+        const payment = await this.paymentRepo.createPayment({
+            payerId: userId,
+            amount: Number(plan.price),
+            paymentType: "SUBSCRIPTION"
+        });
+
+        await this.paymentRepo.updatePayment(payment.id, {
+            stripePaymentId: paymentIntent.id
+        });
+
+        return {
+            clientSecret: paymentIntent.client_secret,
+            paymentIntentId: paymentIntent.id,
+            paymentId: payment.id,
+            subscriptionId: subscription.id,
+            amount: Number(plan.price),
+            currency: "USD"
+        };
+    }
+
+    // Confirm subscription after successful payment
+    static async confirmSubscriptionPayment(
+        subscriptionId: string,
+        userId: string,
+        next: NextFunction
+    ) {
+        const subscription = await this.repository.getSubscriptionById(subscriptionId);
+        if (!subscription) {
+            return next(new AppError(404, "Subscription not found"));
+        }
+
+        if (subscription.status !== "PENDING") {
+            return next(new AppError(400, "Subscription is not pending payment"));
+        }
+
+        const plan = subscription.plan;
         const startDate = new Date();
         const endDate = new Date();
         endDate.setDate(endDate.getDate() + plan.durationDays);
 
-        const activatedSubscription = await this.repository.updateSubscription(subscription.id, {
+        const activatedSubscription = await this.repository.updateSubscription(subscriptionId, {
             status: "ACTIVE",
             paymentStatus: "PAID",
             startDate,
@@ -132,6 +197,11 @@ class SubscriptionService {
 
         if (!subscription) {
             return next(new AppError(404, "Subscription not found"));
+        }
+
+        // Verify ownership
+        if (subscription.providerProfile.userId !== userId) {
+            return next(new AppError(403, "You can only cancel your own subscription"));
         }
 
         if (subscription.status !== "ACTIVE") {

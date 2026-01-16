@@ -29,6 +29,11 @@ class SessionService {
             return next(new AppError(404, "Slot not found"));
         }
 
+        // Prevent instructor from booking own session
+        if (slot.providerProfile?.user?.id === userId) {
+            return next(new AppError(400, "You cannot book your own session"));
+        }
+
         // Validate slot is not in the past
         const now = new Date();
         const slotDateTime = new Date(slot.slotDate);

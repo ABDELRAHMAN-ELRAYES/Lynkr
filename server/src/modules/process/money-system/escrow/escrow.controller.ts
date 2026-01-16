@@ -47,6 +47,7 @@ export const requestWithdrawal = async (req: Request, res: Response, next: NextF
 
     const result = await EscrowService.requestWithdrawal(
         user.providerProfile.id,
+        user.id,
         amount,
         next
     );

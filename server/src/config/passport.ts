@@ -1,8 +1,16 @@
 import passport from "passport";
 import { Strategy as GoogleStrategy } from "passport-google-oauth20";
 import config from "../config/config";
-import UserService from "../modules/user/user.service";
-import AppError from "../utils/app-error";
+import UserRepository from "../modules/user/user.repository";
+
+// Type for Google Auth result
+export interface GoogleAuthResult {
+    email: string;
+    firstName: string;
+    lastName: string;
+    isNewUser: boolean;
+    existingUser: any | null;
+}
 
 passport.use(
     new GoogleStrategy(
@@ -15,33 +23,24 @@ passport.use(
             try {
                 const email = profile.emails?.[0]?.value;
                 if (!email) {
-                    return done(new AppError(400, "No email found in Google profile"));
+                    return done(new Error("No email found in Google profile"));
                 }
 
-                // Check if user exists
-                let user = await UserService.getUserByUsernameOrEmail(email, () => { });
+                const userRepo = UserRepository.getInstance();
 
-                if (!user) {
-                    // Create new user from Google profile
-                    const newUser = await UserService.saveUser(
-                        {
-                            email,
-                            firstName: profile.name?.givenName || "",
-                            lastName: profile.name?.familyName || "",
-                            password: Math.random().toString(36).slice(-12),
-                            phone: "",
-                            role: "CLIENT" as any,
-                        },
-                        () => { }
-                    );
+                // Check if user exists by email
+                const existingUser = await userRepo.getUserByUsernameOrEmail(email);
 
-                    if (!newUser) {
-                        return done(new AppError(500, "Failed to create user"));
-                    }
-                    user = newUser;
-                }
+                // Return profile data for frontend to handle
+                const result: GoogleAuthResult = {
+                    email,
+                    firstName: profile.name?.givenName || "",
+                    lastName: profile.name?.familyName || "",
+                    isNewUser: !existingUser,
+                    existingUser: existingUser || null
+                };
 
-                return done(null, user);
+                return done(null, result);
             } catch (error) {
                 return done(error as Error);
             }

@@ -3,34 +3,38 @@ import app from "./app";
 import config from "./config/config";
 import PrismaClientSingleton from "./data-server-clients/prisma-client";
 import SocketService from "./services/socket.service";
-import { startAutoPublishJob } from "./services/auto-publish-requests.job";
+import { startAutoPublishJob } from "./jobs/auto-publish-requests.job";
+import { startSubscriptionJob } from "./jobs/subscription.job";
+import { slotCleanupJob } from "./jobs/slot-cleanup.job";
 
 const prisma = PrismaClientSingleton.getPrismaClient();
 
 // Create HTTP server
-const httpServer = http.createServer(app);
+const server = http.createServer(app);
 
 // Initialize Socket.io
 const socketService = SocketService.getInstance();
 
-socketService.initialize(httpServer);
+socketService.initialize(server);
 
-const PORT = config.port || 8080;
+const PORT = config.port;
 
-httpServer.listen(PORT, () => {
+server.listen(PORT, () => {
     console.log(`Server is running on port [${PORT}]`);
     console.log(`Environment: ${config.env}`);
     console.log(`WebSocket server initialized`);
 
     // Start scheduled jobs
     startAutoPublishJob();
+    startSubscriptionJob();
+    slotCleanupJob.start();
 });
 
 // Graceful shutdown
 const gracefulShutdown = async () => {
     console.log("Shutting down gracefully...");
 
-    httpServer.close(() => {
+    server.close(() => {
         console.log("HTTP server closed");
     });
 

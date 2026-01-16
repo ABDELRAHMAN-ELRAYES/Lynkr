@@ -24,6 +24,6 @@ export interface IRegisterData {
 }
 
 export interface IResetPasswordData {
-  token: string;        
-  password: string;     
+  token: string;
+  password: string;
 }
