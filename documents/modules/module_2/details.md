@@ -240,16 +240,60 @@ Module 2 is complete when:
 
 ---
 
-## 12. Implementation Status (Updated)
+## 12. Technical Realization & API Reference
 
-**Implemented:**
+### 12.1 Provider Application & Workflow
+**Logic**:
+1.  **Draft/Creation**: User creates a profile (Professional details, Experience, Education).
+2.  **Submission**: User submits application (changes status to `PENDING`).
+3.  **Review**: Admin views pending applications.
+4.  **Decision**:
+    *   *Approve*: Updates status to `APPROVED`, changes User Role to `PROVIDER_APPROVED`.
+    *   *Reject*: Updates status to `REJECTED`, sets cooldown period (30 days).
 
-*   **Profile Creation**: `ProfileService.createProviderProfile` maps and aggregates Title, Bio, Hourly Rate, Skills, Services, Experience, Education, and Languages.
-*   **Application Flow**: `ProviderApplicationService` handles submission, checking pending status, and enforcing a 30-day cooldown for rejections.
-*   **Admin Review**: `approveApplication` and `rejectApplication` logic is implemented, including role updates (`PROVIDER_APPROVED` / `PROVIDER_REJECTED`) and logging review decisions.
-*   **Sub-modules**: dedicated services for Experience, Education, etc., supporting CRUD.
+**API Endpoints (Provider Application Module)**:
+*   `POST /api/v1/provider-applications` (submitApplication) - Submit current profile for review.
+*   `GET /api/v1/provider-applications/me` - Get my application status history.
+*   `GET /api/v1/provider-applications` (Admin) - List pending applications.
+*   `GET /api/v1/provider-applications/:id` (Admin) - View application details.
+*   `PATCH /api/v1/provider-applications/:id/approve` (Admin) - Approve application.
+*   `PATCH /api/v1/provider-applications/:id/reject` (Admin) - Reject application.
 
-**Missing Functionalities:**
+### 12.2 Provider Profile Management
+**Logic**:
+*   Profile consists of: Bio, Title, Hourly Rate, Service Category.
+*   Associated entities: Skills, Languages, Experiences, Educations.
+*   Profile management is restricted based on status (locked when Pending/Approved in some fields).
 
-*   **File Uploads**: The service layer (`profile.service.ts`) does not show explicit handling of file uploads (Certifications, Portfolio) in the creation payload. This logic is likely missing or handled entirely in the controller/middleware without service-level persistence of file metadata in the profile record (needs verification).
+**API Endpoints (Profile Module)**:
+*   `POST /api/v1/provider-profiles` - Create initial profile.
+*   `PUT /api/v1/provider-profiles/:id` - Update profile details.
+*   `GET /api/v1/provider-profiles/:id` - Get specific profile.
+*   `GET /api/v1/provider-profiles/user/:userId` - Get profile by user ID.
+*   `GET /api/v1/provider-profiles` - List all approved profiles (Public directory).
+*   `GET /api/v1/provider-profiles/search` - Search profiles with filters.
+*   `POST /api/v1/provider-profiles/:id/approve` (Admin) - Direct profile approval.
+*   `POST /api/v1/provider-profiles/:id/reject` (Admin) - Direct profile rejection.
+*   `DELETE /api/v1/provider-profiles/:id` (Admin) - Delete profile.
+
+### 12.3 Professional History (Sub-modules)
+**Education**:
+*   `POST /api/v1/provider/education`
+*   `GET /api/v1/provider/education/profile/:profileId`
+*   `GET /api/v1/provider/education/:id`
+*   `PUT /api/v1/provider/education/:id`
+*   `DELETE /api/v1/provider/education/:id`
+
+**Experience**:
+*   `POST /api/v1/provider/experience`
+*   `GET /api/v1/provider/experience/profile/:profileId`
+*   `GET /api/v1/provider/experience/:id`
+*   `PUT /api/v1/provider/experience/:id`
+*   `DELETE /api/v1/provider/experience/:id`
+
+**Skills & Languages**:
+*   Managed via Profile update (nested or separate endpoints depending on precise implementation - currently via Profile service).
+
+**Validation Status**:
+*   **File Uploads**: Currently handled directly in controllers or missing service-level persistence metadata. Further verification needed for document storage logic.
 

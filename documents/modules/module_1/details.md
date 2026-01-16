@@ -233,19 +233,61 @@ Module 1 is complete when:
 
 ---
 
-## 10. Implementation Status (Updated)
+## 10. Technical Realization & API Reference
 
-**Implemented:**
+### 10.1 Authentication Flows
 
-*   **Registration**: Full flow with OTP verification (`auth.service.ts` -> `register`, `registerVerification`).
-*   **Login**: Email/Password login (`auth.service.ts` -> `login`).
-*   **Password Reset**: Request link and reset flow (`forgetPassword`, `resetPassword`).
-*   **User Management**: `UserService` handles creation, update (profile details), status updates, and role updates.
-*   **Role Management**: Basic RBAC via `AuthMiddleware` and `getRolePrivileges`.
-*   **Google OAuth**: Implemented via Passport.js (`passport.ts` -> Google Strategy, `auth.route.ts` -> `/google`, `/google/callback`).
-*   **Provider Application Flow**: Complete flow in `provider-application` module with role transitions (CLIENT → PROVIDER_PENDING on submit, PROVIDER_PENDING → PROVIDER_APPROVED/CLIENT on admin decision).
+**1. User Registration & Verification**
+*   **Logic**:
+    1.  User submits registration details (Name, Email, Phone, Password).
+    2.  System validates uniqueness and format.
+    3.  System creates a temporary/unverified record (or stores in Redis) and generates an OTP.
+    4.  OTP is sent via email (`email.service`).
+    5.  User submits OTP.
+    6.  On success, user status is updated to ACTIVE, and a JWT token is issued.
+*   **API Endpoints**:
+    *   `POST /api/v1/auth/register` (register) - Initiate registration.
+    *   `POST /api/v1/auth/register-verification` (registerVerification) - Verify OTP and complete registration.
 
-**Missing Functionalities:**
+**2. Login Strategy**
+*   **Logic**:
+    1.  User submits Email + Password.
+    2.  System verifies hash.
+    3.  If valid, issues JWT token (cookie + response).
+*   **API Endpoints**:
+    *   `POST /api/v1/auth/login` (login)
 
-*   None - All Module 1 features are implemented.
+**3. Google OAuth**
+*   **Logic**:
+    1.  User clicks "Login with Google".
+    2.  Redirects to Google Consent Screen.
+    3.  Callback receives code -> exchanges for profile.
+    4.  If email exists: Log in.
+    5.  If new: Redirect to frontend callback with pre-filled data to complete registration.
+*   **API Endpoints**:
+    *   `GET /api/v1/auth/google` - Start OAuth flow.
+    *   `GET /api/v1/auth/google/callback` - Handle Google response.
+
+**4. Password Management**
+*   **Logic**:
+    *   *Forgot Password*: Generates reset token -> Emails link.
+    *   *Reset Password*: Validates token -> Updates password.
+*   **API Endpoints**:
+    *   `POST /api/v1/auth/forget-password` (forgetPassword)
+    *   `POST /api/v1/auth/reset-password` (resetPassword)
+
+### 10.2 User Management APIs (Module: `user`)
+
+*   **API Endpoints**:
+    *   `GET /api/v1/users/me` (AuthRouter) - Get current user context.
+    *   `GET /api/v1/users/:id` - Get public user details.
+    *   `PUT /api/v1/users/:id` - Update basic user info.
+    *   `PATCH /api/v1/users/:id/profile` - Update user profile fields.
+    *   `PATCH /api/v1/users/:id` - Update user status (Admin/Self).
+    *   `POST /api/v1/users` - Create user (Admin).
+    *   `GET /api/v1/users` - List all users (Admin).
+    *   `DELETE /api/v1/users/:id` - Delete user.
+    *   `PATCH /api/v1/users/:id/password` - Update password (Authenticated).
+    *   `POST /api/v1/users/batch` - Create batch users (Admin/Dev).
+    *   `GET /api/v1/users/statistics` - User statistics (Admin).
 

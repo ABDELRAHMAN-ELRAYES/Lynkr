@@ -153,19 +153,47 @@ Module 4 is complete when:
 
 ---
 
-## 8. Implementation Status (Updated)
+## 8. Technical Realization & API Reference
 
-**Implemented:**
+### 8.1 Request Management
+**Logic**:
+*   **Direct Request**: Targeted at specific Provider. Status `PENDING`.
+*   **Public Request**: Broadcast to all providers in Category. Status `PUBLIC`.
+*   **Transitions**:
+    *   3-day expiry on Direct Request -> Auto-converts to Public (Cron Job).
+    *   Client can Cancel at any time before Acceptance.
 
-*   **Request Lifecycle**: `RequestService` handles Direct and Public requests, including 3-day deadline logic and status transitions (`PENDING`, `PUBLIC`, `ACCEPTED`, `CANCELLED`).
-*   **Proposal Management**: `ProposalService` enables providers to submit proposals, enforcing exclusivity (one per request) and checks request status.
-*   **Approval Workflow**: `acceptProposal` updates the winning proposal status, auto-rejects all others, sets the Request to `ACCEPTED`, and sends socket notifications.
-*   **Project Creation**: `acceptProposal` now automatically creates a **Project** record and initializes **Escrow** for seamless transition to execution.
-*   **Auto-Publish Scheduler**: `startAutoPublishJob` cron job runs every 15 minutes to publish expired direct requests (opt-in).
-*   **Notifications**: Socket events (`proposal:new`, `proposal:accepted`, `proposal:rejected`) are wired up.
+**API Endpoints (Request Module)**:
+*   `POST /api/v1/requests` - Create request (Direct or Public).
+    *   *Payload*: `title`, `description`, `serviceId`, `features`, `priceMax`, `deadline`, `providerId` (optional).
+    *   *Files*: Multipart upload support.
+*   `GET /api/v1/requests` - List my requests (Client) or available requests (Provider).
+*   `GET /api/v1/requests/:id` - Get request details.
+*   `PUT /api/v1/requests/:id` - Update request (Draft/Pending only).
+*   `POST /api/v1/requests/:id/cancel` - Cancel request.
 
-**Missing Functionalities:**
+### 8.2 Proposal Workflow
+**Logic**:
+*   Provider views Request -> Submits Proposal (Price, Time, Notes).
+*   One proposal per provider per request.
+*   **Acceptance**:
+    1.  Client invokes `accept`.
+    2.  Proposal status -> `ACCEPTED`.
+    3.  All other proposals for request -> `REJECTED`.
+    4.  Request status -> `ACCEPTED`.
+    5.  **Project Created**: System automatically instantiates a `Project` and `Escrow` bucket from the accepted proposal.
 
-*   None - All Module 4 features are implemented.
+**API Endpoints (Proposal Module)**:
+*   `POST /api/v1/proposals` - Submit proposal.
+    *   *Payload*: `requestId`, `price`, `deliveryTime`, `coverLetter`.
+*   `GET /api/v1/proposals/request/:requestId` - Get all proposals for a specific request (Client only).
+*   `GET /api/v1/proposals/:id` - Get proposal details.
+*   `PUT /api/v1/proposals/:id` - Update proposal (before action).
+*   `PATCH /api/v1/proposals/:id/accept` - Client accepts proposal. Triggers Project creation.
+*   `PATCH /api/v1/proposals/:id/reject` - Client rejects proposal.
+*   `DELETE /api/v1/proposals/:id` - Withdraw proposal.
+
+### 8.3 Automation
+*   **Cron Job**: `startAutoPublishJob` runs every 15 minutes. Checks for `PENDING` requests older than 3 days where `autoPublish=true`. Updates status to `PUBLIC`.
 
 

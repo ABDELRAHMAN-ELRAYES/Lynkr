@@ -127,18 +127,38 @@ Module 3 is complete when:
 
 ---
 
-## 8. Implementation Status (Updated)
+## 8. Technical Realization & API Reference
 
-**Implemented:**
+### 8.1 Service & Skill Definitions
+**Logic**:
+*   Admin defines Master Services (e.g., Engineering, Teaching).
+*   Admin defines Master Skills under each Service.
+*   Providers select from these during onboarding.
 
-*   **Service Definition**: `ServiceService` allows creating services and skills, which are the basis for categories.
-*   **Basic Listing**: `ProfileService.getAllProviderProfiles` supports filtering by `approvedOnly`.
-*   **Search Engine**: `searchProviderProfiles` endpoint with name search (partial, case-insensitive on firstName/lastName).
-*   **Advanced Filtering**: Query parameters for `serviceId`, `minPrice`, `maxPrice`, `minRating`, `language`.
-*   **Sorting**: Sort by `name`, `rating`, `price`, `date` with `asc`/`desc` order.
-*   **Pagination**: `page` and `limit` parameters with total count and totalPages in response.
+**API Endpoints (Service Module)**:
+*   `GET /api/v1/services` - List all available service categories.
+*   `GET /api/v1/services/:id` - Get service details.
+*   `GET /api/v1/services/:id/skills` - Get valid skills for a service category.
+*   `POST /api/v1/services` (Admin) - Create new service.
+*   `POST /api/v1/services/:id/skills` (Admin) - Add skill to service.
 
-**Missing Functionalities:**
+### 8.2 Provider Search & Discovery
+**Logic**:
+*   **Search Engine**: Query builder on `ProviderProfile` model.
+*   **Filters**: `serviceId` (Exact), `name` (Partial, ILIKE), `minPrice`/`maxPrice`, `language` (Array overlap), `rating` (GTE).
+*   **Sorting**: Dynamic sorting field + direction.
+*   **Results**: Paginated list of profiles with summary data.
 
-*   None - All Module 3 features are implemented.
+**API Endpoints (Profile Module)**:
+*   `GET /api/v1/provider-profiles/search` - Main search endpoint.
+    *   *Query Params*: `q` (name), `service`, `minPrice`, `maxPrice`, `language`, `minRating`, `sortBy`, `sortOrder`, `page`, `limit`.
+*   `GET /api/v1/provider-profiles` - Directory listing (typically all approved).
+
+### 8.3 Provider Details
+**Logic**:
+*   Full profile view for detail page. Includes public relations (Educations, Experiences).
+*   Strictly filters non-approved profiles unless viewed by Admin or Owner.
+
+**API Endpoints**:
+*   `GET /api/v1/provider-profiles/:id` - Get detailed public profile.
 

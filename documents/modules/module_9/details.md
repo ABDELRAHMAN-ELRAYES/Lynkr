@@ -105,14 +105,22 @@ Ensure **timely, reliable, and context-aware notifications** for all user-facing
 
 ---
 
-## 6. Module Completion Criteria
+## 6. Technical Realization & API Reference
 
-Module 7 is complete when:
+### 6.1 Notification Architecture
+**Logic**:
+*   **Trigger**: Event-driven (e.g., `ProposalCreated`, `MessageReceived`).
+*   **Channels**:
+    1.  **In-App/Database**: Persistent record `Notification` entity.
+    2.  **Real-time**: Socket.IO event `notification:new` emitted to specific user ID room.
+    3.  **Email**: Sent via `EmailService` (SendGrid/Nodemailer) for high-priority events.
+*   **Grouping**: Notifications support grouping by entity (e.g., "5 new messages in Project X").
 
-* Notifications are generated reliably for all Phase 1 events
-* Users receive notifications via platform and email channels
-* Read/unread state is maintained correctly
-* Only relevant recipients are notified
-* Edge cases (offline, deleted entities) are handled gracefully
-* Notifications provide sufficient context for immediate user action
+**API Endpoints (Notification Module)**:
+*   `GET /api/v1/notifications` - Get paginated list of notifications.
+    *   *Query Params*: `page`, `limit`, `type` (optional).
+*   `GET /api/v1/notifications/unread-count` - Get count of unread items (for UI badges).
+*   `PATCH /api/v1/notifications/read-all` - Mark all visible notifications as read.
+*   `PATCH /api/v1/notifications/:id/read` - Mark specific notification as read.
+*   `DELETE /api/v1/notifications/:id` - Delete notification (Hide from view).
 

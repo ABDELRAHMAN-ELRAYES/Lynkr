@@ -99,14 +99,24 @@ Provide a **structured system for users to report issues or complaints**, ensuri
 
 ---
 
-## 6. Module Completion Criteria
+## 6. Technical Realization & API Reference
 
-Module 10 is complete when:
+### 6.1 Report Management
+**Logic**:
+*   **Reporting Targets**: Users can report Users, Projects, Requests.
+*   **Submission**: Report created with status `PENDING`.
+*   **Review Flow**:
+    1.  Admin lists Reports (`PENDING`).
+    2.  Admin investigates (views linked entity).
+    3.  Admin updates status (`RESOLVED` / `REJECTED`).
+    4.  Admin takes action (optional, e.g., Suspend User).
 
-* Users can submit structured complaints reliably
-* Admins can review and update complaint status
-* Complaints are associated with correct entities
-* Notifications are sent to complainants
-* Status transitions are auditable and traceable
-* Edge cases (missing data, duplicates, deleted entities) are handled gracefully
+**API Endpoints (Report Module)**:
+*   `POST /api/v1/reports` - Submit a report.
+    *   *Payload*: `targetId`, `targetType` (User/Project/Request), `reason`, `description`.
+*   `GET /api/v1/reports/my` - List reports submitted by me.
+*   `GET /api/v1/reports/:id` - Get details.
+*   `GET /api/v1/reports/admin/all` - Admin: List all reports.
+*   `PATCH /api/v1/reports/:id/status` - Admin: Update status.
+*   `POST /api/v1/reports/:id/action` - Admin: Trigger automated action (block user etc.).
 
