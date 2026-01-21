@@ -1,81 +1,16 @@
 import { apiClient } from './api-client';
 
-// ============================================
-// Types
-// ============================================
-
-export interface LoginPayload {
-    email: string;
-    password: string;
-}
-
-export interface LoginResponse {
-    success: boolean;
-    message: string;
-    data?: {
-        token: string;
-        user: {
-            id: string;
-            firstName: string;
-            lastName: string;
-            email: string;
-            country?: string;
-            role: string;
-            privileges?: string[];
-            allowedTabs?: string[];
-        };
-    };
-}
-
-export interface RegisterPayload {
-    email: string;
-}
-
-export interface RegisterResponse {
-    success: boolean;
-    message: string;
-    data?: {
-        email: string;
-        otp: string;
-    };
-}
-
-export interface RegisterVerificationPayload {
-    firstName: string;
-    lastName: string;
-    email: string;
-    password: string;
-    country: string;
-    role: string;
-}
-
-export interface ForgotPasswordPayload {
-    email: string;
-}
-
-export interface ForgotPasswordResponse {
-    success: boolean;
-    message: string;
-    data?: {
-        message: string;
-    };
-}
-
-export interface ResetPasswordPayload {
-    token: string;
-    password: string;
-}
-
-export interface ResetPasswordResponse {
-    success: boolean;
-    message: string;
-    data?: {
-        user: {
-            id: string;
-            email: string;
-        };
-    };
-}
+import {
+    LoginPayload,
+    LoginResponse,
+    RegisterPayload,
+    RegisterResponse,
+    RegisterVerificationPayload,
+    ForgotPasswordPayload,
+    ForgotPasswordResponse,
+    ResetPasswordPayload,
+    ResetPasswordResponse
+} from '@/shared/types/auth';
 
 // ============================================
 // Auth Service

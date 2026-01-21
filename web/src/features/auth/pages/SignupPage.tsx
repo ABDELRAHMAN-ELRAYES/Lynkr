@@ -1,7 +1,7 @@
 import { LoadingModal } from "@/shared/components/common/loading-modal";
 import { useAuth } from "@/shared/hooks/use-auth";
 import { authService } from "@/shared/services";
-import { SignupFormData, SignupFormErrors } from "@/shared/types/auth-types";
+import { SignupFormData, SignupFormErrors } from "@/shared/types/auth";
 import { AlertCircle, Eye, EyeOff, LoaderCircle } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";

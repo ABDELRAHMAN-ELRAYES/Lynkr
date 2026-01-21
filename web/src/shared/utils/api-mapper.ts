@@ -3,7 +3,7 @@ import {
   EducationAPI,
   Experience,
   ExperienceAPI,
-} from "@/shared/types/signup-process-types";
+} from "@/shared/types/auth/signup";
 
 function formatDateToAPI(month: string, year: string): string {
   const monthMap: { [key: string]: string } = {
@@ -48,9 +48,9 @@ export function transformExperienceForAPI(
     startDate: formatDateToAPI(exp.startMonth, exp.startYear),
     endDate: exp.currentlyWorking
       ? formatDateToAPI(
-          new Date().toLocaleString("en-US", { month: "long" }),
-          new Date().getFullYear().toString()
-        )
+        new Date().toLocaleString("en-US", { month: "long" }),
+        new Date().getFullYear().toString()
+      )
       : formatDateToAPI(exp.endMonth!, exp.endYear!),
     description: exp.description,
   }));

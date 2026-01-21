@@ -7,7 +7,7 @@ import {
   SignupFormData,
   User,
   UserRole,
-} from "@/shared/types/auth-types";
+} from "@/shared/types/auth";
 
 // Pending data while the registration process
 type PendingDataType = {
@@ -87,7 +87,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const login = async ({ email, password }: LoginFormData) => {
     try {
       // Import the new auth service
-      const { authService } = await import("@/shared/services");
+      // Import the new auth service
+      const { authService } = await import("@/shared/services/auth.service");
 
       const response = await authService.login({ email, password });
 

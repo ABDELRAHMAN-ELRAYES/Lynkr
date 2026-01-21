@@ -4,7 +4,7 @@ import type React from "react";
 
 import { useState } from "react";
 import { X } from "lucide-react";
-import type { Education } from "@/shared/types/signup-process-types";
+import type { Education } from "@/shared/types/auth/signup";
 
 interface EducationModalProps {
   education: Education | null;

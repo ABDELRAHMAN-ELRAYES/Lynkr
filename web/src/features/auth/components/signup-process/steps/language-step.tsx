@@ -1,7 +1,7 @@
 "use client";
 
 import { Plus } from "lucide-react";
-import type { Language } from "@/shared/types/signup-process-types";
+import type { Language } from "@/shared/types/auth/signup";
 import { useState } from "react";
 import { commonLanguages, proficiencyLevels } from "@/shared/constants/common-languages";
 

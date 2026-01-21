@@ -1,7 +1,7 @@
 "use client";
 
 import { Plus } from "lucide-react";
-import type { Education } from "@/shared/types/signup-process-types";
+import type { Education } from "@/shared/types/auth/signup";
 import EducationModal from "@/features/auth/components/signup-process/modals/educational-modal";
 import { useState } from "react";
 

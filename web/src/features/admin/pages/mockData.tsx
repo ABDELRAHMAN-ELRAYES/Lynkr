@@ -18,17 +18,21 @@ import {
 } from "lucide-react";
 import {
     MockUser,
+    SidebarItem,
+} from "@/shared/types/admin";
+import {
     PlatformStat,
     RecentActivity,
     Notification,
-    ActiveProject,
+} from "@/shared/types/admin/dashboard";
+import { ActiveProject } from "@/shared/types/project";
+import {
     FinancialData,
     FinancialOverview,
-    SidebarItem,
-    Order,
-    Payment,
-    AnalyticsData,
-} from "./types";
+} from "@/shared/types/finance";
+import { Order } from "@/shared/types/order";
+import { Payment } from "@/shared/types/payment";
+import { AnalyticsData } from "@/shared/types/admin/analytics";
 
 // Mock users data
 export const usersData: MockUser[] = [

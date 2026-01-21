@@ -4,8 +4,9 @@ import { User, Loader2 } from "lucide-react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
-import { profileService, CreateFullProfileRequest } from "@/shared/services";
-import type { FormData as SignupFormData } from "@/shared/types/signup-process-types";
+import { profileService } from "@/shared/services";
+import { CreateFullProfileRequest } from "@/shared/types/profile";
+import type { FormData as SignupFormData } from "@/shared/types/auth/signup";
 
 interface BioStepProps {
   title: string;

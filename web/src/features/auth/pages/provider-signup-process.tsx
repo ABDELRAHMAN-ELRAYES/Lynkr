@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import type { FormData } from "@/shared/types/signup-process-types";
+import type { FormData } from "@/shared/types/auth/signup";
 import Header from "@/features/auth/components/signup-process/header";
 import ProgressBar from "@/features/auth/components/signup-process/progress-bar";
 import ServiceTypeStep from "@/features/auth/components/signup-process/steps/service-step";

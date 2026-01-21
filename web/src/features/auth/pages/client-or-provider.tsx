@@ -1,6 +1,6 @@
 import { LoadingModal } from "@/shared/components/common/loading-modal";
 import { useAuth } from "@/shared/hooks/use-auth";
-import { UserRole } from "@/shared/types/auth-types";
+import { UserRole } from "@/shared/types/auth";
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
@@ -70,11 +70,10 @@ export default function SignupChoice() {
             <div className="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-2">
               <button
                 onClick={() => setRole("client")}
-                className={`flex flex-col items-start rounded-lg border p-4 text-left transition ${
-                  role === "client"
+                className={`flex flex-col items-start rounded-lg border p-4 text-left transition ${role === "client"
                     ? "border-[#7682e8] bg-[#ccd0f59d]"
                     : "border-gray-300 hover:border-gray-500"
-                }`}
+                  }`}
               >
                 <div className="flex items-center space-x-2 w-full justify-between">
                   <div className="text-lg w-8 mb-4">
@@ -138,11 +137,10 @@ export default function SignupChoice() {
                     </svg>
                   </div>
                   <span
-                    className={`h-4 w-4 rounded-full border-2 ${
-                      role === "client"
+                    className={`h-4 w-4 rounded-full border-2 ${role === "client"
                         ? "border-[#7682e8] bg-[#7682e8]"
                         : "border-gray-400"
-                    }`}
+                      }`}
                   ></span>
                 </div>
                 <p className="mt-2 text-[1.3rem] font-medium text-gray-700">
@@ -151,11 +149,10 @@ export default function SignupChoice() {
               </button>
               <button
                 onClick={() => setRole("pending_provider")}
-                className={`flex flex-col items-start rounded-lg border p-4 text-left transition ${
-                  role === "pending_provider"
+                className={`flex flex-col items-start rounded-lg border p-4 text-left transition ${role === "pending_provider"
                     ? "border-[#7682e8] bg-[#ccd0f59d]"
                     : "border-gray-300 hover:border-gray-500"
-                }`}
+                  }`}
               >
                 <div className="flex items-center space-x-2 w-full justify-between">
                   <div className="text-lg w-8 mb-4">
@@ -177,11 +174,10 @@ export default function SignupChoice() {
                     </svg>
                   </div>
                   <span
-                    className={`h-4 w-4 rounded-full border-2 ${
-                      role === "pending_provider"
+                    className={`h-4 w-4 rounded-full border-2 ${role === "pending_provider"
                         ? "border-[#7682e8] bg-[#7682e8]"
                         : "border-gray-400"
-                    }`}
+                      }`}
                   ></span>
                 </div>
                 <p className="mt-2 text-[1.3rem] max-w-md font-medium text-gray-700">

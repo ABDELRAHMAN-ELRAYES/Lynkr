@@ -2,7 +2,7 @@ import { LoadingModal } from "@/shared/components/common/loading-modal";
 import Button from "@/shared/components/ui/Button";
 import { useAuth } from "@/shared/hooks/use-auth";
 import { authService } from "@/shared/services";
-import { LoginFormData } from "@/shared/types/auth-types";
+import { LoginFormData } from "@/shared/types/auth";
 import { AlertCircle, Eye, EyeOff, LoaderCircle } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -163,8 +163,8 @@ const Login = () => {
                   validateField("email", emailValue, "Email is Required");
                 }}
                 className={`w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#7682e8] focus:border-transparent ${formErrors.email
-                    ? "ring ring-rose-500 focus:ring-0 focus-visible:ring-rose-500"
-                    : ""
+                  ? "ring ring-rose-500 focus:ring-0 focus-visible:ring-rose-500"
+                  : ""
                   }`}
               />
               {formErrors.email && (
@@ -180,8 +180,8 @@ const Login = () => {
             <div className="mb-6 relative">
               <div
                 className={`flex border border-gray-300 rounded-lg focus-within:ring-2 focus-within:ring-[#7682e8] focus-within:border-transparent ${formErrors.password
-                    ? "ring ring-rose-500 focus-within:ring-0 focus-within:ring-rose-500"
-                    : ""
+                  ? "ring ring-rose-500 focus-within:ring-0 focus-within:ring-rose-500"
+                  : ""
                   }`}
               >
                 <input

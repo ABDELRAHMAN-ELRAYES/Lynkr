@@ -1,6 +1,6 @@
 "use client";
 
-import { useState,createContext, useContext } from "react";
+import { useState, createContext, useContext } from "react";
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import {
@@ -36,11 +36,14 @@ import {
 } from "@/shared/components/ui/dropdown-menu";
 import { cn } from "@/shared/lib/utils";
 import { useToast } from "@/shared/components/ui/use-toast";
-import { userService, UserResponse } from "@/shared/services";
-import { profileService, ProfileRequestWithFullData } from "@/shared/services";
+import { userService } from "@/shared/services";
+import { profileService } from "@/shared/services";
+import { UserResponse } from "@/shared/types/user";
+import { ProfileRequestWithFullData } from "@/shared/types/profile";
 
 import { sidebarItems, notificationsData, ordersData, paymentsData } from "./mockData";
-import { Order, Payment } from "./types";
+import { Order } from "@/shared/types/order";
+import { Payment } from "@/shared/types/payment";
 
 // Create a context to share state between layout and pages
 

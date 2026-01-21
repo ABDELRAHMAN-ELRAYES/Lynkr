@@ -1,7 +1,7 @@
 "use client";
 
 import { Plus } from "lucide-react";
-import type { Experience } from "@/shared/types/signup-process-types";
+import type { Experience } from "@/shared/types/auth/signup";
 import ExperienceModal from "@/features/auth/components/signup-process/modals/experience-modal";
 import { useState } from "react";
 

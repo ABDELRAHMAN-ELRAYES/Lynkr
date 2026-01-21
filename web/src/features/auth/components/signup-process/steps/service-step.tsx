@@ -1,7 +1,7 @@
 "use client";
 
 import { apiClient } from "@/shared/services";
-import { ServiceTypes } from "@/shared/types/signup-process-types";
+import { ServiceTypes } from "@/shared/types/auth/signup";
 import { Briefcase, GraduationCap, BookOpen } from "lucide-react";
 import { useEffect, useState } from "react";
 

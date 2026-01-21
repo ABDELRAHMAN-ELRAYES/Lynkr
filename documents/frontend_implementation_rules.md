@@ -219,9 +219,14 @@ type UserRole = 'CLIENT' | 'PROVIDER_PENDING' | 'PROVIDER_APPROVED' | 'ADMIN';
 | Type Category | Location |
 |--------------|----------|
 | Shared entity types (User, Request, etc.) | `shared/types/` |
-| API response/request types | Within the service file or `shared/types/api.types.ts` |
+| API response/request types | `shared/types/` or `features/[module]/types/` |
 | Module-specific types | `features/[module]/types/` |
-| Component props | Same file as component OR `types/` directory if shared |
+| Component props | `features/[module]/types/` or `shared/types/` |
+
+> [!IMPORTANT]
+> **Strict Rule:** Types MUST be defined ONLY in dedicated `types/` directories. NEVER define types inside component files, service files, or utility files.
+> - Do NOT export types from service files.
+> - Do NOT define interfaces/types inside `.tsx` or `.ts` files that contain logic.
 
 ### 4.4 Backend Alignment
 

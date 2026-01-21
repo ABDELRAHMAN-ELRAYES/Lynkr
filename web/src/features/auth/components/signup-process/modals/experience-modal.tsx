@@ -4,7 +4,7 @@ import type React from "react";
 
 import { useState } from "react";
 import { X } from "lucide-react";
-import type { Experience } from "@/shared/types/signup-process-types";
+import type { Experience } from "@/shared/types/auth/signup";
 
 interface ExperienceModalProps {
   experience: Experience | null;
