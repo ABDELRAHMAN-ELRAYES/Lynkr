@@ -1,15 +1,15 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { Mail, ArrowLeft, AlertCircle, Loader2 } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
-
-
+import { toast } from "sonner";
+import { authService } from "@/shared/services";
 
 export default function ForgotPasswordPage() {
   const [email, setEmail] = useState("");
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [errors, setErrors] = useState<{ email?: string }>({});
-const navigate = useNavigate();
+  const navigate = useNavigate();
   const validateEmail = (email: string): boolean => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return emailRegex.test(email);
@@ -30,21 +30,41 @@ const navigate = useNavigate();
 
     setIsLoading(true);
 
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 2000));
+    try {
+      const response = await authService.forgotPassword({ email });
 
-    setIsLoading(false);
-    setIsSubmitted(true);
+      if (response.success) {
+        toast.success("Password reset link sent to your email");
+        setIsSubmitted(true);
+      } else {
+        toast.error(response.message || "Failed to send reset email");
+        setErrors({ email: response.message });
+      }
+    } catch {
+      toast.error("An unexpected error occurred");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
 
 
   const handleResendEmail = async () => {
     setIsLoading(true);
-    await new Promise((resolve) => setTimeout(resolve, 1500));
-    
-    setIsLoading(false);
-    // Show success message or handle resend logic
+
+    try {
+      const response = await authService.forgotPassword({ email });
+
+      if (response.success) {
+        toast.success("Password reset link resent to your email");
+      } else {
+        toast.error(response.message || "Failed to resend email");
+      }
+    } catch {
+      toast.error("An unexpected error occurred");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   if (isSubmitted) {
@@ -84,7 +104,7 @@ const navigate = useNavigate();
               </button>
 
               <button
-                onClick={()=> navigate("/login")}
+                onClick={() => navigate("/login")}
                 className="w-full text-[#7682e8]  text-sm font-medium transition-colors group cursor-pointer duration-200 flex items-center justify-center gap-2"
               >
                 <div className="rounded-xl flex items-center justify-center duration-500 transition-all group-hover:-translate-x-2">
@@ -143,9 +163,8 @@ const navigate = useNavigate();
                   id="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className={`w-full pl-12 pr-4 py-3 bg-white/5 text-black border ${
-                    errors.email ? "border-red-400" : "border-white/20"
-                  } rounded-xl placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#7682e8] focus:border-transparent transition-all duration-200 backdrop-blur-sm`}
+                  className={`w-full pl-12 pr-4 py-3 bg-white/5 text-black border ${errors.email ? "border-red-400" : "border-white/20"
+                    } rounded-xl placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#7682e8] focus:border-transparent transition-all duration-200 backdrop-blur-sm`}
                   placeholder="Enter your email address"
                 />
                 {errors.email && (

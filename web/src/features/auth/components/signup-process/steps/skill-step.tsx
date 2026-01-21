@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { X } from "lucide-react";
-import { apiClient } from "@/client/api-client";
+import { apiClient } from "@/shared/services";
 
 interface SkillsStepProps {
   skills: string[];
@@ -104,7 +104,7 @@ export default function SkillsStep({
           setFetchedSkills(res);
         }
       })
-      .catch(() => {})
+      .catch(() => { })
       .finally(() => {
         setIsLoading(false);
       });
@@ -153,11 +153,10 @@ export default function SkillsStep({
               key={skill}
               onClick={() => toggleSkill(skill)}
               disabled={isLoading}
-              className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
-                skills.includes(skill)
+              className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${skills.includes(skill)
                   ? "bg-[#768de8] text-white"
                   : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-              } ${isLoading ? "opacity-50 cursor-not-allowed" : ""}`}
+                } ${isLoading ? "opacity-50 cursor-not-allowed" : ""}`}
             >
               {skill}
             </button>

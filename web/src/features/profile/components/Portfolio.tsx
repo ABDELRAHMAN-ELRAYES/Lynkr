@@ -1,5 +1,4 @@
-import React from "react";
-import ProfileLayout from "@/shared/components/layout/ProfileLayout";
+
 
 export default function Portfolio() {
   const items = Array.from({ length: 6 }).map((_, i) => ({

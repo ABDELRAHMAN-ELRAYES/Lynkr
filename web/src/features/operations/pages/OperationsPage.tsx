@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import Button from "@/shared/components/ui/Button";
 import SearchView from "@/shared/components/ui/SearchView";
 import Dropdown from "@/shared/components/ui/Dropdown";
@@ -25,6 +25,7 @@ interface Task {
     | "meeting"
     | "join-meeting"
     | "upload"
+    | "urgent"
   )[];
   startDate?: string; // Added for progress calculation
 }
@@ -35,29 +36,29 @@ interface SummaryItem {
 }
 
 const OperationsPage: React.FC = () => {
-  const [searchQuery, setSearchQuery] = useState("");
-  const [selectedService, setSelectedService] = useState("");
-  const [selectedPriority, setSelectedPriority] = useState("");
-  const [selectedAssignment, setSelectedAssignment] = useState("");
+  const [, setSearchQuery] = useState("");
+  const [, setSelectedService] = useState("");
+  const [, setSelectedPriority] = useState("");
+  const [, setSelectedAssignment] = useState("");
 
   // Function to calculate progress percentage
   const calculateProgress = (dueDate: string, startDate?: string): number => {
     const due = new Date(dueDate);
     const now = new Date();
-    
+
     // If start date is provided, use it; otherwise assume task started 7 days before due date
     const start = startDate ? new Date(startDate) : new Date(due.getTime() - 7 * 24 * 60 * 60 * 1000);
-    
+
     const totalDuration = due.getTime() - start.getTime();
     const elapsed = now.getTime() - start.getTime();
-    
+
     let progress = Math.min(100, Math.max(0, (elapsed / totalDuration) * 100));
-    
+
     // If overdue, show 100% progress
     if (now > due) {
       progress = 100;
     }
-    
+
     return Math.round(progress);
   };
 
@@ -300,7 +301,7 @@ const OperationsPage: React.FC = () => {
             <div className="space-y-4">
               {tasks.map((task) => {
                 const progress = calculateProgress(task.dueDate, task.startDate);
-                
+
                 return (
                   <div
                     key={task.id}
@@ -364,15 +365,15 @@ const OperationsPage: React.FC = () => {
                           {progress}% complete
                         </span>
                       </div>
-                      
+
                       {/* Progress Bar */}
                       <div className="w-full h-2 bg-gray-200 rounded-full">
-                        <div 
+                        <div
                           className="h-full bg-[#7682e8] rounded-full transition-all duration-300"
                           style={{ width: `${progress}%` }}
                         ></div>
                       </div>
-                      
+
                       <div className="flex justify-between items-center mt-1">
                         <span className="text-xs font-inter font-normal text-global-5">
                           {task.dueDate}

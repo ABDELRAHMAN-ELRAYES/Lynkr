@@ -1,10 +1,8 @@
-import React, { useState, useEffect, useRef } from "react";
-import { Sparkles, TrendingUp, ArrowRight } from "lucide-react";
+import { useRef } from "react";
+import { ArrowRight } from "lucide-react";
 import RotatingText from "@/shared/components/common/imported/RotatingText";
 
 const HeroSection = () => {
-  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
-  const [currentWord, setCurrentWord] = useState(0);
   const containerRef = useRef(null);
 
   const words = ["Innovation", "Excellence", "Creativity", "Growth", "Success"];

@@ -1,13 +1,15 @@
 import { LoadingModal } from "@/shared/components/common/loading-modal";
 import { useAuth } from "@/shared/hooks/use-auth";
+import { authService } from "@/shared/services";
 import { SignupFormData, SignupFormErrors } from "@/shared/types/auth-types";
 import { AlertCircle, Eye, EyeOff, LoaderCircle } from "lucide-react";
-import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { toast } from "sonner";
 
 const Signup = () => {
   const { signup } = useAuth();
+  const [searchParams] = useSearchParams();
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState<SignupFormData>({
     firstName: "",
@@ -26,11 +28,33 @@ const Signup = () => {
   });
   const [formErrors, setFormErrors] = useState<SignupFormErrors>({});
   const [touched, setTouched] = useState<Record<string, boolean>>({});
+  const [isOAuthPreFill, setIsOAuthPreFill] = useState(false);
 
   const navigate = useNavigate();
+
+  // Check for OAuth pre-fill data from URL params
+  useEffect(() => {
+    const oauthEmail = searchParams.get("email");
+    const oauthFirstName = searchParams.get("firstName");
+    const oauthLastName = searchParams.get("lastName");
+    const isOAuth = searchParams.get("oauth");
+
+    if (isOAuth === "google" && (oauthEmail || oauthFirstName || oauthLastName)) {
+      setIsOAuthPreFill(true);
+      setFormData((prev) => ({
+        ...prev,
+        email: oauthEmail || prev.email,
+        firstName: oauthFirstName || prev.firstName,
+        lastName: oauthLastName || prev.lastName,
+      }));
+      toast.success("Complete your registration with Google data");
+    }
+  }, [searchParams]);
+
   useEffect(() => {
     document.title = "Lynkr | Register";
   }, []);
+
   // Delay the redirection to another page and view and hide the loading modal
   const [loadingModal, setLoadingModal] = useState(false);
   const handleRedirect = (path: string) => () => {
@@ -196,7 +220,7 @@ const Signup = () => {
       if (!data.success) {
         toast.error(
           data.message ||
-            "Something Went Wrong while trying to register you data."
+          "Something Went Wrong while trying to register you data."
         );
         setIsLoading(false);
         return;
@@ -222,9 +246,8 @@ const Signup = () => {
   }) => (
     <div className="flex items-center">
       <div
-        className={`w-2 h-2 rounded-full mr-2 ${
-          valid ? "bg-green-500" : "bg-gray-300"
-        }`}
+        className={`w-2 h-2 rounded-full mr-2 ${valid ? "bg-green-500" : "bg-gray-300"
+          }`}
       ></div>
       <span className={`text-sm ${valid ? "text-gray-700" : "text-gray-500"}`}>
         {label}
@@ -274,6 +297,9 @@ const Signup = () => {
 
             <button
               type="button"
+              onClick={() => {
+                window.location.href = authService.getGoogleAuthUrl();
+              }}
               className="cursor-pointer w-full bg-white border border-gray-300 rounded-lg py-3 px-4 mb-6 flex items-center justify-center gap-3 hover:bg-gray-50 transition-colors"
             >
               <svg className="w-5 h-5" viewBox="0 0 24 24">
@@ -319,11 +345,10 @@ const Signup = () => {
                       handleInputChange("firstName", e.target.value)
                     }
                     onBlur={() => handleBlur("firstName")}
-                    className={`w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#7682e8] focus:border-transparent ${
-                      formErrors.firstName && touched.firstName
-                        ? "border-rose-500 ring-1 ring-rose-500"
-                        : ""
-                    }`}
+                    className={`w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#7682e8] focus:border-transparent ${formErrors.firstName && touched.firstName
+                      ? "border-rose-500 ring-1 ring-rose-500"
+                      : ""
+                      }`}
                   />
                   {formErrors.firstName && touched.firstName && (
                     <div className="flex gap-2 items-start mt-1">
@@ -343,11 +368,10 @@ const Signup = () => {
                       handleInputChange("lastName", e.target.value)
                     }
                     onBlur={() => handleBlur("lastName")}
-                    className={`w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#7682e8] focus:border-transparent ${
-                      formErrors.lastName && touched.lastName
-                        ? "border-rose-500 ring-1 ring-rose-500"
-                        : ""
-                    }`}
+                    className={`w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#7682e8] focus:border-transparent ${formErrors.lastName && touched.lastName
+                      ? "border-rose-500 ring-1 ring-rose-500"
+                      : ""
+                      }`}
                   />
                   {formErrors.lastName && touched.lastName && (
                     <div className="flex gap-2 items-start mt-1">
@@ -367,12 +391,18 @@ const Signup = () => {
                   value={formData.email}
                   onChange={(e) => handleInputChange("email", e.target.value)}
                   onBlur={() => handleBlur("email")}
-                  className={`w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#7682e8] focus:border-transparent ${
-                    formErrors.email && touched.email
-                      ? "border-rose-500 ring-1 ring-rose-500"
-                      : ""
-                  }`}
+                  disabled={isOAuthPreFill}
+                  readOnly={isOAuthPreFill}
+                  className={`w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#7682e8] focus:border-transparent ${formErrors.email && touched.email
+                    ? "border-rose-500 ring-1 ring-rose-500"
+                    : ""
+                    } ${isOAuthPreFill ? "bg-gray-100 cursor-not-allowed" : ""}`}
                 />
+                {isOAuthPreFill && (
+                  <p className="text-sm text-gray-500 mt-1">
+                    Email provided by Google
+                  </p>
+                )}
                 {formErrors.email && touched.email && (
                   <div className="flex gap-2 items-center mt-1">
                     <AlertCircle className="h-4 w-4 text-red-400" />
@@ -386,11 +416,10 @@ const Signup = () => {
                   value={formData.country}
                   onChange={(e) => handleInputChange("country", e.target.value)}
                   onBlur={() => handleBlur("country")}
-                  className={`w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#7682e8] focus:border-transparent bg-white ${
-                    formErrors.country && touched.country
-                      ? "border-rose-500 ring-1 ring-rose-500"
-                      : ""
-                  }`}
+                  className={`w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#7682e8] focus:border-transparent bg-white ${formErrors.country && touched.country
+                    ? "border-rose-500 ring-1 ring-rose-500"
+                    : ""
+                    }`}
                 >
                   <option value="" disabled>
                     Select your country
@@ -413,11 +442,10 @@ const Signup = () => {
 
               <div className="mb-6 relative">
                 <div
-                  className={`flex border border-gray-300 rounded-lg focus-within:ring-2 focus-within:ring-[#7682e8] focus-within:border-transparent ${
-                    formErrors.password && touched.password
-                      ? "border-rose-500 ring-1 ring-rose-500"
-                      : ""
-                  }`}
+                  className={`flex border border-gray-300 rounded-lg focus-within:ring-2 focus-within:ring-[#7682e8] focus-within:border-transparent ${formErrors.password && touched.password
+                    ? "border-rose-500 ring-1 ring-rose-500"
+                    : ""
+                    }`}
                 >
                   <input
                     type={showPassword ? "text" : "password"}
@@ -471,9 +499,8 @@ const Signup = () => {
               <button
                 onClick={handleSubmit}
                 disabled={isLoading || !isFormValid}
-                className={`cursor-pointer w-full bg-[#7682e8] text-white py-3 px-4 rounded-lg font-medium mb-6 disabled:opacity-50 disabled:cursor-not-allowed ${
-                  formData.password.length === 0 || allCriteriaMet ? "mt-8" : ""
-                }`}
+                className={`cursor-pointer w-full bg-[#7682e8] text-white py-3 px-4 rounded-lg font-medium mb-6 disabled:opacity-50 disabled:cursor-not-allowed ${formData.password.length === 0 || allCriteriaMet ? "mt-8" : ""
+                  }`}
               >
                 {isLoading ? (
                   <div className="flex gap-2 items-center justify-center">

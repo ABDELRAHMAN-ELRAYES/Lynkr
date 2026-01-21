@@ -14,7 +14,7 @@ class SlotCleanupJob {
         // Schedule to run every 24 hours
         this.intervalId = setInterval(() => {
             this.runCleanup();
-        }, 24 * 60 * 60 * 1000); // 24 hours
+        }, 24 * 60 * 60 * 1000);
 
         console.log("✅ Slot cleanup job started");
     }

@@ -1,10 +1,8 @@
-import React, { PropsWithChildren } from "react";
+
 import {
   Link,
-  NavLink,
   Outlet,
   useLocation,
-  useParams,
 } from "react-router-dom";
 import {
   User,
@@ -142,7 +140,7 @@ export default function ProfileLayout() {
   const { pathname } = useLocation();
   return (
     <div className="min-h-screen ">
-      <Navbar/>
+      <Navbar />
       <div className="flex justify-center max-w-[90rem] mx-auto my-[8rem]">
         <aside className="w-64 bg-white border border-gray-200 rounded-xl min-h-screen hidden md:block mt-[24px]">
           <div className="p-6">
@@ -160,11 +158,10 @@ export default function ProfileLayout() {
                   <Link
                     key={to}
                     to={`/profile/${to}`}
-                    className={`flex items-center px-3 py-2 rounded-lg ${
-                      active
-                        ? "bg-gray-50 text-gray-600"
-                        : "text-gray-700 hover:bg-gray-50"
-                    }`}
+                    className={`flex items-center px-3 py-2 rounded-lg ${active
+                      ? "bg-gray-50 text-gray-600"
+                      : "text-gray-700 hover:bg-gray-50"
+                      }`}
                   >
                     <Icon className="w-4 h-4 mr-3" />
                     <span className="font-normal">{label}</span>
@@ -188,7 +185,7 @@ export default function ProfileLayout() {
 
 
       <div className="max-w-[90rem] h-px bg-gray-300 mx-auto"></div>
-      <Footer/>
+      <Footer />
     </div>
   );
 }

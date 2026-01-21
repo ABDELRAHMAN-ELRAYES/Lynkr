@@ -1,6 +1,6 @@
 "use client";
 
-import { apiClient } from "@/client/api-client";
+import { apiClient } from "@/shared/services";
 import { useEffect, useState } from "react";
 
 interface HourlyRateStepProps {

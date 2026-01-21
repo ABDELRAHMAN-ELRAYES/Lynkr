@@ -20,11 +20,13 @@ interface TypingIndicator {
 }
 
 interface Notification {
+    id: string;
     type: string;
     title: string;
     message: string;
     link?: string;
     data?: any;
+    read?: boolean;
 }
 
 export function useWebSocket(userId: string | null) {

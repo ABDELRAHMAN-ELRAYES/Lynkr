@@ -26,7 +26,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/shared/components/ui/select";
-import { useAdminContext } from "../AdminLayout";
+import { useAdminContext } from "./AdminLayout";
 import { analyticsData } from "./mockData";
 
 export default function AnalyticsPage() {

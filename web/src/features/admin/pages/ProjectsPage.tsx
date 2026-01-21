@@ -14,15 +14,12 @@ import {
     Search,
     Trash2,
 } from "lucide-react";
-import { Avatar, AvatarFallback, AvatarImage } from "@/shared/components/ui/avatar";
+import { Avatar, AvatarFallback } from "@/shared/components/ui/avatar";
 import { Badge } from "@/shared/components/ui/badge";
 import Button from "@/shared/components/ui/Button";
 import {
     Card,
     CardContent,
-    CardHeader,
-    CardTitle,
-    CardDescription,
 } from "@/shared/components/ui/card";
 import { Input } from "@/shared/components/ui/input";
 import { Progress } from "@/shared/components/ui/progress";
@@ -49,7 +46,7 @@ import {
     TableRow,
 } from "@/shared/components/ui/table";
 import { cn } from "@/shared/lib/utils";
-import { useAdminContext } from "../AdminLayout";
+import { useAdminContext } from "./AdminLayout";
 import { activeProjects } from "./mockData";
 import { getPriorityColor } from "./utils.tsx";
 

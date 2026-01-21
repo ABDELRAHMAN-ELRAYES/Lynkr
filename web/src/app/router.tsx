@@ -17,6 +17,7 @@ import ResetPasswordPage from "@/features/auth/pages/reset-password";
 import OTPVerificationPage from "@/features/auth/pages/register-verification";
 import ClientProviderPage from "@/features/auth/pages/client-or-provider";
 import ProviderApplyPage from "@/features/auth/pages/provider-signup-process";
+import GoogleOAuthCallbackPage from "@/features/auth/pages/GoogleOAuthCallbackPage";
 
 // Admin
 import AdminLayout from "@/features/admin/pages/AdminLayout";
@@ -174,6 +175,10 @@ export const router = createBrowserRouter([
         <ResetPasswordPage />
       </PublicRoute>
     ),
+  },
+  {
+    path: "/auth/callback",
+    element: <GoogleOAuthCallbackPage />,
   },
   {
     path: "/client-or-provider",

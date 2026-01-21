@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Lock,
   Eye,
@@ -8,8 +8,15 @@ import {
   Loader2,
   ArrowLeft,
 } from "lucide-react";
+import { useSearchParams, useNavigate } from "react-router-dom";
+import { toast } from "sonner";
+import { authService } from "@/shared/services";
 
 export default function ResetPasswordPage() {
+  const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
+  const token = searchParams.get("token");
+
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -19,7 +26,16 @@ export default function ResetPasswordPage() {
   const [errors, setErrors] = useState<{
     password?: string;
     confirmPassword?: string;
+    token?: string;
   }>({});
+
+  // Validate token is present
+  useEffect(() => {
+    if (!token) {
+      toast.error("Invalid or missing reset token");
+      navigate("/forget-password");
+    }
+  }, [token, navigate]);
 
   const validatePassword = (password: string): string | null => {
     if (password.length < 8) {
@@ -57,6 +73,12 @@ export default function ResetPasswordPage() {
   const handleSubmit = async () => {
     setErrors({});
 
+    if (!token) {
+      toast.error("Invalid reset token");
+      navigate("/forget-password");
+      return;
+    }
+
     const passwordError = validatePassword(password);
     if (passwordError) {
       setErrors({ password: passwordError });
@@ -70,16 +92,28 @@ export default function ResetPasswordPage() {
 
     setIsLoading(true);
 
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 2000));
+    try {
+      const response = await authService.resetPassword({ token, password });
 
-    setIsLoading(false);
-    setIsSubmitted(true);
+      if (response.success) {
+        toast.success("Password reset successful!");
+        setIsSubmitted(true);
+      } else {
+        toast.error(response.message || "Failed to reset password");
+        if (response.message?.toLowerCase().includes("expired") ||
+          response.message?.toLowerCase().includes("invalid")) {
+          setErrors({ token: response.message });
+        }
+      }
+    } catch {
+      toast.error("An unexpected error occurred");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleBackToLogin = () => {
-    // Navigate to login page
-    console.log("Navigate to login");
+    navigate("/login");
   };
 
   if (isSubmitted) {
@@ -167,9 +201,8 @@ export default function ResetPasswordPage() {
                   id="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className={`w-full pl-12 pr-12 py-3 bg-white/5 text-black border ${
-                    errors.password ? "border-red-400" : "border-white/20"
-                  } rounded-xl placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#7682e8] focus:border-transparent transition-all duration-200 backdrop-blur-sm`}
+                  className={`w-full pl-12 pr-12 py-3 bg-white/5 text-black border ${errors.password ? "border-red-400" : "border-white/20"
+                    } rounded-xl placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#7682e8] focus:border-transparent transition-all duration-200 backdrop-blur-sm`}
                   placeholder="Enter new password"
                 />
                 <button
@@ -190,13 +223,12 @@ export default function ResetPasswordPage() {
                 <div className="mt-2 flex items-center gap-2">
                   <div className="flex-1 h-1 bg-gray-200 rounded-full overflow-hidden">
                     <div
-                      className={`h-full transition-all duration-300 ${
-                        passwordStrength.strength === "Weak"
+                      className={`h-full transition-all duration-300 ${passwordStrength.strength === "Weak"
                           ? "w-1/3 bg-red-400"
                           : passwordStrength.strength === "Medium"
-                          ? "w-2/3 bg-yellow-400"
-                          : "w-full bg-green-400"
-                      }`}
+                            ? "w-2/3 bg-yellow-400"
+                            : "w-full bg-green-400"
+                        }`}
                     />
                   </div>
                   <span
@@ -232,11 +264,10 @@ export default function ResetPasswordPage() {
                   id="confirmPassword"
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
-                  className={`w-full pl-12 pr-12 py-3 bg-white/5 text-black border ${
-                    errors.confirmPassword
+                  className={`w-full pl-12 pr-12 py-3 bg-white/5 text-black border ${errors.confirmPassword
                       ? "border-red-400"
                       : "border-white/20"
-                  } rounded-xl placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#7682e8] focus:border-transparent transition-all duration-200 backdrop-blur-sm`}
+                    } rounded-xl placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#7682e8] focus:border-transparent transition-all duration-200 backdrop-blur-sm`}
                   placeholder="Confirm new password"
                 />
                 <button
@@ -279,18 +310,16 @@ export default function ResetPasswordPage() {
                 ].map((req, index) => (
                   <div key={index} className="flex items-center gap-2">
                     <div
-                      className={`w-4 h-4 rounded-full flex items-center justify-center ${
-                        req.met
+                      className={`w-4 h-4 rounded-full flex items-center justify-center ${req.met
                           ? "bg-green-100 text-green-600"
                           : "bg-gray-200 text-gray-400"
-                      }`}
+                        }`}
                     >
                       {req.met && <Check className="w-3 h-3" />}
                     </div>
                     <span
-                      className={`text-xs ${
-                        req.met ? "text-green-600" : "text-gray-500"
-                      }`}
+                      className={`text-xs ${req.met ? "text-green-600" : "text-gray-500"
+                        }`}
                     >
                       {req.label}
                     </span>

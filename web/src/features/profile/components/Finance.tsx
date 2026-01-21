@@ -1,5 +1,4 @@
-import React from "react";
-import ProfileLayout from "@/shared/components/layout/ProfileLayout";
+
 
 export default function Finance() {
   const payouts = [
@@ -51,11 +50,10 @@ export default function Finance() {
                   <td className="p-3 text-gray-700">{p.date}</td>
                   <td className="p-3">
                     <span
-                      className={`px-2 py-1 rounded-full text-xs ${
-                        p.status === "Paid"
+                      className={`px-2 py-1 rounded-full text-xs ${p.status === "Paid"
                           ? "bg-green-50 text-green-700"
                           : "bg-yellow-50 text-yellow-700"
-                      }`}
+                        }`}
                     >
                       {p.status}
                     </span>

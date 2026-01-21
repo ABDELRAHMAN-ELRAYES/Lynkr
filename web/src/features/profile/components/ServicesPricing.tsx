@@ -1,6 +1,4 @@
-import React from "react";
-import ProfileLayout from "@/shared/components/layout/ProfileLayout";
-import { Plus, DollarSign, Package, Calendar, FileText } from "lucide-react";
+import { Plus, DollarSign, Package } from "lucide-react";
 
 export default function ServicesPricing() {
   return (

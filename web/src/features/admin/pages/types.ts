@@ -1,6 +1,5 @@
 import { ReactNode } from "react";
-import { UserResponse } from "@/shared/services";
-import { ProfileRequestWithUser } from "@/shared/services/profileService";
+import { UserResponse, ProfileRequestWithFullData } from "@/shared/services";
 
 // User-related types
 export interface MockUser {
@@ -190,7 +189,7 @@ export interface UsersTabProps {
     setIsCreatingUser: (creating: boolean) => void;
     createUserData: any;
     setCreateUserData: (data: any) => void;
-    pendingProviders: ProfileRequestWithUser[];
+    pendingProviders: ProfileRequestWithFullData[];
     pendingProvidersLoading: boolean;
     handleCreateUser: () => void;
     handleEditUser: (user: any) => void;

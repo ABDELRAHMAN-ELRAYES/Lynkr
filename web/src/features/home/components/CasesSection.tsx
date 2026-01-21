@@ -8,56 +8,7 @@ import {
   CheckCircle,
   TrendingUp,
 } from "lucide-react";
-const cards = [
-  {
-    icon: "🎓",
-    title: "Thesis Support",
-    description: "Get expert guidance for your thesis research and writing",
-    experts: "847",
-  },
-  {
-    icon: "📊",
-    title: "Statistical Analysis",
-    description: "Professional data analysis and statistical modeling",
-    experts: "623",
-  },
-  {
-    icon: "✍️",
-    title: "Writing & Formatting",
-    description: "Academic writing, editing, and formatting services",
-    experts: "1,234",
-  },
-  {
-    icon: "👨‍🏫",
-    title: "Tutoring",
-    description: "One-on-one tutoring and mentoring sessions",
-    experts: "789",
-  },
-  {
-    icon: "⚙️",
-    title: "CFD & Simulation",
-    description: "Computational fluid dynamics and engineering simulation",
-    experts: "456",
-  },
-  {
-    icon: "✍️",
-    title: "Tutoring",
-    description: "One-on-one tutoring and mentoring sessions",
-    experts: "789",
-  },
-  {
-    icon: "✍️",
-    title: "Mechanical Design",
-    description: "CAD modeling, design optimization, and prototyping",
-    experts: "567",
-  },
-  {
-    icon: "✍️",
-    title: "Tutoring",
-    description: "One-on-one tutoring and mentoring sessions",
-    experts: "789",
-  },
-];
+
 const CasesSection = () => {
   return (
     <section className="px-4 lg:px-24 py-16 lg:py-24">

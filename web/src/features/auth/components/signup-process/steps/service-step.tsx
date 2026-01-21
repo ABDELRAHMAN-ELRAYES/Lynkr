@@ -1,6 +1,6 @@
 "use client";
 
-import { apiClient } from "@/client/api-client";
+import { apiClient } from "@/shared/services";
 import { ServiceTypes } from "@/shared/types/signup-process-types";
 import { Briefcase, GraduationCap, BookOpen } from "lucide-react";
 import { useEffect, useState } from "react";
@@ -61,8 +61,8 @@ export default function ServiceTypeStep({
               key={service.id}
               onClick={() => handleSelect(service.id, service.service_type as ServiceTypes)}
               className={`p-6 border-2 rounded-lg text-left transition-all hover:border-[#768de8] ${serviceId === service.id
-                  ? "border-[#7682e8] bg-[#ccd0f59d]"
-                  : "border-gray-200"
+                ? "border-[#7682e8] bg-[#ccd0f59d]"
+                : "border-gray-200"
                 }`}
             >
               <Icon

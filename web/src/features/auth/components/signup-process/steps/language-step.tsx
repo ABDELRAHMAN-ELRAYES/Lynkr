@@ -1,9 +1,9 @@
 "use client";
 
-import { Plus, X } from "lucide-react";
+import { Plus } from "lucide-react";
 import type { Language } from "@/shared/types/signup-process-types";
 import { useState } from "react";
-import { commonLanguages, proficiencyLevels } from "@/mock/common-languages";
+import { commonLanguages, proficiencyLevels } from "@/shared/constants/common-languages";
 
 interface LanguagesStepProps {
   languages: Language[];

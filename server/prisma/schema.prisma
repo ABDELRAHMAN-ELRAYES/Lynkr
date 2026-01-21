@@ -354,7 +354,7 @@ model File {
     @@map("files")
 }
 
-// Join table: Request <-> File (Many -> Many)
+// Request <-> File (Many -> Many)
 model RequestFile {
     id        String   @id @default(uuid())
     requestId String   @map("request_id")
@@ -370,7 +370,7 @@ model RequestFile {
     @@map("request_files")
 }
 
-// Join table: Proposal <-> File (Many -> Many)
+// Proposal <-> File (Many -> Many)
 model ProposalFile {
     id         String   @id @default(uuid())
     proposalId String   @map("proposal_id")
@@ -413,7 +413,7 @@ model Payment {
     @@map("payments")
 }
 
-// Join table: Payment <-> Project
+// Payment <-> Project
 model ProjectPayment {
     id        String @id @default(uuid())
     paymentId String @unique @map("payment_id")
@@ -487,7 +487,7 @@ model Project {
     @@map("projects")
 }
 
-// Join table: Project <-> File (Many -> Many)
+// Project <-> File (Many -> Many)
 model ProjectFile {
     id          String   @id @default(uuid())
     projectId   String   @map("project_id")
@@ -667,7 +667,7 @@ model SessionParticipant {
     @@map("session_participants")
 }
 
-// Join table: Payment <-> SessionParticipant
+// Payment <-> SessionParticipant
 model SessionPayment {
     id            String @id @default(uuid())
     paymentId     String @unique @map("payment_id")
@@ -696,7 +696,7 @@ model SessionAttendance {
     @@map("session_attendances")
 }
 
-// Join table: File <-> TeachingSession
+// File <-> TeachingSession
 model SessionFile {
     id         String   @id @default(uuid())
     sessionId  String   @map("session_id")
@@ -771,7 +771,7 @@ model Review {
     @@map("reviews")
 }
 
-// Join table: Review <-> Project
+// Review <-> Project
 model ProjectReview {
     id        String @id @default(uuid())
     reviewId  String @unique @map("review_id")
@@ -787,7 +787,7 @@ model ProjectReview {
     @@map("project_reviews")
 }
 
-// Join table: Review <-> TeachingSession
+// Review <-> TeachingSession
 model SessionReview {
     id        String @id @default(uuid())
     reviewId  String @unique @map("review_id")
@@ -857,7 +857,7 @@ model Report {
     @@map("reports")
 }
 
-// Join table: Report <-> File
+// Report <-> File
 model ReportFile {
     id        String   @id @default(uuid())
     reportId  String   @map("report_id")

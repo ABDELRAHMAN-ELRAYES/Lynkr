@@ -15,7 +15,6 @@ import {
     Mail,
     MapPin,
     MoreHorizontal,
-    Plus,
     Search,
     Trash2,
     UserCheck,
@@ -61,7 +60,7 @@ import { Switch } from "@/shared/components/ui/switch";
 import { cn } from "@/shared/lib/utils";
 import { useToast } from "@/shared/components/ui/use-toast";
 import { userService, UserResponse } from "@/shared/services";
-import { useAdminContext } from "../AdminLayout";
+import { useAdminContext } from "./AdminLayout";
 import { usersData as mockUsersData } from "./mockData";
 import { getStatusColor, getRoleColor } from "./utils.tsx";
 
@@ -79,7 +78,6 @@ type UsersSubTab = "all" | "active" | "pending" | "suspended" | "provider-reques
 export default function UsersPage() {
     const {
         users,
-        usersLoading,
         fetchUsers,
         pendingProviders,
         pendingProvidersLoading,

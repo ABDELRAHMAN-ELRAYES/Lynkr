@@ -41,7 +41,7 @@ import {
 } from "@/shared/components/ui/table";
 import { cn } from "@/shared/lib/utils";
 import { useToast } from "@/shared/components/ui/use-toast";
-import { useAdminContext } from "../AdminLayout";
+import { useAdminContext } from "./AdminLayout";
 import { getPaymentStatusColor } from "./utils.tsx";
 
 type PaymentsSubTab = "all" | "pending" | "completed" | "failed" | "refunded";

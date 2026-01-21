@@ -1,5 +1,4 @@
-import React, { useState } from "react";
-import ProfileLayout from "@/shared/components/layout/ProfileLayout";
+import { useState } from "react";
 import { Star, EyeOff, Bold, Italic, List, Link, Plus } from "lucide-react";
 
 export default function Profile() {
@@ -102,14 +101,12 @@ export default function Profile() {
             <span className="text-sm text-gray-600">Public Profile</span>
             <button
               onClick={() => setPublicProfile(!publicProfile)}
-              className={`relative w-11 h-6 rounded-full transition-colors ${
-                publicProfile ? "bg-brand-blue" : "bg-gray-300"
-              }`}
+              className={`relative w-11 h-6 rounded-full transition-colors ${publicProfile ? "bg-brand-blue" : "bg-gray-300"
+                }`}
             >
               <div
-                className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-transform ${
-                  publicProfile ? "translate-x-6" : "translate-x-1"
-                }`}
+                className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-transform ${publicProfile ? "translate-x-6" : "translate-x-1"
+                  }`}
               />
             </button>
           </div>

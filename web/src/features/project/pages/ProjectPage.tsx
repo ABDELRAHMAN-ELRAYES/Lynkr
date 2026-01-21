@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import Header from "@/shared/components/common/Header";
+
 import Button from "@/shared/components/ui/Button";
 import EditText from "@/shared/components/ui/EditText";
 import Navbar from "@/shared/components/common/Navbar";
@@ -242,9 +242,8 @@ const ProjectDetails: React.FC = () => {
                       <img
                         src="/images/img_arrow_down.svg"
                         alt="toggle"
-                        className={`w-4 h-4 transition-transform ${
-                          isProjectDetailsExpanded ? "rotate-180" : ""
-                        }`}
+                        className={`w-4 h-4 transition-transform ${isProjectDetailsExpanded ? "rotate-180" : ""
+                          }`}
                       />
                     </Button>
                   </div>
@@ -411,9 +410,8 @@ const ProjectDetails: React.FC = () => {
                     {messages.map((message) => (
                       <div
                         key={message.id}
-                        className={`flex gap-3 ${
-                          message.isOwn ? "justify-end" : "justify-start"
-                        }`}
+                        className={`flex gap-3 ${message.isOwn ? "justify-end" : "justify-start"
+                          }`}
                       >
                         {!message.isOwn && (
                           <img
@@ -423,16 +421,14 @@ const ProjectDetails: React.FC = () => {
                           />
                         )}
                         <div
-                          className={`flex flex-col gap-1 max-w-[70%] ${
-                            message.isOwn ? "items-end" : "items-start"
-                          }`}
+                          className={`flex flex-col gap-1 max-w-[70%] ${message.isOwn ? "items-end" : "items-start"
+                            }`}
                         >
                           <div
-                            className={`p-3 rounded-lg ${
-                              message.isOwn
+                            className={`p-3 rounded-lg ${message.isOwn
                                 ? "bg-global-1 text-global-8"
                                 : "bg-global-3 text-global-1"
-                            }`}
+                              }`}
                           >
                             <p className="text-sm font-inter font-normal leading-relaxed">
                               {message.content}
@@ -503,9 +499,8 @@ const ProjectDetails: React.FC = () => {
                     {deliverables.map((deliverable) => (
                       <div
                         key={deliverable.id}
-                        className={`border border-primary rounded-lg p-4 ${
-                          deliverable.isLocked ? "bg-global-4" : "bg-global-5"
-                        }`}
+                        className={`border border-primary rounded-lg p-4 ${deliverable.isLocked ? "bg-global-4" : "bg-global-5"
+                          }`}
                       >
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-4">
@@ -522,11 +517,10 @@ const ProjectDetails: React.FC = () => {
                                 {deliverable.size}
                               </p>
                               <span
-                                className={`text-xs font-inter font-normal px-2 py-1 rounded ${
-                                  deliverable.isLocked
+                                className={`text-xs font-inter font-normal px-2 py-1 rounded ${deliverable.isLocked
                                     ? "text-global-3 bg-global-3"
                                     : "text-global-3 bg-global-3"
-                                }`}
+                                  }`}
                               >
                                 {deliverable.isLocked
                                   ? "Locked — Pay to access"

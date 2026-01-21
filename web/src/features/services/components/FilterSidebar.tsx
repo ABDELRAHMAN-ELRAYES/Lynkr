@@ -1,7 +1,5 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import {
-  ChevronDown,
-  ChevronUp,
   DollarSign,
   BookOpen,
   Users,
@@ -51,8 +49,6 @@ const FilterSidebar = ({
     },
   ];
 
-  const experienceLevels = [];
-
   const priceRanges = [
     { id: "budget", label: "$5 - $15/hr", range: [5, 15] },
     { id: "standard", label: "$15 - $35/hr", range: [15, 35] },
@@ -61,9 +57,7 @@ const FilterSidebar = ({
     { id: "custom", label: "Custom Range", range: null },
   ];
 
-  const availabilityOptions = [];
 
-  const popularSkills = [];
 
   const handleFilterChange = (
     category: string,
@@ -245,11 +239,10 @@ const FilterSidebar = ({
                 {[...Array(5)].map((_, i) => (
                   <Star
                     key={i}
-                    className={`w-3 h-3 ${
-                      i < rating
-                        ? "text-yellow-400 fill-current"
-                        : "text-gray-300"
-                    }`}
+                    className={`w-3 h-3 ${i < rating
+                      ? "text-yellow-400 fill-current"
+                      : "text-gray-300"
+                      }`}
                   />
                 ))}
                 <span className="text-sm text-gray-700 ml-1">& up</span>

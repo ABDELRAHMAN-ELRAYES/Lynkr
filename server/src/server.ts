@@ -13,9 +13,7 @@ const prisma = PrismaClientSingleton.getPrismaClient();
 const server = http.createServer(app);
 
 // Initialize Socket.io
-const socketService = SocketService.getInstance();
-
-socketService.initialize(server);
+SocketService.getInstance().initialize(server);
 
 const PORT = config.port;
 

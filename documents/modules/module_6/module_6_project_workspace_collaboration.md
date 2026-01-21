@@ -214,3 +214,45 @@ This module is considered complete when:
 - Activity log captures all key actions
 
 At this point, the platform supports **controlled project execution and collaboration**.
+
+---
+
+## 11. Technical Reference: Project Activity System
+
+### 11.1 Purpose
+The Project Activity system functions as an **Audit Log** and **Timeline**. It tracks every significant action taken within a project lifecycle to provide transparency and accountability to both the Client and Provider. It answers the question: *"Who did what, and when?"*
+
+### 11.2 API Endpoints
+**Base URL:** `/api/v1/projects`
+
+| Method | Endpoint | Description | Access |
+| :--- | :--- | :--- | :--- |
+| `GET` | `/:id/activities` | Retrieves the full timeline of activities for a specific project. | Project Participants |
+
+### 11.3 Detailed Logic & Event Types
+
+**Recorded Events (via `ProjectService.logActivity`):**
+
+1.  **`FILE_UPLOADED`**
+    *   **Trigger:** `ProjectService.uploadProjectFile`
+    *   **Details:** "Uploaded file: [filename]"
+
+2.  **`FILE_DELETED`**
+    *   **Trigger:** `ProjectService.deleteProjectFile`
+    *   **Details:** "Deleted file: [filename]"
+
+3.  **`COMPLETION_REQUESTED`**
+    *   **Trigger:** `ProjectService.markProjectComplete` (Provider Action)
+    *   **Details:** "Provider marked project as completed"
+
+4.  **`COMPLETION_CONFIRMED`**
+    *   **Trigger:** `ProjectService.confirmProjectComplete` (Client Action)
+    *   **Details:** "Client confirmed project completion. Funds released."
+
+5.  **`PROJECT_CANCELLED`**
+    *   **Trigger:** `ProjectService.cancelProject`
+    *   **Details:** "Client cancelled the project"
+
+### 11.4 Database Model: `ProjectActivity`
+*   **Relation:** Many-to-One with `Project`.
+*   **Fields:** `userId` (actor), `action` (enum/string), `details` (text), `createdAt`.

@@ -30,7 +30,7 @@ import {
   Sheet,
   AlertTriangle,
 } from "lucide-react";
-import { Button } from "./ui/Button";
+import Button from "@/shared/components/ui/Button";
 import axios from "axios";
 
 interface UploadedFile {
@@ -559,9 +559,8 @@ export default function OperationRequestForm({
 
   return (
     <div
-      className={`${
-        isOpen ? "flex flex-col" : "hidden"
-      }  w-full max-w-7xl mx-auto bg-white rounded-xl shadow-2xl overflow-hidden`}
+      className={`${isOpen ? "flex flex-col" : "hidden"
+        }  w-full max-w-7xl mx-auto bg-white rounded-xl shadow-2xl overflow-hidden`}
     >
       {/* Header */}
       <div className="bg-gradient-to-r from-blue-50 to-indigo-50 px-6 py-4 border-b border-gray-200">
@@ -602,11 +601,10 @@ export default function OperationRequestForm({
                   type="text"
                   value={projectTitle}
                   onChange={(e) => setProjectTitle(e.target.value)}
-                  className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm transition-all ${
-                    isNearTitleLimit
+                  className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm transition-all ${isNearTitleLimit
                       ? "border-orange-300 focus:ring-orange-500"
                       : "border-gray-300"
-                  }`}
+                    }`}
                   maxLength={titleLimit}
                 />
                 <div className="flex items-center justify-between">
@@ -621,9 +619,8 @@ export default function OperationRequestForm({
                     )}
                   </div>
                   <div
-                    className={`text-xs font-medium ${
-                      isNearTitleLimit ? "text-orange-600" : "text-gray-500"
-                    }`}
+                    className={`text-xs font-medium ${isNearTitleLimit ? "text-orange-600" : "text-gray-500"
+                      }`}
                   >
                     {titleCharCount} / {titleLimit}
                   </div>
@@ -747,11 +744,10 @@ export default function OperationRequestForm({
                   <button
                     type="button"
                     onClick={() => setIsPreviewMode(!isPreviewMode)}
-                    className={`p-2 rounded-md transition-colors shrink-0 ${
-                      isPreviewMode
+                    className={`p-2 rounded-md transition-colors shrink-0 ${isPreviewMode
                         ? "bg-blue-100 text-blue-600"
                         : "hover:bg-gray-200 text-gray-600"
-                    }`}
+                      }`}
                     title={isPreviewMode ? "Edit Mode" : "Preview Mode"}
                   >
                     {isPreviewMode ? <EyeOff size={16} /> : <Eye size={16} />}
@@ -790,11 +786,10 @@ export default function OperationRequestForm({
                 Attachments
               </label>
               <div
-                className={`border-2 border-dashed rounded-xl p-6 text-center transition-all duration-200 ${
-                  isDragOver
+                className={`border-2 border-dashed rounded-xl p-6 text-center transition-all duration-200 ${isDragOver
                     ? "border-blue-400 bg-blue-50 scale-[1.02]"
                     : "border-gray-300 hover:border-gray-400 hover:bg-gray-50"
-                }`}
+                  }`}
                 onDragOver={handleDragOver}
                 onDragLeave={handleDragLeave}
                 onDrop={handleDrop}
@@ -1021,22 +1016,20 @@ export default function OperationRequestForm({
                 <button
                   type="button"
                   onClick={() => setBudgetType("Fixed")}
-                  className={`flex-1 px-4 py-3 text-sm font-medium rounded-lg transition-all ${
-                    budgetType === "Fixed"
+                  className={`flex-1 px-4 py-3 text-sm font-medium rounded-lg transition-all ${budgetType === "Fixed"
                       ? "bg-blue-100 text-blue-700 border-2 border-blue-300 shadow-sm"
                       : "bg-white text-gray-700 border-2 border-gray-300 hover:bg-gray-50"
-                  }`}
+                    }`}
                 >
                   Fixed
                 </button>
                 <button
                   type="button"
                   onClick={() => setBudgetType("Hourly")}
-                  className={`flex-1 px-4 py-3 text-sm font-medium rounded-lg transition-all ${
-                    budgetType === "Hourly"
+                  className={`flex-1 px-4 py-3 text-sm font-medium rounded-lg transition-all ${budgetType === "Hourly"
                       ? "bg-blue-100 text-blue-700 border-2 border-blue-300 shadow-sm"
                       : "bg-white text-gray-700 border-2 border-gray-300 hover:bg-gray-50"
-                  }`}
+                    }`}
                 >
                   Hourly
                 </button>

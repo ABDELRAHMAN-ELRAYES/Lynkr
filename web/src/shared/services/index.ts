@@ -1,5 +1,5 @@
-// Re-export all services for easy importing
-export * from './api';
-export { default as apiClient } from './api/apiClient';
-export { apiClient as fetchApiClient } from './api-client';
-
+// Barrel export for shared services
+export * from './api-client';
+export * from './auth.service';
+export * from './user.service';
+export * from './profile.service';

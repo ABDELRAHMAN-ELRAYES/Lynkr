@@ -11,7 +11,7 @@ import {
     MoreHorizontal,
     Search,
 } from "lucide-react";
-import { Avatar, AvatarFallback, AvatarImage } from "@/shared/components/ui/avatar";
+import { Avatar, AvatarFallback } from "@/shared/components/ui/avatar";
 import { Badge } from "@/shared/components/ui/badge";
 import Button from "@/shared/components/ui/Button";
 import {
@@ -43,7 +43,7 @@ import {
 } from "@/shared/components/ui/table";
 import { cn } from "@/shared/lib/utils";
 import { useToast } from "@/shared/components/ui/use-toast";
-import { useAdminContext } from "../AdminLayout";
+import { useAdminContext } from "./AdminLayout";
 import { getPriorityColor } from "./utils.tsx";
 
 type OrdersSubTab = "all" | "pending" | "processing" | "completed" | "cancelled";

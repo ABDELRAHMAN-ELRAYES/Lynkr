@@ -106,20 +106,62 @@ Enable secure, controlled financial transactions between clients and service pro
 
 ---
 
-## 7. Implementation Status (Updated)
+## 7. Implementation Status (Detailed Technical Reference)
 
-**Implemented:**
+### 7.1 Escrow System Overview
 
-*   **Project & Escrow Integration**: `ProjectService.createProjectFromProposal` creates the project and initializes the `Escrow` record with `HOLDING` status.
-*   **Stripe Integration**: `PaymentService` is fully integrated with Stripe SDK to create `PaymentIntents` and handle webhooks (`payment_intent.succeeded`).
-*   **Transaction Logic**:
-    *   **Payment**: Webhook updates `Payment` status, adds funds to `Escrow`, updates `Project.paidAmount`.
-    *   **Project Activation**: Automatically transitions Project to `IN_PROGRESS` when fully paid.
-    *   **Completion**: `markProjectComplete` (Provider) -> `confirmProjectComplete` (Client) workflow is implemented.
-    *   **Release**: `confirmProjectComplete` triggers `EscrowRepo.releaseEscrow`, moving funds to Provider's `availableBalance`.
-    *   **Cancellation**: `cancelProject` triggers `EscrowRepo.refundEscrow`.
+The Escrow System is a financial safety mechanism acting as a neutral third party between the **Client** and the **Provider**.
+- **For Clients:** It ensures money is safe and only released upon satisfaction.
+- **For Providers:** It proves the client's commitment and ability to pay.
 
-**Missing Functionalities:**
+### 7.2 API Endpoints
+**Base URL:** `/api/v1/escrow`
 
-*   **Payout Execution**: `EscrowService.requestWithdrawal` verifies balance but lacks the actual Stripe Connect integration to transfer funds to the provider's bank account (marked with TODO).
-*   **Split Payments**: The database schema supports partial payments (`paidAmount` vs `totalPrice`), but the `createProjectFromProposal` sets `depositAmount` to `totalPrice` initially. Logic for explicit "Milestone" or "Split" scheduling via UI flow is not explicitly enforced in the service layer yet, although `PaymentService` handles multiple payments accumulating.
+| Method | Endpoint | Description | Access |
+| :--- | :--- | :--- | :--- |
+| `GET` | `/project/:projectId` | Retrieves escrow details for a specific project. | Authenticated Users |
+| `GET` | `/balance` | Gets the authenticated provider's currently available balance. | Providers |
+| `POST` | `/withdraw` | Requests a withdrawal of funds from the provider's balance. | Providers |
+
+### 7.3 Detailed Workflows & Logic
+
+#### A. Creating the Escrow (Agreement Phase)
+*   **Trigger:** Client accepts a proposal.
+*   **Code Location:** `ProjectService.createProjectFromProposal`
+*   **Logic:**
+    1.  New `Project` created.
+    2.  `EscrowRepository.createEscrow` called immediately.
+    3.  `depositAmount` set to project total price; `balance` starts at 0.
+
+#### B. Depositing Funds (Payment Phase)
+*   **Trigger:** Client completes Stripe payment.
+*   **Code Location:** `PaymentService.handlePaymentSuccess` (Webhook)
+*   **Logic:**
+    1.  Stripe 'succeeded' event received.
+    2.  System identifies linked Project.
+    3.  `EscrowRepository.addToEscrow` adds payment amount to `balance`.
+    4.  Project status updates to `IN_PROGRESS`.
+
+#### C. Releasing Funds (Completion Phase)
+*   **Trigger:** Client confirms project completion.
+*   **Code Location:** `ProjectService.confirmProjectComplete` (Route: `PATCH /api/v1/projects/:id/confirm`)
+*   **Logic:**
+    1.  Project must be in `COMPLETED` status (marked by provider).
+    2.  `EscrowRepository.releaseEscrow` executes a **Database Transaction**:
+        *   Sets Escrow status to `RELEASED`.
+        *   Sets Escrow `balance` to 0.
+        *   **Increments** `ProviderProfile.availableBalance` by escrow amount.
+    3.  Logs `COMPLETION_CONFIRMED` activity.
+
+#### D. Withdrawing Funds (Payout Phase)
+*   **Trigger:** Provider requests withdrawal.
+*   **Code Location:** `EscrowService.requestWithdrawal` (Route: `POST /api/v1/escrow/withdraw`)
+*   **Logic:**
+    1.  Validates amount (>0, >=$10 min, <= availableBalance).
+    2.  `EscrowRepository.createWithdrawal` executes:
+        *   **Decrements** `ProviderProfile.availableBalance`.
+        *   *(Pending)* Triggers Stripe Connect payout.
+
+### 7.4 Database Model: `Escrow`
+*   **Relation:** One-to-One with `Project`.
+*   **Fields:** `depositAmount`, `balance`, `status` (HOLDING, RELEASED, REFUNDED), `releasedAt`.
