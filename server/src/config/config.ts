@@ -28,6 +28,9 @@ interface Config {
         defaultFrom: string;
         service?: string;
     };
+    resetPassword: {
+        url: string
+    };
     stripe: {
         secretKey: string;
         webhookSecret: string;
@@ -84,6 +87,9 @@ const config: Config = {
         from: process.env.EMAIL_FROM || "info@lynkr.com",
         defaultFrom: process.env.EMAIL_FROM || "info@lynkr.com",
         service: process.env.EMAIL_SERVICE,
+    },
+    resetPassword: {
+        url: process.env.RESET_PASSWORD_URL || "http://localhost:5173/reset-password"
     },
     stripe: {
         secretKey: process.env.STRIPE_SECRET_KEY || "",

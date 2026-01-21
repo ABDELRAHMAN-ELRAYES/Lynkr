@@ -76,17 +76,28 @@ export interface RegisterResponse {
     message: string;
     data?: {
         email: string;
-        otp: string;
+        otp: {
+            code: string;
+            expiresIn: string;
+        };
     };
 }
 
+// Payload for register verification - matches backend IRegisterData
 export interface RegisterVerificationPayload {
-    firstName: string;
-    lastName: string;
-    email: string;
-    password: string;
-    country: string;
-    role: string;
+    otp: {
+        hashedOtp: string;
+        expiresIn: string;
+        enteredOtp: string;
+    };
+    user: {
+        firstName: string;
+        lastName: string;
+        email: string;
+        password: string;
+        phone?: string;
+        role: string;
+    };
 }
 
 export interface ForgotPasswordPayload {
@@ -116,3 +127,46 @@ export interface ResetPasswordResponse {
         };
     };
 }
+
+// Response from /auth/me endpoint
+export interface CurrentUserResponse {
+    success: boolean;
+    data: {
+        user?: {
+            id: string;
+            firstName?: string;
+            first_name?: string;
+            lastName?: string;
+            last_name?: string;
+            email: string;
+            country?: string;
+            active?: boolean;
+            isActive?: boolean;
+            is_active?: boolean;
+            role: string;
+            privileges?: string[];
+            allowedTabs?: string[];
+        };
+        // Fallback for direct data access
+        id?: string;
+        firstName?: string;
+        first_name?: string;
+        lastName?: string;
+        last_name?: string;
+        email?: string;
+        country?: string;
+        active?: boolean;
+        isActive?: boolean;
+        is_active?: boolean;
+        role?: string;
+    } | null;
+}
+
+// Logout response
+export interface LogoutResponse {
+    success: boolean;
+    message: string;
+}
+
+// Re-export provider signup types for convenience
+export * from './signup';

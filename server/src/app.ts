@@ -57,9 +57,9 @@ import { bodyParser, cookieParserMiddleware, corsMiddleware, formParser } from "
 
     try {
         await userRepo.addUser(userData);
-        console.log("✅ Default admin user created");
+        console.log("Default admin user created");
     } catch (err) {
-        console.error("❌ Failed to create admin user:", err);
+        console.error("Failed to create admin user:", err);
     }
 })();
 
@@ -99,26 +99,26 @@ app.use(
 
 
 // API Routes
-app.use("/api/v1/auth", authLimiter, AuthRouter);
-app.use("/api/v1/users", UserRouter);
-app.use("/api/v1/profiles", ProfileRouter);
-app.use("/api/v1/payments", PaymentRouter);
-app.use("/api/v1/services", ServiceRouter);
-app.use("/api/v1/subscriptions", SubscriptionRouter);
-app.use("/api/v1/reviews", ReviewRouter);
-app.use("/api/v1/settings", SettingsRouter);
-app.use("/api/v1/meetings", MeetingRouter);
-app.use("/api/v1/notifications", NotificationRouter);
-app.use("/api/v1/proposals", ProposalRouter);
-app.use("/api/v1/escrow", EscrowRouter);
-app.use("/api/v1/requests", RequestRouter);
-app.use("/api/v1/provider-applications", ProviderApplicationRouter);
-app.use("/api/v1/projects", ProjectRouter);
-app.use("/api/v1/conversations", ConversationRouter);
-app.use("/api/v1/messages", MessageRouter);
-app.use("/api/v1/teaching/slots", SlotRouter);
-app.use("/api/v1/teaching/sessions", SessionRouter);
-app.use("/api/v1/reports", ReportRouter);
+app.use("/api/auth", authLimiter, AuthRouter);
+app.use("/api/users", UserRouter);
+app.use("/api/profiles", ProfileRouter);
+app.use("/api/payments", PaymentRouter);
+app.use("/api/services", ServiceRouter);
+app.use("/api/subscriptions", SubscriptionRouter);
+app.use("/api/reviews", ReviewRouter);
+app.use("/api/settings", SettingsRouter);
+app.use("/api/meetings", MeetingRouter);
+app.use("/api/notifications", NotificationRouter);
+app.use("/api/proposals", ProposalRouter);
+app.use("/api/escrow", EscrowRouter);
+app.use("/api/requests", RequestRouter);
+app.use("/api/provider-applications", ProviderApplicationRouter);
+app.use("/api/projects", ProjectRouter);
+app.use("/api/conversations", ConversationRouter);
+app.use("/api/messages", MessageRouter);
+app.use("/api/teaching/slots", SlotRouter);
+app.use("/api/teaching/sessions", SessionRouter);
+app.use("/api/reports", ReportRouter);
 
 // 404 handler
 app.use(notFoundHandler);

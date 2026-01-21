@@ -1,6 +1,6 @@
 import { apiClient } from './api-client';
 
-import {
+import type {
     LoginPayload,
     LoginResponse,
     RegisterPayload,
@@ -9,14 +9,18 @@ import {
     ForgotPasswordPayload,
     ForgotPasswordResponse,
     ResetPasswordPayload,
-    ResetPasswordResponse
+    ResetPasswordResponse,
+    CurrentUserResponse,
+    LogoutResponse,
 } from '@/shared/types/auth';
+
 
 // ============================================
 // Auth Service
 // ============================================
 
-const API_BASE_URL = import.meta.env.VITE_API_URL;
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+console.log(API_BASE_URL)
 
 export const authService = {
     /**
@@ -24,11 +28,15 @@ export const authService = {
      */
     login: async (payload: LoginPayload): Promise<LoginResponse> => {
         try {
+            // Backend expects 'usernameOrEmail' not 'email'
             const data = await apiClient({
                 url: '/auth/login',
                 options: {
                     method: 'POST',
-                    body: JSON.stringify(payload),
+                    body: JSON.stringify({
+                        usernameOrEmail: payload.email,
+                        password: payload.password,
+                    }),
                 },
                 skipErrorToast: true,
             });
@@ -177,7 +185,7 @@ export const authService = {
     /**
      * Logout the current user
      */
-    logout: async () => {
+    logout: async (): Promise<LogoutResponse> => {
         try {
             await apiClient({
                 url: '/auth/logout',
@@ -203,7 +211,7 @@ export const authService = {
     /**
      * Get current authenticated user data
      */
-    getCurrentUser: async () => {
+    getCurrentUser: async (): Promise<CurrentUserResponse> => {
         try {
             const data = await apiClient({
                 url: '/auth/me',
@@ -215,7 +223,7 @@ export const authService = {
 
             return {
                 success: true,
-                data: data.data?.user,
+                data: data.data || data,
             };
         } catch (error: unknown) {
             return {

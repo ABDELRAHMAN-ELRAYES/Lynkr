@@ -1,8 +1,8 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import type { ReactNode } from "react";
-import { apiClient } from "@/shared/services/api-client";
+import { authService } from "@/shared/services";
 import { LoadingModal } from "@/shared/components/common/loading-modal";
-import {
+import type {
   LoginFormData,
   SignupFormData,
   User,
@@ -12,7 +12,11 @@ import {
 // Pending data while the registration process
 type PendingDataType = {
   email: string;
-  otp: string;
+  otp: {
+    code: string;
+    expiresIn: string;
+  };
+  enteredOtp: string;
   isVerified: boolean;
 };
 
@@ -38,10 +42,8 @@ type AuthContextType = {
     user?: User;
     message: string;
   }>;
-  verifyAccount: () => void;
-  registerUser: (
-    role: UserRole
-  ) => Promise<{ success: boolean; message: string }>;
+  verifyAccount: (enteredOtp: string) => void;
+  registerUser: (role: UserRole) => Promise<{ success: boolean; message: string }>;
   logout: () => Promise<{ success: boolean; message: string }>;
 };
 
@@ -59,22 +61,25 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     const restoreSession = async () => {
       try {
-        const data = await apiClient({
-          url: "/auth/me",
-          options: { method: "GET" },
-        });
-        const fetchedUser = {
-          id: data.id,
-          firstName: data.first_name,
-          lastName: data.last_name,
-          email: data.email,
-          country: data.country,
-          isActive: data.is_active,
-          role: data.role,
-        };
-        setUser(fetchedUser);
-        setIsAuthenticated(true);
-      } catch (error: any) {
+        const response = await authService.getCurrentUser();
+        if (response.success && response.data) {
+          // Backend returns { data: { user: {...} } }
+          const userData = response.data.user || response.data;
+          const fetchedUser: User = {
+            id: userData.id || "",
+            firstName: userData.firstName || userData.first_name || "",
+            lastName: userData.lastName || userData.last_name || "",
+            email: userData.email || "",
+            country: userData.country || "",
+            isActive: userData.active ?? userData.isActive ?? userData.is_active ?? true,
+            role: (userData.role as UserRole) || "CLIENT",
+          };
+          setUser(fetchedUser);
+          setIsAuthenticated(true);
+        } else {
+          setIsAuthenticated(false);
+        }
+      } catch {
         setIsAuthenticated(false);
       } finally {
         setIsLoading(false);
@@ -86,9 +91,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   // login handler
   const login = async ({ email, password }: LoginFormData) => {
     try {
-      // Import the new auth service
-      // Import the new auth service
-      const { authService } = await import("@/shared/services/auth.service");
 
       const response = await authService.login({ email, password });
 
@@ -147,12 +149,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   // logout handler
   const logout = async () => {
     try {
-      await apiClient({ url: "/auth/logout", options: { method: "POST" } });
+      const response = await authService.logout();
       setUser(null);
       setIsAuthenticated(false);
-      return { success: true, message: "You logged out successfully." };
-    } catch (error: any) {
-      return { success: false, message: error.message };
+      return { success: response.success, message: response.message || "You logged out successfully." };
+    } catch (error: unknown) {
+      const err = error as { message?: string };
+      return { success: false, message: err.message || "Logout failed" };
     } finally {
       setIsLoading(false);
     }
@@ -160,101 +163,104 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   // signup handler(check if the email is registered and generate an otp) and works as a resend verification email too
   const signup = async (newUser: SignupFormData) => {
     try {
-      const data = await apiClient({
-        url: "/auth/register",
-        options: {
-          method: "POST",
-          body: JSON.stringify({ email: newUser.email }),
-        },
-      });
+      const response = await authService.register({ email: newUser.email });
 
-      setPendingData({ email: data.email, otp: data.otp, isVerified: false });
-      setUser({
-        id: "pending_id",
-        role: "CLIENT",
-        firstName: newUser.firstName,
-        lastName: newUser.lastName,
-        email: newUser.email,
-        country: newUser.country,
-        password: newUser.password,
-        isActive: false,
-      });
-      return {
-        success: true,
-        message:
-          "We Send You a one time password to verify your account, Check your Inbox.",
-      };
-    } catch (error: any) {
+      if (response.success && response.data) {
+        setPendingData({
+          email: response.data.email,
+          otp: response.data.otp || { code: "", expiresIn: "" },
+          enteredOtp: "",
+          isVerified: false
+        });
+        setUser({
+          id: "pending_id",
+          role: "CLIENT",
+          firstName: newUser.firstName,
+          lastName: newUser.lastName,
+          email: newUser.email,
+          country: newUser.country,
+          password: newUser.password,
+          isActive: false,
+        });
+        return {
+          success: true,
+          message: "We sent you a one time password to verify your account. Check your inbox.",
+        };
+      } else {
+        return {
+          success: false,
+          message: response.message || "Registration failed",
+        };
+      }
+    } catch (error: unknown) {
+      const err = error as { message?: string };
       setUser(null);
       return {
         success: false,
-        message:
-          error.message ||
-          "Something went wrong while Trying to register your data",
+        message: err.message || "Something went wrong while trying to register your data",
       };
     } finally {
       setIsLoading(false);
     }
   };
   // to verify the account if the otp is verified
-  const verifyAccount = () => {
+  const verifyAccount = (enteredOtp: string) => {
     setPendingData((prev: PendingDataType | undefined) =>
       prev
-        ? { ...prev, isVerified: true }
-        : { email: "", otp: "", isVerified: false }
+        ? { ...prev, enteredOtp, isVerified: true }
+        : { email: "", otp: { code: "", expiresIn: "" }, enteredOtp: "", isVerified: false }
     );
   };
 
   const registerUser = async (role: UserRole) => {
-    console.log({
-      firstName: user?.firstName,
-      lastName: user?.lastName,
-      email: user?.email,
-      password: user?.password,
-      country: user?.country,
-      role,
-    });
-
     try {
-      const data = await apiClient({
-        url: "/auth/register-verification",
-        options: {
-          method: "POST",
-          body: JSON.stringify({
-            firstName: user?.firstName,
-            lastName: user?.lastName,
-            email: user?.email,
-            password: user?.password,
-            country: user?.country,
-            role,
-          }),
+      // Build payload matching backend IRegisterData structure
+      const response = await authService.registerVerification({
+        otp: {
+          hashedOtp: pendingData?.otp.code || "",
+          expiresIn: pendingData?.otp.expiresIn || "",
+          enteredOtp: pendingData?.enteredOtp || "",
+        },
+        user: {
+          firstName: user?.firstName || "",
+          lastName: user?.lastName || "",
+          email: user?.email || "",
+          password: user?.password || "",
+          role,
         },
       });
 
-      setUser({
-        id: data.id,
-        role: data.role,
-        firstName: data.first_name,
-        lastName: data.last_name,
-        email: data.email,
-        country: data.country,
-        isActive: data.is_active,
-      });
-      setIsAuthenticated(true);
-      return {
-        success: true,
-        message:
-          role === "CLIENT"
-            ? "Welcome to Lynkr."
-            : "You are being redirected to complete your data.",
-      };
-    } catch (error: any) {
+      if (response.success && response.data) {
+        const userData = response.data;
+        setUser({
+          id: userData.id,
+          role: userData.role as UserRole,
+          firstName: userData.first_name || userData.firstName,
+          lastName: userData.last_name || userData.lastName,
+          email: userData.email,
+          country: userData.country,
+          isActive: userData.is_active ?? true,
+        });
+        setIsAuthenticated(true);
+        return {
+          success: true,
+          message:
+            role === "CLIENT"
+              ? "Welcome to Lynkr."
+              : "You are being redirected to complete your data.",
+        };
+      } else {
+        return {
+          success: false,
+          message: response.message || "Registration verification failed",
+        };
+      }
+    } catch (error: unknown) {
+      const err = error as { message?: string };
       setUser(null);
       return {
         success: false,
-        message:
-          error.message ||
-          "Something went wrong while Trying to register your data",
+        message: err.message || "Something went wrong while trying to register your data",
       };
     } finally {
       setIsLoading(false);

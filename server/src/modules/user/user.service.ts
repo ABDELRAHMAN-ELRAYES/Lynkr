@@ -183,6 +183,11 @@ class UserService {
         return this.userRepository.findOrCreateUserByEmail(data);
     }
 
+    // Find user by email without throwing error (for forgot password)
+    static async findUserByEmail(email: string) {
+        return this.userRepository.getUserByUsernameOrEmail(email);
+    }
+
     // Update the user account to make it active or inactive
     static async updateUserStatus(
         userId: string,

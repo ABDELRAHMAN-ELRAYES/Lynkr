@@ -5,7 +5,7 @@ interface IApiClient {
   options: RequestInit;
   skipErrorToast?: boolean;
 }
-const API_BASE_URL = import.meta.env.VITE_API_URL;
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 // Create API client to avoid duplications
 export const apiClient = async ({
@@ -13,7 +13,7 @@ export const apiClient = async ({
   options = {},
   skipErrorToast = false,
 }: IApiClient) => {
-  const response = await fetch(`${API_BASE_URL}${url}`, {
+  const response = await fetch(`${API_BASE_URL}/api${url}`, {
     ...options,
     credentials: "include",
     headers: {
@@ -41,7 +41,7 @@ export const apiFormClient = async ({
   options = {},
   formData,
 }: IApiFormClient) => {
-  const response = await fetch(`${API_BASE_URL}${url}`, {
+  const response = await fetch(`${API_BASE_URL}/api${url}`, {
     ...options,
 
     method: options.method || "POST",

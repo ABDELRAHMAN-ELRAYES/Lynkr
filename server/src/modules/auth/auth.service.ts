@@ -140,7 +140,7 @@ class AuthenticationService {
             email: newUser?.email,
         };
         emailObj
-            .send("welcome", "مرحباً بك في Operest", templateData)
+            .send("welcome", "مرحباً بك في Lynkr", templateData)
             .catch((_error) =>
                 next(new AppError(500, "حدث خطأ ما أثناء محاولة إرسال بريد التحقق"))
             );
@@ -151,20 +151,20 @@ class AuthenticationService {
     // Send Forget password email
     static async forgetPassword(email: string, next: NextFunction) {
         if (!email) {
-            next(new AppError(400, "البريد الإلكتروني مطلوب"));
+            next(new AppError(400, "Email is required"));
             return;
         }
 
-        // Check if the user exists
-        const user = await UserService.getUserByUsernameOrEmail(email, next);
+        // Check if the user exists - use repository directly to avoid login-style error message
+        const user = await UserService.findUserByEmail(email);
         if (!user) {
-            next(new AppError(401, "البريد الإلكتروني غير موجود!"));
+            next(new AppError(404, "No account found with this email address"));
             return;
         }
 
         const resetToken = signPasswordResetJWT(user.email);
 
-        const resetLink = `https://lynkr.com/reset-password?token=${encodeURIComponent(
+        const resetLink = `${config.resetPassword.url}?token=${encodeURIComponent(
             resetToken
         )}`;
 

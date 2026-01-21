@@ -6,40 +6,11 @@ This document provides comprehensive rules and guidelines for AI agents building
 
 ---
 act as a senior react software engineer to implement and complete module 1 frontend and connection with the api and make the workflow of  the module features work at  
-module_1
- with following the rules 
-frontend_implementation_rules.md
+module_1 with following the rules frontend_implementation_rules.md
  
  
 ## Core Principles
 
-### 1. Technology Stack (MANDATORY)
-
-All frontend development must use the established technology stack:
-
-| Category | Technology | Version |
-|----------|------------|---------|
-| UI Library | React | 19.1 |
-| Language | TypeScript | 5.9 (Strict Mode) |
-| Build Tool | Vite | 7 |
-| Styling | Tailwind CSS | 4 |
-| State Management | Zustand | 5 |
-| Routing | React Router | 7 |
-| Forms | React Hook Form | 7 |
-| Validation | Zod | 4 |
-| HTTP Client | Axios | 1.12 |
-| UI Primitives | Radix UI | Latest |
-| Icons | Lucide React | Latest |
-| Animations | Framer Motion | 12 |
-| Real-time | Socket.io Client | Latest |
-| Video | Agora RTC React | 2.3 |
-| Payments | Stripe React | Latest |
-| Charts | Recharts / Chart.js | Latest |
-
-> [!CAUTION]
-> NEVER introduce new dependencies without explicit user approval. Work within the existing stack.
-
----
 
 ## 2. Project Architecture
 
@@ -471,49 +442,6 @@ Always include dark mode variants where appropriate:
 
 ## 8. Form Handling Rules
 
-### 8.1 React Hook Form + Zod Pattern
-
-```tsx
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
-
-// Define schema
-const requestSchema = z.object({
-  title: z.string().min(3, 'Title must be at least 3 characters'),
-  description: z.string().min(10, 'Description must be at least 10 characters'),
-  serviceId: z.string().uuid('Please select a service'),
-  priceMax: z.number().positive().optional(),
-  deadline: z.string().optional(),
-});
-
-type RequestFormData = z.infer<typeof requestSchema>;
-
-// In component
-const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm<RequestFormData>({
-  resolver: zodResolver(requestSchema),
-  defaultValues: {
-    title: '',
-    description: '',
-  },
-});
-
-const onSubmit = async (data: RequestFormData) => {
-  // Handle submission
-};
-
-return (
-  <form onSubmit={handleSubmit(onSubmit)}>
-    <input {...register('title')} />
-    {errors.title && <span className="text-red-500">{errors.title.message}</span>}
-    
-    <button type="submit" disabled={isSubmitting}>
-      {isSubmitting ? 'Submitting...' : 'Submit'}
-    </button>
-  </form>
-);
-```
-
 ### 8.2 Form Validation Alignment
 
 Validation rules MUST align with backend validation. Reference backend service layer validation.
@@ -521,41 +449,6 @@ Validation rules MUST align with backend validation. Reference backend service l
 ---
 
 ## 9. Routing Rules
-
-### 9.1 Route Structure
-
-```typescript
-// app/Router.tsx
-<Routes>
-  {/* Public routes */}
-  <Route path="/" element={<HomePage />} />
-  <Route path="/login" element={<LoginPage />} />
-  <Route path="/register" element={<RegisterPage />} />
-  
-  {/* Protected routes */}
-  <Route element={<ProtectedRoute />}>
-    <Route element={<DashboardLayout />}>
-      <Route path="/dashboard" element={<DashboardPage />} />
-      <Route path="/requests" element={<RequestsPage />} />
-      <Route path="/requests/new" element={<CreateRequestPage />} />
-      <Route path="/requests/:id" element={<RequestDetailPage />} />
-      <Route path="/proposals" element={<ProposalsPage />} />
-      <Route path="/projects" element={<ProjectsPage />} />
-      <Route path="/projects/:id" element={<ProjectDetailPage />} />
-    </Route>
-  </Route>
-  
-  {/* Provider-only routes */}
-  <Route element={<ProviderRoute />}>
-    <Route path="/provider/*" element={<ProviderRoutes />} />
-  </Route>
-  
-  {/* Admin routes */}
-  <Route element={<AdminRoute />}>
-    <Route path="/admin/*" element={<AdminRoutes />} />
-  </Route>
-</Routes>
-```
 
 ### 9.2 Route Protection
 

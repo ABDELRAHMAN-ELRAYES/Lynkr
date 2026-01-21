@@ -17,7 +17,8 @@ export default function OTPVerificationPage() {
   const [maxResendAttempts] = useState(3);
 
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
-  const { email, otp } = pendingData || { email: "", otp: "" };
+  const email = pendingData?.email || "";
+  const otpData = pendingData?.otp || { code: "", expiresIn: "" };
   const navigate = useNavigate();
 
   // Redirect to login if no OTP is available
@@ -152,28 +153,22 @@ export default function OTPVerificationPage() {
     setError("");
 
     try {
-      if (codeToVerify === otp) {
-        verifyAccount();
-        toast.success(
-          "Verified, You are being Redirected To Complete the registration process",
-          {
-            style: {
-              background: "#ffffff",
-              color: "#7682e8",
-              border: "1px solid #7682e8",
-            },
-          }
-        );
-        setTimeout(() => {
-          handleRedirect("/client-or-provider")();
-        }, 2000);
-      } else {
-        toast.error("Invalid verification code. Please try again.");
-        setOtp(["", "", "", "", "", ""]);
-        setTimeout(() => {
-          inputRefs.current[0]?.focus();
-        }, 100);
-      }
+      // Store the entered OTP and mark account as verified
+      // The actual OTP comparison happens on the backend via compare()
+      verifyAccount(codeToVerify);
+      toast.success(
+        "Verified, You are being Redirected To Complete the registration process",
+        {
+          style: {
+            background: "#ffffff",
+            color: "#7682e8",
+            border: "1px solid #7682e8",
+          },
+        }
+      );
+      setTimeout(() => {
+        handleRedirect("/client-or-provider")();
+      }, 2000);
     } catch (err) {
       toast.error("Verification failed. Please try again.");
       setOtp(["", "", "", "", "", ""]);
@@ -207,7 +202,7 @@ export default function OTPVerificationPage() {
       if (!data.success) {
         toast.error(
           data.message ||
-            "Something Went Wrong while trying to resend a verification mail."
+          "Something Went Wrong while trying to resend a verification mail."
         );
         return;
       }
@@ -220,8 +215,7 @@ export default function OTPVerificationPage() {
       setOtp(["", "", "", "", "", ""]);
 
       toast.success(
-        `Verification code sent! Attempts remaining: ${
-          maxResendAttempts - newAttempts
+        `Verification code sent! Attempts remaining: ${maxResendAttempts - newAttempts
         }`,
         {
           style: {
@@ -257,7 +251,7 @@ export default function OTPVerificationPage() {
       {loadingModal && <LoadingModal />}
       <div className="min-h-screen flex items-center justify-center p-4">
         <div className="w-full max-w-md">
-          {}
+          { }
           <div className="text-start mb-4 flex items-start border border-gray-300 rounded-2xl p-4 gap-4">
             <div>
               <div className="cursor-pointer text-[4rem] text-[#7682e8] font-pacifico font-extralight">
@@ -272,10 +266,10 @@ export default function OTPVerificationPage() {
             </div>
           </div>
 
-          {}
+          { }
           <div className="backdrop-blur-lg rounded-2xl border border-gray-300 p-8">
             <div className="space-y-6">
-              {}
+              { }
               <div className="text-center">
                 <div className="inline-flex items-center gap-2 bg-blue-50 text-blue-700 px-4 py-2 rounded-xl mb-4">
                   <Mail className="w-4 h-4" />
@@ -286,7 +280,7 @@ export default function OTPVerificationPage() {
                 </p>
               </div>
 
-              {}
+              { }
               <div>
                 <label className="block text-sm font-medium mb-4 text-center">
                   Verification Code
@@ -307,13 +301,12 @@ export default function OTPVerificationPage() {
                       onKeyDown={(e) => handleKeyDown(index, e)}
                       onPaste={index === 0 ? handlePaste : undefined}
                       disabled={isLoading || hasMaxAttempts}
-                      className={`w-12 h-12 text-center text-xl font-bold border-2 ${
-                        error
-                          ? "border-red-400 bg-red-50"
-                          : digit
+                      className={`w-12 h-12 text-center text-xl font-bold border-2 ${error
+                        ? "border-red-400 bg-red-50"
+                        : digit
                           ? "border-[#7682e8] bg-blue-50"
                           : "border-gray-300 bg-white"
-                      } rounded-xl focus:outline-none focus:ring-2 focus:ring-[#7682e8] focus:border-[#7682e8] transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed`}
+                        } rounded-xl focus:outline-none focus:ring-2 focus:ring-[#7682e8] focus:border-[#7682e8] transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed`}
                       autoComplete="one-time-code"
                     />
                   ))}
@@ -326,9 +319,9 @@ export default function OTPVerificationPage() {
                   </div>
                 )}
 
-                {}
+                { }
                 <div className="text-center space-y-2">
-                  {}
+                  { }
                   {resendAttempts > 0 && (
                     <p className="text-sm text-gray-600">
                       Resend attempts: {resendAttempts}/{maxResendAttempts}
@@ -340,11 +333,10 @@ export default function OTPVerificationPage() {
                 <button
                   onClick={handleResendCode}
                   disabled={!canResend || resendLoading || hasMaxAttempts}
-                  className={`inline-flex items-center gap-2 text-sm font-medium transition-all duration-200 px-3 py-2 rounded-lg ${
-                    canResend && !resendLoading && !hasMaxAttempts
-                      ? "text-[#7682e8] hover:text-[#5a67d8] hover:bg-blue-50 cursor-pointer"
-                      : "text-gray-400 cursor-not-allowed opacity-50"
-                  }`}
+                  className={`inline-flex items-center gap-2 text-sm font-medium transition-all duration-200 px-3 py-2 rounded-lg ${canResend && !resendLoading && !hasMaxAttempts
+                    ? "text-[#7682e8] hover:text-[#5a67d8] hover:bg-blue-50 cursor-pointer"
+                    : "text-gray-400 cursor-not-allowed opacity-50"
+                    }`}
                 >
                   {resendLoading ? (
                     <Loader2 className="w-4 h-4 animate-spin" />
@@ -354,8 +346,8 @@ export default function OTPVerificationPage() {
                   {resendLoading
                     ? "Sending..."
                     : hasMaxAttempts
-                    ? "Maximum Attempts Reached"
-                    : "Resend Code"}
+                      ? "Maximum Attempts Reached"
+                      : "Resend Code"}
                 </button>
 
                 {!canResend && !resendLoading && !hasMaxAttempts && (
@@ -388,7 +380,7 @@ export default function OTPVerificationPage() {
             </div>
           </div>
 
-          {}
+          { }
           <div className="text-center mt-8">
             <p className="text-xs text-gray-500">
               Need help? Contact our{" "}
