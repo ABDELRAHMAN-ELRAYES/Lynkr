@@ -719,113 +719,43 @@ export const financialOverview: FinancialOverview = {
     pendingPayouts: "$12,340",
 };
 
-// Sidebar items
+// Sidebar items - Flat navigation without dropdowns
 export const sidebarItems: SidebarItem[] = [
     {
         title: "Dashboard",
         icon: <Home />,
         isActive: true,
-        url: "#dashboard",
+        url: "/admin/dashboard",
     },
     {
         title: "Users",
         icon: <Users />,
-        badge: "1,247",
-        items: [
-            { title: "All Users", url: "#users", badge: "1,247" },
-            { title: "Active Users", url: "#users-active", badge: "892" },
-            { title: "Provider Requests", url: "#users-provider-requests", badge: "5" },
-            { title: "Pending Approval", url: "#users-pending", badge: "23" },
-            { title: "Suspended", url: "#users-suspended", badge: "12" },
-        ],
+        url: "/admin/users",
+    },
+    {
+        title: "Services",
+        icon: <Layers />,
+        url: "/admin/services",
     },
     {
         title: "Projects",
-        icon: <Layers />,
-        badge: "156",
-        items: [
-            { title: "Active Projects", url: "#projects-active", badge: "89" },
-            { title: "Completed", url: "#projects-completed", badge: "67" },
-            { title: "On Hold", url: "#projects-hold", badge: "12" },
-            { title: "Templates", url: "#projects-templates" },
-        ],
+        icon: <FileText />,
+        url: "/admin/projects",
     },
     {
         title: "Orders",
         icon: <ShoppingCart />,
-        badge: "45",
-        items: [
-            { title: "New Orders", url: "#orders-new", badge: "12" },
-            { title: "In Progress", url: "#orders-progress", badge: "23" },
-            { title: "Completed", url: "#orders-completed", badge: "156" },
-            { title: "Refunds", url: "#orders-refunds", badge: "3" },
-        ],
+        url: "/admin/orders",
     },
     {
         title: "Payments",
         icon: <CreditCard />,
-        items: [
-            { title: "Transactions", url: "#payments-transactions" },
-            { title: "Pending Payments", url: "#payments-pending", badge: "8" },
-            { title: "Refunds", url: "#payments-refunds" },
-            { title: "Reports", url: "#payments-reports" },
-        ],
-    },
-    {
-        title: "Communications",
-        icon: <MessageSquare />,
-        badge: "28",
-        items: [
-            { title: "Messages", url: "#communications-messages", badge: "15" },
-            { title: "Video Calls", url: "#communications-video" },
-            {
-                title: "Notifications",
-                url: "#communications-notifications",
-                badge: "13",
-            },
-            { title: "Announcements", url: "#communications-announcements" },
-        ],
-    },
-    {
-        title: "Reviews",
-        icon: <Star />,
-        items: [
-            { title: "All Reviews", url: "#reviews-all" },
-            { title: "Pending Moderation", url: "#reviews-pending", badge: "7" },
-            { title: "Reported Reviews", url: "#reviews-reported", badge: "2" },
-            { title: "Analytics", url: "#reviews-analytics" },
-        ],
-    },
-    {
-        title: "Support",
-        icon: <HelpCircle />,
-        badge: "12",
-        items: [
-            { title: "Open Tickets", url: "#support-open", badge: "12" },
-            { title: "Resolved", url: "#support-resolved" },
-            { title: "Knowledge Base", url: "#support-knowledge" },
-            { title: "FAQ Management", url: "#support-faq" },
-        ],
+        url: "/admin/payments",
     },
     {
         title: "Analytics",
         icon: <BarChart3 />,
-        items: [
-            { title: "Platform Overview", url: "#analytics-overview" },
-            { title: "User Analytics", url: "#analytics-users" },
-            { title: "Revenue Reports", url: "#analytics-revenue" },
-            { title: "Performance Metrics", url: "#analytics-performance" },
-        ],
-    },
-    {
-        title: "Content",
-        icon: <FileText />,
-        items: [
-            { title: "Pages Management", url: "#content-pages" },
-            { title: "Media Library", url: "#content-media" },
-            { title: "SEO Settings", url: "#content-seo" },
-            { title: "Blog Posts", url: "#content-blog" },
-        ],
+        url: "/admin/analytics",
     },
 ];
 

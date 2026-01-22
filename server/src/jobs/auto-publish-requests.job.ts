@@ -4,9 +4,8 @@ import NotificationService from "../modules/notification/notification.service";
 
 const prisma = PrismaClientSingleton.getPrismaClient();
 
-/**
+/*
  * Auto-publish expired direct requests (opt-in only)
- * Runs every 15 minutes
  */
 async function publishExpiredRequests() {
     try {
@@ -69,7 +68,7 @@ export function startAutoPublishJob() {
         await publishExpiredRequests();
     });
 
-    console.log("✅ Auto-publish job scheduled (every 15 minutes)");
+    console.log("Auto-publish job scheduled (every 15 minutes)");
 }
 
 export { publishExpiredRequests };

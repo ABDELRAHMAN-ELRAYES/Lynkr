@@ -10,7 +10,7 @@ export function WelcomeSection() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5 }}
-                className="overflow-hidden rounded-3xl bg-7682e8 p-8 text-white shadow-lg"
+                className="overflow-hidden rounded-3xl bg-[#7682e8] p-8 text-white shadow-lg"
             >
                 <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
                     <div className="space-y-4">

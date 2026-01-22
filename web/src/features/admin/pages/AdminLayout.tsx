@@ -82,7 +82,6 @@ export default function AdminLayout() {
     const [notifications] = useState(notificationsData.length);
     const [sidebarOpen, setSidebarOpen] = useState(true);
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-    const [expandedItems, setExpandedItems] = useState<Record<string, boolean>>({});
 
     // Data state
     const [orders, setOrders] = useState<Order[]>(ordersData);
@@ -177,30 +176,6 @@ export default function AdminLayout() {
         setMobileMenuOpen(false);
     };
 
-    const toggleExpanded = (title: string) => {
-        setExpandedItems((prev) => ({
-            ...prev,
-            [title]: !prev[title],
-        }));
-    };
-
-    const mapTitleToRoute = (title: string): string => {
-        const key = title.toLowerCase();
-        if (key.includes("dashboard")) return "/admin/dashboard";
-        if (key.includes("user")) return "/admin/users";
-        if (key.includes("project")) return "/admin/projects";
-        if (key.includes("order")) return "/admin/orders";
-        if (key.includes("payment")) return "/admin/payments";
-        if (key.includes("analytic")) return "/admin/analytics";
-        if (key.includes("setting")) return "/admin/settings";
-        return "/admin/dashboard";
-    };
-
-    const isActiveRoute = (title: string): boolean => {
-        const route = mapTitleToRoute(title);
-        return location.pathname === route || location.pathname.startsWith(route + "/");
-    };
-
     // Sidebar component
     const renderSidebar = (isMobile: boolean) => (
         <div className="flex h-full flex-col">
@@ -233,71 +208,33 @@ export default function AdminLayout() {
             <ScrollArea className="flex-1 px-3 py-2">
                 <div className="space-y-1">
                     {sidebarItems.map((item) => (
-                        <div key={item.title} className="mb-1">
-                            <button
-                                className={cn(
-                                    "flex w-full items-center justify-between rounded-2xl px-3 py-2 text-sm font-medium text-slate-700",
-                                    isActiveRoute(item.title)
-                                        ? "bg-indigo-50 text-indigo-700"
-                                        : "hover:bg-slate-100"
-                                )}
-                                onClick={() => {
-                                    const route = mapTitleToRoute(item.title);
-                                    if (route !== "/admin/dashboard" || item.title.toLowerCase().includes("dashboard")) {
-                                        handleNavigation(route);
-                                    }
-                                    if (item.items) {
-                                        toggleExpanded(item.title);
-                                    }
-                                }}
-                            >
-                                <div className="flex items-center gap-3">
-                                    {item.icon}
-                                    <span>{item.title}</span>
-                                </div>
-                                {item.badge && (
-                                    <Badge
-                                        variant="secondary"
-                                        className="ml-auto rounded-full px-2 py-0.5 text-xs bg-slate-200 text-slate-600"
-                                    >
-                                        {item.badge}
-                                    </Badge>
-                                )}
-                                {item.items && (
-                                    <ChevronDown
-                                        className={cn(
-                                            "ml-2 h-4 w-4 transition-transform",
-                                            expandedItems[item.title] ? "rotate-180" : ""
-                                        )}
-                                    />
-                                )}
-                            </button>
-
-                            {item.items && expandedItems[item.title] && (
-                                <div className="mt-1 ml-6 space-y-1 border-l border-slate-200 pl-3">
-                                    {item.items.map((subItem) => (
-                                        <button
-                                            key={subItem.title}
-                                            className="flex items-center justify-between rounded-2xl px-3 py-2 text-sm text-slate-600 hover:bg-slate-100 w-full text-left"
-                                            onClick={() => {
-                                                const route = mapTitleToRoute(item.title);
-                                                handleNavigation(route);
-                                            }}
-                                        >
-                                            {subItem.title}
-                                            {subItem.badge && (
-                                                <Badge
-                                                    variant="secondary"
-                                                    className="ml-auto rounded-full px-2 py-0.5 text-xs bg-slate-200 text-slate-600"
-                                                >
-                                                    {subItem.badge}
-                                                </Badge>
-                                            )}
-                                        </button>
-                                    ))}
-                                </div>
+                        <button
+                            key={item.title}
+                            className={cn(
+                                "flex w-full items-center justify-between rounded-2xl px-3 py-2.5 text-sm font-medium text-slate-700",
+                                location.pathname === item.url || location.pathname.startsWith(item.url + "/")
+                                    ? "bg-indigo-50 text-indigo-700"
+                                    : "hover:bg-slate-100"
                             )}
-                        </div>
+                            onClick={() => {
+                                if (item.url) {
+                                    handleNavigation(item.url);
+                                }
+                            }}
+                        >
+                            <div className="flex items-center gap-3">
+                                {item.icon}
+                                <span>{item.title}</span>
+                            </div>
+                            {item.badge && (
+                                <Badge
+                                    variant="secondary"
+                                    className="ml-auto rounded-full px-2 py-0.5 text-xs bg-slate-200 text-slate-600"
+                                >
+                                    {item.badge}
+                                </Badge>
+                            )}
+                        </button>
                     ))}
                 </div>
             </ScrollArea>

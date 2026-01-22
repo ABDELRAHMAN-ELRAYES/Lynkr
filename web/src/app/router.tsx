@@ -23,6 +23,7 @@ import GoogleOAuthCallbackPage from "@/features/auth/pages/GoogleOAuthCallbackPa
 import AdminLayout from "@/features/admin/pages/AdminLayout";
 import DashboardPage from "@/features/admin/pages/dashboard/DashboardPage";
 import UsersPage from "@/features/admin/pages/users/UsersPage";
+import AdminServicesPage from "@/features/admin/pages/services/ServicesPage";
 import ProjectsPage from "@/features/admin/pages/projects/ProjectsPage";
 import OrdersPage from "@/features/admin/pages/orders/OrdersPage";
 import PaymentsPage from "@/features/admin/pages/payments/PaymentsPage";
@@ -71,6 +72,7 @@ export const router = createBrowserRouter([
       { index: true, element: <Navigate to="dashboard" replace /> },
       { path: "dashboard", element: <DashboardPage /> },
       { path: "users", element: <UsersPage /> },
+      { path: "services", element: <AdminServicesPage /> },
       { path: "projects", element: <ProjectsPage /> },
       { path: "orders", element: <OrdersPage /> },
       { path: "payments", element: <PaymentsPage /> },

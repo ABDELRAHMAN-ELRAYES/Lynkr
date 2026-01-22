@@ -1,6 +1,6 @@
 import SlotService from "../modules/teaching/slot/slot.service";
 
-/**
+/*
  * Slot Cleanup Job
  * Deletes past unreserved teaching slots daily at 2 AM
  */
@@ -16,14 +16,14 @@ class SlotCleanupJob {
             this.runCleanup();
         }, 24 * 60 * 60 * 1000);
 
-        console.log("✅ Slot cleanup job started");
+        console.log("Slot cleanup job started");
     }
 
     stop() {
         if (this.intervalId) {
             clearInterval(this.intervalId);
             this.intervalId = null;
-            console.log("⏹️ Slot cleanup job stopped");
+            console.log("Slot cleanup job stopped");
         }
     }
 

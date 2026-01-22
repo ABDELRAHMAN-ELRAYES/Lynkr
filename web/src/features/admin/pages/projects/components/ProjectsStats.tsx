@@ -11,18 +11,7 @@ import {
     CardContent,
     CardHeader,
     CardTitle,
-} from "@/shared/components/ui/card";
-import { Project } from "@/shared/types/project";
-import { Activity } from "lucide-react"; // Import Activity specifically if used, checking mock logic
-
-// Using activeProjects length for stats or mocked numbers?
-// The original page used hardcoded or derived stats.
-// Let's pass stats as props or derive them.
-// Looking at original file (Step 54):
-// <div className="text-2xl font-bold text-slate-800">{activeProjects.length}</div>
-// <div className="text-2xl font-bold text-slate-800">12</div> (Completed)
-// <div className="text-2xl font-bold text-slate-800">5</div> (Pending Review)
-// <div className="text-2xl font-bold text-slate-800">98%</div> (Success Rate)
+} from "@/shared/components/ui/card"; 
 
 interface ProjectsStatsProps {
     activeCount: number;

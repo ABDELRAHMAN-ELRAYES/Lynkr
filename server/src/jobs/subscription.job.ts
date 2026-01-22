@@ -33,7 +33,7 @@ export function startSubscriptionJob() {
         await processSubscriptions();
     });
 
-    console.log("✅ Subscription job scheduled (every hour)");
+    console.log("Subscription job scheduled (every hour)");
 }
 
 export { processSubscriptions };
