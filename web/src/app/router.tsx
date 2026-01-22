@@ -21,13 +21,13 @@ import GoogleOAuthCallbackPage from "@/features/auth/pages/GoogleOAuthCallbackPa
 
 // Admin
 import AdminLayout from "@/features/admin/pages/AdminLayout";
-import DashboardPage from "@/features/admin/pages/DashboardPage";
-import UsersPage from "@/features/admin/pages/UsersPage";
-import ProjectsPage from "@/features/admin/pages/ProjectsPage";
-import OrdersPage from "@/features/admin/pages/OrdersPage";
-import PaymentsPage from "@/features/admin/pages/PaymentsPage";
-import AnalyticsPage from "@/features/admin/pages/AnalyticsPage";
-import SettingsPage from "@/features/admin/pages/SettingsPage";
+import DashboardPage from "@/features/admin/pages/dashboard/DashboardPage";
+import UsersPage from "@/features/admin/pages/users/UsersPage";
+import ProjectsPage from "@/features/admin/pages/projects/ProjectsPage";
+import OrdersPage from "@/features/admin/pages/orders/OrdersPage";
+import PaymentsPage from "@/features/admin/pages/payments/PaymentsPage";
+import AnalyticsPage from "@/features/admin/pages/analytics/AnalyticsPage";
+import SettingsPage from "@/features/admin/pages/settings/SettingsPage";
 
 // Profile
 import ProfileLayout from "@/shared/components/layout/ProfileLayout";

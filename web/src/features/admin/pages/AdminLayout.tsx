@@ -41,7 +41,7 @@ import { profileService } from "@/shared/services";
 import { UserResponse } from "@/shared/types/user";
 import { ProfileRequestWithFullData } from "@/shared/types/profile";
 
-import { sidebarItems, notificationsData, ordersData, paymentsData } from "./mockData";
+import { sidebarItems, notificationsData, ordersData, paymentsData } from "@/features/admin/data/mockData";
 import { Order } from "@/shared/types/order";
 import { Payment } from "@/shared/types/payment";
 
