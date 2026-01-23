@@ -107,6 +107,33 @@ class ProfileRepository {
         }
     }
 
+    async getPendingProviderProfiles() {
+        try {
+            return await this.prisma.providerProfile.findMany({
+                where: { isApproved: false },
+                include: {
+                    user: {
+                        select: {
+                            id: true,
+                            firstName: true,
+                            lastName: true,
+                            email: true,
+                            username: true,
+                        },
+                    },
+                    service: true,
+                    skills: true,
+                    experiences: true,
+                    education: true,
+                    languages: true,
+                },
+                orderBy: { createdAt: "desc" },
+            });
+        } catch (error) {
+            throw new AppError(500, "Failed to get pending provider profiles");
+        }
+    }
+
     async searchProviderProfiles(params: ISearchParamsRequired) {
         try {
             // Build where clause - only approved providers

@@ -9,6 +9,8 @@ import {
     approveProviderProfile,
     rejectProviderProfile,
     deleteProviderProfile,
+    getPendingProfiles,
+    evaluateProfileRequest,
 } from "./profile.controller";
 import { protect, checkPermissions } from "../../auth/auth.controller";
 import { UserRole } from "../../../enum/UserRole";
@@ -18,6 +20,23 @@ const ProfileRouter = Router();
 // Public routes (approved profiles only)
 ProfileRouter.get("/", getAllProviderProfiles);
 ProfileRouter.get("/search", searchProviderProfiles);
+
+// Admin routes for reviewing pending providers - MUST be before /:id routes
+ProfileRouter.get(
+    "/requests/pending",
+    protect,
+    checkPermissions([UserRole.ADMIN, UserRole.SUPER_ADMIN]),
+    getPendingProfiles
+);
+
+ProfileRouter.post(
+    "/requests/:id/evaluate",
+    protect,
+    checkPermissions([UserRole.ADMIN, UserRole.SUPER_ADMIN]),
+    evaluateProfileRequest
+);
+
+// Get profile by ID (public)
 ProfileRouter.get("/:id", getProviderProfileById);
 
 // Protected routes - Providers can manage their own profiles
@@ -73,4 +92,3 @@ ProfileRouter.delete(
 );
 
 export default ProfileRouter;
-

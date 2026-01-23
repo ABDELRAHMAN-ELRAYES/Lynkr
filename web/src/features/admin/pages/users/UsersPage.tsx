@@ -12,6 +12,7 @@ import { UsersTable } from "./components/UsersTable";
 import { PendingProvidersTable } from "./components/PendingProvidersTable";
 import { UserDetailModal } from "./components/UserDetailModal";
 import { CreateUserModal } from "./components/CreateUserModal";
+import { ProviderRequestDetailModal } from "./components/ProviderRequestDetailModal";
 
 export default function UsersPage() {
     const {
@@ -289,6 +290,21 @@ export default function UsersPage() {
                             role: "CLIENT",
                             isActive: true,
                         });
+                    }}
+                />
+            )}
+
+            {selectedProviderRequest && (
+                <ProviderRequestDetailModal
+                    request={selectedProviderRequest}
+                    onClose={() => setSelectedProviderRequest(null)}
+                    onApprove={(id) => {
+                        handleApproveProvider(id);
+                        setSelectedProviderRequest(null);
+                    }}
+                    onReject={(id) => {
+                        handleRejectProvider(id);
+                        setSelectedProviderRequest(null);
                     }}
                 />
             )}

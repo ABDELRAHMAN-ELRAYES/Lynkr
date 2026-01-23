@@ -238,3 +238,72 @@ export const deleteProviderProfile = catchAsync(
         });
     }
 );
+
+/**
+ * Get Pending Provider Profiles (Admin only)
+ * Returns profiles that are not yet approved with full user data
+ */
+export const getPendingProfiles = catchAsync(
+    async (_request: Request, response: Response) => {
+        const profiles = await ProfileService.getPendingProviderProfiles();
+
+        // Transform to match frontend's expected ProfileRequestWithFullData format
+        const pendingRequests = profiles.map(profile => ({
+            id: profile.id,
+            userId: profile.userId,
+            type: "JOIN_REQUEST",
+            status: "PENDING",
+            createdAt: profile.createdAt,
+            updatedAt: profile.updatedAt,
+            user: profile.user,
+            profile: {
+                title: profile.title,
+                bio: profile.bio,
+                hourlyRate: profile.hourlyRate,
+            },
+            // Include full profile data
+            service: profile.service,
+            skills: profile.skills,
+            experiences: profile.experiences,
+            education: profile.education,
+            languages: profile.languages,
+        }));
+
+        response.status(200).json({
+            status: "success",
+            data: pendingRequests,
+        });
+    }
+);
+
+/**
+ * Evaluate Profile Request (Approve/Reject) - Admin only
+ */
+export const evaluateProfileRequest = catchAsync(
+    async (request: Request, response: Response, next: NextFunction) => {
+        const requestId = request.params.id;
+        const { decision, adminNotes } = request.body;
+
+        let result;
+        if (decision === "APPROVED") {
+            result = await ProfileService.approveProviderProfile(requestId, next);
+        } else if (decision === "REJECTED") {
+            result = await ProfileService.rejectProviderProfile(requestId, next);
+        } else {
+            response.status(400).json({
+                status: "fail",
+                message: "Invalid decision. Must be 'APPROVED' or 'REJECTED'.",
+            });
+            return;
+        }
+
+        if (!result) return;
+
+        response.status(200).json({
+            status: "success",
+            message: result.message,
+            adminNotes,
+        });
+    }
+);
+

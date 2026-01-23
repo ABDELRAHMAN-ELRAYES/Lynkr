@@ -94,6 +94,14 @@ class ProfileService {
     }
 
     /**
+     * Get Pending Provider Profiles (not yet approved)
+     * Returns profiles with full user and related data for admin review
+     */
+    static async getPendingProviderProfiles() {
+        return await this.profileRepository.getPendingProviderProfiles();
+    }
+
+    /**
      * Search Provider Profiles with filters, sorting, and pagination
      */
     static async searchProviderProfiles(params: ISearchParams) {
