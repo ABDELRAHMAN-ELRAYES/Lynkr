@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Filter, Search, Activity } from "lucide-react";
+import { Search, Activity } from "lucide-react";
 import Button from "@/shared/components/ui/Button";
 import { Input } from "@/shared/components/ui/input";
 import {
@@ -24,13 +24,8 @@ import { activeProjects } from "@/features/admin/data/mockData";
 import { ProjectsHeader } from "./components/ProjectsHeader";
 import { ProjectsStats } from "./components/ProjectsStats";
 import { ProjectsTable } from "./components/ProjectsTable";
-import { Badge } from "@/shared/components/ui/badge";
+import { StatusTag } from "@/shared/components/common/tags";
 
-// Define a safe Project type if imported one doesn't match mock structure, 
-// but we used Project imported in Table, so we should assume it matches.
-// However, mockData might return something slightly different?
-// Step 54 showed mockData import.
-// Let's use the type from components.
 
 type ProjectsSubTab = "all" | "active" | "completed" | "on_hold" | "cancelled";
 
@@ -138,7 +133,7 @@ export default function ProjectsPage() {
                                                     <p className="text-xs text-slate-500">{project.deadline}</p>
                                                 </div>
                                             </div>
-                                            <Badge variant="outline" className="rounded-lg">Due Soon</Badge>
+                                            <StatusTag colorScheme="warning">Due Soon</StatusTag>
                                         </div>
                                     ))}
                                 </div>

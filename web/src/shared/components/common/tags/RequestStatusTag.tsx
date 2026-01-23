@@ -11,10 +11,10 @@ export interface RequestStatusTagProps extends React.HTMLAttributes<HTMLSpanElem
 
 const statusConfig: Record<RequestStatus, { label: string; colorScheme: ColorScheme }> = {
     PENDING: { label: "Pending", colorScheme: "warning" },
-    PUBLIC: { label: "Public", colorScheme: "info" },
-    ACCEPTED: { label: "Accepted", colorScheme: "success" },
+    PUBLIC: { label: "Public", colorScheme: "sky" },
+    ACCEPTED: { label: "Accepted", colorScheme: "emerald" },
     EXPIRED: { label: "Expired", colorScheme: "neutral" },
-    CANCELLED: { label: "Cancelled", colorScheme: "error" },
+    CANCELLED: { label: "Cancelled", colorScheme: "rose" },
 };
 
 export function RequestStatusTag({ status, size, className, ...props }: RequestStatusTagProps) {

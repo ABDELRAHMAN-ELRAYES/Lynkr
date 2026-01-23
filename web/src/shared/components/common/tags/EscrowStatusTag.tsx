@@ -11,8 +11,8 @@ export interface EscrowStatusTagProps extends React.HTMLAttributes<HTMLSpanEleme
 
 const statusConfig: Record<EscrowStatus, { label: string; colorScheme: ColorScheme }> = {
     HOLDING: { label: "Holding", colorScheme: "warning" },
-    RELEASED: { label: "Released", colorScheme: "success" },
-    REFUNDED: { label: "Refunded", colorScheme: "orange" },
+    RELEASED: { label: "Released", colorScheme: "emerald" },
+    REFUNDED: { label: "Refunded", colorScheme: "rose" },
 };
 
 export function EscrowStatusTag({ status, size, className, ...props }: EscrowStatusTagProps) {

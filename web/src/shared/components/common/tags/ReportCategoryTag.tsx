@@ -10,11 +10,11 @@ export interface ReportCategoryTagProps extends React.HTMLAttributes<HTMLSpanEle
 }
 
 const categoryConfig: Record<ReportCategory, { label: string; colorScheme: ColorScheme }> = {
-    FRAUD: { label: "Fraud", colorScheme: "error" },
+    FRAUD: { label: "Fraud", colorScheme: "rose" },
     ABUSE: { label: "Abuse", colorScheme: "orange" },
     SERVICE_FAILURE: { label: "Service Failure", colorScheme: "warning" },
-    POLICY_VIOLATION: { label: "Policy Violation", colorScheme: "purple" },
-    TECHNICAL: { label: "Technical", colorScheme: "info" },
+    POLICY_VIOLATION: { label: "Policy Violation", colorScheme: "violet" },
+    TECHNICAL: { label: "Technical", colorScheme: "teal" },
 };
 
 export function ReportCategoryTag({ category, size, className, ...props }: ReportCategoryTagProps) {

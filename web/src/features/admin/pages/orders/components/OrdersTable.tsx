@@ -6,8 +6,8 @@ import {
     Eye,
     MoreHorizontal,
 } from "lucide-react";
-import { Avatar, AvatarFallback } from "@/shared/components/ui/avatar";
-import { Badge } from "@/shared/components/ui/badge";
+import { Avatar, AvatarFallback, AvatarImage } from "@/shared/components/ui/avatar";
+import { StatusTag } from "@/shared/components/common/tags";
 import Button from "@/shared/components/ui/Button";
 import {
     Card,
@@ -33,7 +33,7 @@ import {
 } from "@/shared/components/ui/table";
 import { cn } from "@/shared/lib/utils";
 import { Order } from "@/shared/types/order";
-import { getPriorityColor } from "@/features/admin/utils/adminUtils";
+// import { getPriorityColor } from "@/features/admin/utils/adminUtils";
 
 interface OrdersTableProps {
     filteredOrders: Order[];
@@ -53,15 +53,8 @@ export function OrdersTable({
         currentPage * itemsPerPage
     );
 
-    const getOrderStatusColor = (status: string) => {
-        switch (status) {
-            case "pending": return "bg-amber-50 text-amber-700 border-amber-200";
-            case "processing": return "bg-blue-50 text-blue-700 border-blue-200";
-            case "completed": return "bg-emerald-50 text-emerald-700 border-emerald-200";
-            case "cancelled": return "bg-rose-50 text-rose-700 border-rose-200";
-            default: return "bg-slate-100 text-slate-700 border-slate-200";
-        }
-    };
+    // Helper removed, using Tags
+
 
     return (
         <Card className="rounded-3xl border border-slate-200/80 bg-white shadow-sm">
@@ -98,9 +91,16 @@ export function OrdersTable({
                                     <div className="text-sm font-medium text-slate-800">${order.amount.toLocaleString()}</div>
                                 </TableCell>
                                 <TableCell className="p-4">
-                                    <Badge variant="outline" className={cn("rounded-xl font-medium", getOrderStatusColor(order.status))}>
+                                    <StatusTag
+                                        colorScheme={
+                                            order.status === 'completed' ? 'success' :
+                                                order.status === 'pending' ? 'warning' :
+                                                    order.status === 'cancelled' ? 'error' :
+                                                        order.status === 'processing' ? 'info' : 'neutral'
+                                        }
+                                    >
                                         {order.status}
-                                    </Badge>
+                                    </StatusTag>
                                 </TableCell>
                                 <TableCell className="p-4">
                                     <div className="flex items-center gap-1 text-sm text-slate-600">
@@ -109,9 +109,14 @@ export function OrdersTable({
                                     </div>
                                 </TableCell>
                                 <TableCell className="p-4">
-                                    <Badge className={cn("rounded-xl font-medium", getPriorityColor(order.priority))}>
+                                    <StatusTag
+                                        colorScheme={
+                                            order.priority === 'High' ? 'error' :
+                                                order.priority === 'Medium' ? 'warning' : 'success'
+                                        }
+                                    >
                                         {order.priority}
-                                    </Badge>
+                                    </StatusTag>
                                 </TableCell>
                                 <TableCell className="p-4 text-right">
                                     <DropdownMenu>

@@ -16,12 +16,12 @@ export interface ProjectStatusTagProps extends React.HTMLAttributes<HTMLSpanElem
 }
 
 const statusConfig: Record<ProjectStatus, { label: string; colorScheme: ColorScheme }> = {
-    PENDING_PAYMENT: { label: "Pending Payment", colorScheme: "warning" },
-    IN_PROGRESS: { label: "In Progress", colorScheme: "info" },
-    COMPLETED: { label: "Completed", colorScheme: "success" },
-    CONFIRMED: { label: "Confirmed", colorScheme: "emerald" },
-    CANCELLED: { label: "Cancelled", colorScheme: "error" },
-    DISPUTED: { label: "Disputed", colorScheme: "orange" },
+    PENDING_PAYMENT: { label: "Pending Payment", colorScheme: "orange" },
+    IN_PROGRESS: { label: "In Progress", colorScheme: "sky" },
+    COMPLETED: { label: "Completed", colorScheme: "emerald" },
+    CONFIRMED: { label: "Confirmed", colorScheme: "teal" },
+    CANCELLED: { label: "Cancelled", colorScheme: "rose" },
+    DISPUTED: { label: "Disputed", colorScheme: "pink" },
 };
 
 export function ProjectStatusTag({ status, size, className, ...props }: ProjectStatusTagProps) {

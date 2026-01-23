@@ -11,7 +11,14 @@ export type ColorScheme =
     | "purple"
     | "emerald"
     | "orange"
-    | "cyan";
+    | "cyan"
+    | "sky"
+    | "violet"
+    | "blue"
+    | "rose"
+    | "indigo"
+    | "pink"
+    | "teal";
 
 export type TagSize = "sm" | "md" | "lg";
 
@@ -22,16 +29,24 @@ export interface StatusTagProps extends React.HTMLAttributes<HTMLSpanElement> {
 }
 
 const colorSchemeStyles: Record<ColorScheme, string> = {
-    success: "bg-green-100 text-green-800 border-green-200",
-    warning: "bg-yellow-100 text-yellow-800 border-yellow-200",
-    error: "bg-red-100 text-red-800 border-red-200",
-    info: "bg-blue-100 text-blue-800 border-blue-200",
-    neutral: "bg-gray-100 text-gray-800 border-gray-200",
-    primary: "bg-indigo-100 text-indigo-800 border-indigo-200",
-    purple: "bg-purple-100 text-purple-800 border-purple-200",
-    emerald: "bg-emerald-100 text-emerald-800 border-emerald-200",
-    orange: "bg-orange-100 text-orange-800 border-orange-200",
-    cyan: "bg-cyan-100 text-cyan-800 border-cyan-200",
+    success: "bg-emerald-50 text-emerald-700 border-emerald-200",
+    warning: "bg-amber-50 text-amber-800 border-amber-200",
+    error: "bg-rose-50 text-rose-700 border-rose-200",
+    info: "bg-sky-50 text-sky-700 border-sky-200",
+    neutral: "bg-slate-100 text-slate-700 border-slate-200",
+    primary: "bg-indigo-50 text-indigo-700 border-indigo-200",
+    purple: "bg-purple-50 text-purple-700 border-purple-200",
+    emerald: "bg-emerald-50 text-emerald-700 border-emerald-200",
+    orange: "bg-orange-50 text-orange-800 border-orange-200",
+    cyan: "bg-cyan-50 text-cyan-800 border-cyan-200",
+    // New colors
+    sky: "bg-sky-50 text-sky-700 border-sky-200",
+    violet: "bg-violet-50 text-violet-700 border-violet-200",
+    blue: "bg-blue-50 text-blue-700 border-blue-200",
+    rose: "bg-rose-50 text-rose-700 border-rose-200",
+    indigo: "bg-indigo-50 text-indigo-700 border-indigo-200",
+    pink: "bg-pink-50 text-pink-700 border-pink-200",
+    teal: "bg-teal-50 text-teal-700 border-teal-200",
 };
 
 const sizeStyles: Record<TagSize, string> = {
@@ -50,7 +65,7 @@ export function StatusTag({
     return (
         <span
             className={cn(
-                "inline-flex items-center font-medium rounded-md border",
+                "inline-flex items-center font-medium rounded-2xl border",
                 colorSchemeStyles[colorScheme],
                 sizeStyles[size],
                 className

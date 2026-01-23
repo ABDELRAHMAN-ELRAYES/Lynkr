@@ -5,8 +5,8 @@ import {
     CheckCircle,
     Eye,
 } from "lucide-react";
-import { Avatar, AvatarFallback } from "@/shared/components/ui/avatar";
-import { Badge } from "@/shared/components/ui/badge";
+import { Avatar, AvatarFallback, AvatarImage } from "@/shared/components/ui/avatar";
+import { ApplicationStatusTag, StatusTag } from "@/shared/components/common/tags";
 import Button from "@/shared/components/ui/Button";
 import {
     Card,
@@ -90,17 +90,15 @@ export function PendingProvidersTable({
                                     </TableCell>
                                     <TableCell className="p-4 text-sm text-slate-600">{request.user?.email || "N/A"}</TableCell>
                                     <TableCell className="p-4">
-                                        <Badge variant="outline" className="rounded-xl font-medium bg-blue-50 text-blue-800 border-blue-200">
+                                        <StatusTag colorScheme="info">
                                             {request.type === "JOIN_REQUEST" ? "Join Request" : "Update Request"}
-                                        </Badge>
+                                        </StatusTag>
                                     </TableCell>
                                     <TableCell className="p-4 text-sm text-slate-500">
                                         {request.createdAt ? new Date(request.createdAt).toLocaleDateString() : "N/A"}
                                     </TableCell>
                                     <TableCell className="p-4">
-                                        <Badge variant="outline" className="rounded-xl font-medium bg-amber-50 text-amber-800 border-amber-200">
-                                            Pending Review
-                                        </Badge>
+                                        <ApplicationStatusTag status="PENDING" />
                                     </TableCell>
                                     <TableCell className="p-4 text-right">
                                         <div className="flex gap-2 justify-end">

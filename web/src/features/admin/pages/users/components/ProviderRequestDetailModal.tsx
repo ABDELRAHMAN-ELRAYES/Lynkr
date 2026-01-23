@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { X, User, Briefcase, GraduationCap, Languages, Clock, CheckCircle, Ban, AlertTriangle } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/shared/components/ui/avatar";
-import { Badge } from "@/shared/components/ui/badge";
+import { ApplicationStatusTag, StatusTag } from "@/shared/components/common/tags";
 import Button from "@/shared/components/ui/Button";
 import {
     Card,
@@ -137,9 +137,7 @@ export function ProviderRequestDetailModal({
                                         ${profile.hourlyRate}/hr
                                     </div>
                                 )}
-                                <Badge variant="outline" className="bg-amber-50 text-amber-800 border-amber-200">
-                                    Pending Review
-                                </Badge>
+                                <ApplicationStatusTag status="PENDING" />
                             </div>
                         </div>
 
@@ -161,9 +159,9 @@ export function ProviderRequestDetailModal({
                                 <h4 className="font-semibold text-slate-800 flex items-center gap-2">
                                     <Briefcase className="h-4 w-4" /> Service Category
                                 </h4>
-                                <Badge className="bg-indigo-100 text-indigo-800 border-indigo-200">
+                                <StatusTag colorScheme="primary">
                                     {service.name}
-                                </Badge>
+                                </StatusTag>
                             </div>
                         )}
 
@@ -175,9 +173,9 @@ export function ProviderRequestDetailModal({
                                 </h4>
                                 <div className="flex flex-wrap gap-2">
                                     {skills.map((skill: any, index: number) => (
-                                        <Badge key={index} variant="outline" className="bg-slate-50">
+                                        <StatusTag key={index} colorScheme="neutral">
                                             {skill.skillName || skill.name || skill}
-                                        </Badge>
+                                        </StatusTag>
                                     ))}
                                 </div>
                             </div>
@@ -240,9 +238,9 @@ export function ProviderRequestDetailModal({
                                 </h4>
                                 <div className="flex flex-wrap gap-2">
                                     {languages.map((lang: any, index: number) => (
-                                        <Badge key={index} variant="outline" className="bg-slate-50">
+                                        <StatusTag key={index} colorScheme="neutral">
                                             {lang.language} - {lang.proficiency}
-                                        </Badge>
+                                        </StatusTag>
                                     ))}
                                 </div>
                             </div>

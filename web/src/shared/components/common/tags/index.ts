@@ -17,3 +17,4 @@ export * from "./MeetingStatusTag";
 export * from "./SessionTypeTag";
 export * from "./NotificationTypeTag";
 export * from "./ActiveStatusTag";
+export * from "./AdminPrivilegeTag";

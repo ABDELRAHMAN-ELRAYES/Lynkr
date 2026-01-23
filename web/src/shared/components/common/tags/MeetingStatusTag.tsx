@@ -11,9 +11,9 @@ export interface MeetingStatusTagProps extends React.HTMLAttributes<HTMLSpanElem
 
 const statusConfig: Record<MeetingStatus, { label: string; colorScheme: ColorScheme }> = {
     PENDING: { label: "Pending", colorScheme: "warning" },
-    ACTIVE: { label: "Active", colorScheme: "success" },
-    COMPLETED: { label: "Completed", colorScheme: "info" },
-    CANCELLED: { label: "Cancelled", colorScheme: "error" },
+    ACTIVE: { label: "Active", colorScheme: "indigo" },
+    COMPLETED: { label: "Completed", colorScheme: "emerald" },
+    CANCELLED: { label: "Cancelled", colorScheme: "rose" },
 };
 
 export function MeetingStatusTag({ status, size, className, ...props }: MeetingStatusTagProps) {

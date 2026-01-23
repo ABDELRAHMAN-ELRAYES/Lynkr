@@ -11,9 +11,9 @@ export interface PaymentStatusTagProps extends React.HTMLAttributes<HTMLSpanElem
 
 const statusConfig: Record<PaymentStatus, { label: string; colorScheme: ColorScheme }> = {
     PENDING: { label: "Pending", colorScheme: "warning" },
-    COMPLETED: { label: "Completed", colorScheme: "success" },
-    REFUNDED: { label: "Refunded", colorScheme: "orange" },
-    CANCELLED: { label: "Cancelled", colorScheme: "error" },
+    COMPLETED: { label: "Completed", colorScheme: "emerald" },
+    REFUNDED: { label: "Refunded", colorScheme: "sky" },
+    CANCELLED: { label: "Cancelled", colorScheme: "rose" },
 };
 
 export function PaymentStatusTag({ status, size, className, ...props }: PaymentStatusTagProps) {

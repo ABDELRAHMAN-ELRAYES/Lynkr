@@ -11,8 +11,8 @@ export interface ProposalStatusTagProps extends React.HTMLAttributes<HTMLSpanEle
 
 const statusConfig: Record<ProposalStatus, { label: string; colorScheme: ColorScheme }> = {
     PENDING: { label: "Pending", colorScheme: "warning" },
-    ACCEPTED: { label: "Accepted", colorScheme: "success" },
-    REJECTED: { label: "Rejected", colorScheme: "error" },
+    ACCEPTED: { label: "Accepted", colorScheme: "emerald" },
+    REJECTED: { label: "Rejected", colorScheme: "rose" },
 };
 
 export function ProposalStatusTag({ status, size, className, ...props }: ProposalStatusTagProps) {

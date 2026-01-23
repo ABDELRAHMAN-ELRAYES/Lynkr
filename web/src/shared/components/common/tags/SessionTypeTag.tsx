@@ -10,8 +10,8 @@ export interface SessionTypeTagProps extends React.HTMLAttributes<HTMLSpanElemen
 }
 
 const typeConfig: Record<SessionType, { label: string; colorScheme: ColorScheme }> = {
-    ONE_TO_ONE: { label: "1:1 Session", colorScheme: "info" },
-    GROUP: { label: "Group Session", colorScheme: "purple" },
+    ONE_TO_ONE: { label: "1:1 Session", colorScheme: "blue" },
+    GROUP: { label: "Group Session", colorScheme: "violet" },
 };
 
 export function SessionTypeTag({ type, size, className, ...props }: SessionTypeTagProps) {

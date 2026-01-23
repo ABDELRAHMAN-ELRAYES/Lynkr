@@ -3,14 +3,13 @@
 import {
     Ban,
     CheckCircle,
-    Edit,
     Eye,
     Mail,
     MoreHorizontal,
     Trash2,
 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/shared/components/ui/avatar";
-import { Badge } from "@/shared/components/ui/badge";
+import { UserRoleTag, UserStatusTag } from "@/shared/components/common/tags";
 import Button from "@/shared/components/ui/Button";
 import {
     Card,
@@ -36,7 +35,6 @@ import {
 } from "@/shared/components/ui/table";
 import { cn } from "@/shared/lib/utils";
 import { UserResponse } from "@/shared/types/user";
-import { getStatusColor, getRoleColor } from "@/features/admin/utils/adminUtils";
 
 interface UsersTableProps {
     filteredUsers: UserResponse[];
@@ -92,14 +90,10 @@ export function UsersTable({
                                     </div>
                                 </TableCell>
                                 <TableCell className="p-4">
-                                    <Badge variant="outline" className={cn("rounded-xl font-medium", getRoleColor(user.role))}>
-                                        {user.role}
-                                    </Badge>
+                                    <UserRoleTag role={user.role as any} />
                                 </TableCell>
                                 <TableCell className="p-4">
-                                    <Badge variant="outline" className={cn("rounded-xl font-medium", getStatusColor(user.is_active ? "active" : "suspended"))}>
-                                        {user.is_active ? "active" : "suspended"}
-                                    </Badge>
+                                    <UserStatusTag active={user.is_active} />
                                 </TableCell>
                                 <TableCell className="p-4 text-sm text-slate-700">{user.country || "N/A"}</TableCell>
                                 <TableCell className="p-4 text-sm text-slate-500">

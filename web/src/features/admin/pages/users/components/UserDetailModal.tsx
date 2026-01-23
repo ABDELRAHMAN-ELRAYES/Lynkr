@@ -8,7 +8,7 @@ import {
     X,
 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/shared/components/ui/avatar";
-import { Badge } from "@/shared/components/ui/badge";
+import { UserRoleTag, UserStatusTag } from "@/shared/components/common/tags";
 import Button from "@/shared/components/ui/Button";
 import {
     Card,
@@ -20,7 +20,7 @@ import { Input } from "@/shared/components/ui/input";
 import { Label } from "@/shared/components/ui/label";
 import { cn } from "@/shared/lib/utils";
 import { UserResponse } from "@/shared/types/user";
-import { getStatusColor, getRoleColor } from "@/features/admin/utils/adminUtils";
+// import { getStatusColor, getRoleColor } from "@/features/admin/utils/adminUtils";
 
 interface UserDetailModalProps {
     selectedUser: UserResponse | null;
@@ -96,13 +96,11 @@ export function UserDetailModal({
                             <div className="grid grid-cols-2 gap-4">
                                 <div>
                                     <label className="text-sm font-medium text-slate-500">Role</label>
-                                    <Badge variant="outline" className={cn("mt-1 font-medium", getRoleColor(selectedUser.role))}>{selectedUser.role}</Badge>
+                                    <UserRoleTag role={selectedUser.role as any} />
                                 </div>
                                 <div>
                                     <label className="text-sm font-medium text-slate-500">Status</label>
-                                    <Badge variant="outline" className={cn("mt-1 font-medium", getStatusColor(selectedUser.is_active ? "active" : "suspended"))}>
-                                        {selectedUser.is_active ? "Active" : "Inactive"}
-                                    </Badge>
+                                    <UserStatusTag active={selectedUser.is_active} />
                                 </div>
                             </div>
                             <div className="grid grid-cols-2 gap-4">

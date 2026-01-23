@@ -11,8 +11,8 @@ export interface ApplicationStatusTagProps extends React.HTMLAttributes<HTMLSpan
 
 const statusConfig: Record<ApplicationStatus, { label: string; colorScheme: ColorScheme }> = {
     PENDING: { label: "Pending", colorScheme: "warning" },
-    APPROVED: { label: "Approved", colorScheme: "success" },
-    REJECTED: { label: "Rejected", colorScheme: "error" },
+    APPROVED: { label: "Approved", colorScheme: "emerald" },
+    REJECTED: { label: "Rejected", colorScheme: "rose" },
 };
 
 export function ApplicationStatusTag({ status, size, className, ...props }: ApplicationStatusTagProps) {

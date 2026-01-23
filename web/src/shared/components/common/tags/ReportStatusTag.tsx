@@ -10,9 +10,9 @@ export interface ReportStatusTagProps extends React.HTMLAttributes<HTMLSpanEleme
 }
 
 const statusConfig: Record<ReportStatus, { label: string; colorScheme: ColorScheme }> = {
-    SUBMITTED: { label: "Submitted", colorScheme: "info" },
+    SUBMITTED: { label: "Submitted", colorScheme: "blue" },
     UNDER_REVIEW: { label: "Under Review", colorScheme: "warning" },
-    RESOLVED: { label: "Resolved", colorScheme: "success" },
+    RESOLVED: { label: "Resolved", colorScheme: "emerald" },
     DISMISSED: { label: "Dismissed", colorScheme: "neutral" },
 };
 

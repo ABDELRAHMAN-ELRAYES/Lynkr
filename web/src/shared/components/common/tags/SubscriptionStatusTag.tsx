@@ -11,9 +11,9 @@ export interface SubscriptionStatusTagProps extends React.HTMLAttributes<HTMLSpa
 
 const statusConfig: Record<SubscriptionStatus, { label: string; colorScheme: ColorScheme }> = {
     PENDING: { label: "Pending", colorScheme: "warning" },
-    ACTIVE: { label: "Active", colorScheme: "success" },
+    ACTIVE: { label: "Active", colorScheme: "emerald" },
     EXPIRED: { label: "Expired", colorScheme: "neutral" },
-    CANCELLED: { label: "Cancelled", colorScheme: "error" },
+    CANCELLED: { label: "Cancelled", colorScheme: "rose" },
 };
 
 export function SubscriptionStatusTag({ status, size, className, ...props }: SubscriptionStatusTagProps) {

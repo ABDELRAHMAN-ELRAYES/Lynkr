@@ -10,11 +10,11 @@ export interface SessionStatusTagProps extends React.HTMLAttributes<HTMLSpanElem
 }
 
 const statusConfig: Record<SessionStatus, { label: string; colorScheme: ColorScheme }> = {
-    SCHEDULED: { label: "Scheduled", colorScheme: "info" },
+    SCHEDULED: { label: "Scheduled", colorScheme: "blue" },
     IN_PROGRESS: { label: "In Progress", colorScheme: "warning" },
-    COMPLETED: { label: "Completed", colorScheme: "success" },
-    CANCELLED: { label: "Cancelled", colorScheme: "error" },
-    NO_SHOW: { label: "No Show", colorScheme: "neutral" },
+    COMPLETED: { label: "Completed", colorScheme: "emerald" },
+    CANCELLED: { label: "Cancelled", colorScheme: "rose" },
+    NO_SHOW: { label: "No Show", colorScheme: "pink" },
 };
 
 export function SessionStatusTag({ status, size, className, ...props }: SessionStatusTagProps) {

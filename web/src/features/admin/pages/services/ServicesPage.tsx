@@ -1,9 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Plus, Grid, List, Search, Loader2, Trash2, X, Eye } from "lucide-react";
+import { Plus, Grid, List, Search, Loader2, Trash2, Eye } from "lucide-react";
 import { useToast } from "@/shared/components/ui/use-toast";
-import { serviceService, Service, Skill } from "@/shared/services";
+import { serviceService, Service } from "@/shared/services";
 import Button from "@/shared/components/ui/Button";
 import { Input } from "@/shared/components/ui/input";
 import {
@@ -13,7 +13,7 @@ import {
     CardHeader,
     CardTitle,
 } from "@/shared/components/ui/card";
-import { Badge } from "@/shared/components/ui/badge";
+import { ActiveStatusTag, StatusTag } from "@/shared/components/common/tags";
 import {
     Dialog,
     DialogContent,
@@ -277,15 +277,7 @@ export default function ServicesPage() {
                             <CardHeader className="pb-3">
                                 <div className="flex items-start justify-between">
                                     <CardTitle className="text-lg text-slate-800">{service.name}</CardTitle>
-                                    <Badge
-                                        variant={service.isActive ? "default" : "secondary"}
-                                        className={cn(
-                                            "rounded-full",
-                                            service.isActive ? "bg-emerald-100 text-emerald-700" : "bg-slate-200 text-slate-600"
-                                        )}
-                                    >
-                                        {service.isActive ? "Active" : "Inactive"}
-                                    </Badge>
+                                    <ActiveStatusTag active={service.isActive} />
                                 </div>
                                 {service.description && (
                                     <CardDescription className="line-clamp-2">{service.description}</CardDescription>
@@ -298,18 +290,18 @@ export default function ServicesPage() {
                                     </p>
                                     <div className="flex flex-wrap gap-1.5">
                                         {service.skills?.slice(0, 5).map((skill) => (
-                                            <Badge key={skill.id} variant="outline" className="rounded-lg text-xs bg-[#7682e8] text-white">
+                                            <StatusTag key={skill.id} colorScheme="primary" className="text-xs">
                                                 {skill.name}
-                                            </Badge>
+                                            </StatusTag>
                                         ))}
                                         {(service.skills?.length || 0) > 5 && (
-                                            <Badge
-                                                variant="outline"
-                                                className="rounded-lg text-xs cursor-pointer hover:bg-slate-100"
+                                            <StatusTag
+                                                colorScheme="neutral"
+                                                className="text-xs cursor-pointer hover:bg-slate-100"
                                                 onClick={() => openViewSkillsModal(service)}
                                             >
                                                 +{(service.skills?.length || 0) - 5} more
-                                            </Badge>
+                                            </StatusTag>
                                         )}
                                         {(service.skills?.length || 0) > 0 && (
                                             <Button
@@ -384,24 +376,16 @@ export default function ServicesPage() {
                                         {service.description || "-"}
                                     </TableCell>
                                     <TableCell className="p-4">
-                                        <Badge
-                                            variant="secondary"
-                                            className="rounded-lg cursor-pointer hover:bg-slate-200"
+                                        <StatusTag
+                                            colorScheme="neutral"
+                                            className="cursor-pointer hover:bg-slate-200"
                                             onClick={() => openViewSkillsModal(service)}
                                         >
                                             {service.skills?.length || 0} skills
-                                        </Badge>
+                                        </StatusTag>
                                     </TableCell>
                                     <TableCell className="p-4">
-                                        <Badge
-                                            variant={service.isActive ? "default" : "secondary"}
-                                            className={cn(
-                                                "rounded-full",
-                                                service.isActive ? "bg-emerald-100 text-emerald-700" : "bg-slate-200 text-slate-600"
-                                            )}
-                                        >
-                                            {service.isActive ? "Active" : "Inactive"}
-                                        </Badge>
+                                        <ActiveStatusTag active={service.isActive} />
                                     </TableCell>
                                     <TableCell className="p-4 text-right">
                                         <div className="flex items-center justify-end gap-2">
@@ -543,11 +527,11 @@ export default function ServicesPage() {
                                     className="flex items-center justify-between p-3 rounded-xl bg-slate-50 hover:bg-slate-100"
                                 >
                                     <div className="flex items-center gap-2">
-                                        <Badge variant="outline" className="rounded-lg bg-[#7682e8] text-white">
+                                        <StatusTag colorScheme="primary">
                                             {skill.name}
-                                        </Badge>
+                                        </StatusTag>
                                         {!skill.isActive && (
-                                            <Badge variant="secondary" className="text-xs">Inactive</Badge>
+                                            <ActiveStatusTag active={false} size="sm" />
                                         )}
                                     </div>
                                     <Button

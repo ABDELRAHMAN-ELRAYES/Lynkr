@@ -10,10 +10,10 @@ export interface PaymentTypeTagProps extends React.HTMLAttributes<HTMLSpanElemen
 }
 
 const typeConfig: Record<PaymentType, { label: string; colorScheme: ColorScheme }> = {
-    FULL: { label: "Full", colorScheme: "success" },
-    INITIAL: { label: "Initial", colorScheme: "info" },
+    FULL: { label: "Full", colorScheme: "teal" },
+    INITIAL: { label: "Initial", colorScheme: "blue" },
     FINAL: { label: "Final", colorScheme: "emerald" },
-    SESSION: { label: "Session", colorScheme: "purple" },
+    SESSION: { label: "Session", colorScheme: "violet" },
 };
 
 export function PaymentTypeTag({ type, size, className, ...props }: PaymentTypeTagProps) {

@@ -17,12 +17,12 @@ export interface NotificationTypeTagProps extends React.HTMLAttributes<HTMLSpanE
 }
 
 const typeConfig: Record<NotificationType, { label: string; colorScheme: ColorScheme }> = {
-    MESSAGE: { label: "Message", colorScheme: "info" },
-    PROPOSAL: { label: "Proposal", colorScheme: "purple" },
-    PROJECT: { label: "Project", colorScheme: "success" },
+    MESSAGE: { label: "Message", colorScheme: "blue" },
+    PROPOSAL: { label: "Proposal", colorScheme: "violet" },
+    PROJECT: { label: "Project", colorScheme: "teal" },
     PAYMENT: { label: "Payment", colorScheme: "emerald" },
-    REVIEW: { label: "Review", colorScheme: "warning" },
-    SESSION: { label: "Session", colorScheme: "cyan" },
+    REVIEW: { label: "Review", colorScheme: "orange" },
+    SESSION: { label: "Session", colorScheme: "sky" },
     SYSTEM: { label: "System", colorScheme: "neutral" },
 };
 

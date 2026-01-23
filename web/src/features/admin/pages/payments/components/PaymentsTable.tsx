@@ -8,8 +8,8 @@ import {
     MoreHorizontal,
     RefreshCcw,
 } from "lucide-react";
-import { Avatar, AvatarFallback } from "@/shared/components/ui/avatar";
-import { Badge } from "@/shared/components/ui/badge";
+import { Avatar, AvatarFallback, AvatarImage } from "@/shared/components/ui/avatar";
+import { PaymentStatusTag } from "@/shared/components/common/tags";
 import Button from "@/shared/components/ui/Button";
 import {
     Card,
@@ -35,7 +35,7 @@ import {
 } from "@/shared/components/ui/table";
 import { cn } from "@/shared/lib/utils";
 import { Payment } from "@/shared/types/payment";
-import { getPaymentStatusColor } from "@/features/admin/utils/adminUtils";
+// import { getPaymentStatusColor } from "@/features/admin/utils/adminUtils";
 
 interface PaymentsTableProps {
     filteredPayments: Payment[];
@@ -94,9 +94,7 @@ export function PaymentsTable({
                                     </div>
                                 </TableCell>
                                 <TableCell className="p-4">
-                                    <Badge variant="outline" className={cn("rounded-xl font-medium", getPaymentStatusColor(payment.status))}>
-                                        {payment.status}
-                                    </Badge>
+                                    <PaymentStatusTag status={payment.status as any} />
                                 </TableCell>
                                 <TableCell className="p-4">
                                     <div className="flex items-center gap-1 text-sm text-slate-600">

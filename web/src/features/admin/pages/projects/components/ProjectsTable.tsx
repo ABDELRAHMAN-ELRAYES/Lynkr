@@ -2,14 +2,13 @@
 
 import {
     Calendar,
-    Clock,
     Edit,
     Eye,
     MessageSquare,
     MoreHorizontal,
 } from "lucide-react";
-import { Avatar, AvatarFallback, AvatarImage } from "@/shared/components/ui/avatar";
-import { Badge } from "@/shared/components/ui/badge";
+import { Avatar, AvatarFallback } from "@/shared/components/ui/avatar";
+import { ProjectStatusTag, StatusTag } from "@/shared/components/common/tags";
 import Button from "@/shared/components/ui/Button";
 import {
     Card,
@@ -35,7 +34,6 @@ import {
 } from "@/shared/components/ui/table";
 import { cn } from "@/shared/lib/utils";
 import { ActiveProject } from "@/shared/types/project";
-import { getPriorityColor } from "@/features/admin/utils/adminUtils";
 
 interface ProjectsTableProps {
     projects: ActiveProject[];
@@ -50,16 +48,6 @@ export function ProjectsTable({ projects }: ProjectsTableProps) {
         (currentPage - 1) * itemsPerPage,
         currentPage * itemsPerPage
     );
-
-    const getStatusColor = (status: string) => {
-        switch (status) {
-            case "active": return "bg-blue-50 text-blue-700 border-blue-200";
-            case "completed": return "bg-emerald-50 text-emerald-700 border-emerald-200";
-            case "on_hold": return "bg-amber-50 text-amber-700 border-amber-200";
-            case "cancelled": return "bg-rose-50 text-rose-700 border-rose-200";
-            default: return "bg-slate-100 text-slate-700 border-slate-200";
-        }
-    };
 
     return (
         <Card className="rounded-3xl border border-slate-200/80 bg-white shadow-sm">
@@ -93,9 +81,14 @@ export function ProjectsTable({ projects }: ProjectsTableProps) {
                                     </div>
                                 </TableCell>
                                 <TableCell className="p-4">
-                                    <Badge variant="outline" className={cn("rounded-xl font-medium", getStatusColor(project.status))}>
-                                        {project.status.replace("_", " ")}
-                                    </Badge>
+                                    <ProjectStatusTag
+                                        status={
+                                            (project.status as string) === "active" ? "IN_PROGRESS" :
+                                                (project.status as string) === "completed" ? "COMPLETED" :
+                                                    (project.status as string) === "on_hold" ? "PENDING_PAYMENT" :
+                                                        (project.status as string) === "cancelled" ? "CANCELLED" : "IN_PROGRESS"
+                                        }
+                                    />
                                 </TableCell>
                                 <TableCell className="p-4 min-w-[150px]">
                                     <div className="space-y-1">
@@ -112,9 +105,14 @@ export function ProjectsTable({ projects }: ProjectsTableProps) {
                                     </div>
                                 </TableCell>
                                 <TableCell className="p-4">
-                                    <Badge className={cn("rounded-xl font-medium", getPriorityColor(project.priority))}>
+                                    <StatusTag
+                                        colorScheme={
+                                            project.priority.toLowerCase() === 'high' ? 'error' :
+                                                project.priority.toLowerCase() === 'medium' ? 'warning' : 'success'
+                                        }
+                                    >
                                         {project.priority}
-                                    </Badge>
+                                    </StatusTag>
                                 </TableCell>
                                 <TableCell className="p-4 text-right">
                                     <DropdownMenu>

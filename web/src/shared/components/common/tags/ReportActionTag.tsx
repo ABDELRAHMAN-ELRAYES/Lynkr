@@ -10,10 +10,10 @@ export interface ReportActionTagProps extends React.HTMLAttributes<HTMLSpanEleme
 }
 
 const actionConfig: Record<ReportAction, { label: string; colorScheme: ColorScheme }> = {
-    STATUS_CHANGE: { label: "Status Change", colorScheme: "info" },
+    STATUS_CHANGE: { label: "Status Change", colorScheme: "blue" },
     WARNING: { label: "Warning", colorScheme: "warning" },
     SUSPEND: { label: "Suspend", colorScheme: "orange" },
-    BAN: { label: "Ban", colorScheme: "error" },
+    BAN: { label: "Ban", colorScheme: "rose" },
 };
 
 export function ReportActionTag({ action, size, className, ...props }: ReportActionTagProps) {

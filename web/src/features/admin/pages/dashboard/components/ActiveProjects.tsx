@@ -8,11 +8,10 @@ import {
     CardHeader,
     CardTitle,
 } from "@/shared/components/ui/card";
-import { Badge } from "@/shared/components/ui/badge";
+import { ProjectStatusTag, StatusTag } from "@/shared/components/common/tags";
 import { Progress } from "@/shared/components/ui/progress";
 import { cn } from "@/shared/lib/utils";
 import { activeProjects } from "@/features/admin/data/mockData";
-import { getPriorityColor } from "@/features/admin/utils/adminUtils";
 
 export function ActiveProjects() {
     return (
@@ -26,9 +25,9 @@ export function ActiveProjects() {
                         Projects currently in progress
                     </CardDescription>
                 </div>
-                <Badge variant="outline" className="rounded-xl border-slate-300">
+                <StatusTag colorScheme="neutral">
                     {activeProjects.length} Active
-                </Badge>
+                </StatusTag>
             </CardHeader>
             <CardContent>
                 <div className="space-y-4">
@@ -45,14 +44,14 @@ export function ActiveProjects() {
                                     <p className="text-sm font-medium text-slate-800 truncate">
                                         {project.name}
                                     </p>
-                                    <Badge
-                                        className={cn(
-                                            "rounded-xl font-medium",
-                                            getPriorityColor(project.priority)
-                                        )}
+                                    <StatusTag
+                                        colorScheme={
+                                            project.priority.toLowerCase() === 'high' ? 'error' :
+                                                project.priority.toLowerCase() === 'medium' ? 'warning' : 'success'
+                                        }
                                     >
                                         {project.priority}
-                                    </Badge>
+                                    </StatusTag>
                                 </div>
                                 <p className="text-xs text-slate-500 mt-1">
                                     {project.client}
