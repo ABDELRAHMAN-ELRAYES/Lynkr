@@ -149,6 +149,23 @@ shared/components/RequestCard.tsx
 features/auth/components/Button.tsx
 ```
 
+### 3.4 Status Tags & Badges Usage (MANDATORY)
+
+- **ALWAYS use centralized tag components** from `@/shared/components/common/tags`.
+- **NEVER create inline badges** or new tag components inside feature directories.
+- **IF a required tag is missing**, you MUST create it in `shared/components/common/tags` first, then import and use it.
+
+```tsx
+// ✅ CORRECT
+import { ProjectStatusTag } from '@/shared/components/common/tags';
+<ProjectStatusTag status={project.status} />
+
+// ❌ WRONG
+<span className="bg-green-100 text-green-800 px-2 py-1 rounded">
+  {project.status}
+</span>
+```
+
 ---
 
 ## 4. TypeScript Rules (CRITICAL)
