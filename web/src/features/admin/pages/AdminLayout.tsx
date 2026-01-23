@@ -36,7 +36,7 @@ import {
 } from "@/shared/components/ui/dropdown-menu";
 import { cn } from "@/shared/lib/utils";
 import { useToast } from "@/shared/components/ui/use-toast";
-import { userService } from "@/shared/services";
+import { userService, authService } from "@/shared/services";
 import { profileService } from "@/shared/services";
 import { UserResponse } from "@/shared/types/user";
 import { ProfileRequestWithFullData } from "@/shared/types/profile";
@@ -176,6 +176,23 @@ export default function AdminLayout() {
         setMobileMenuOpen(false);
     };
 
+    const handleLogout = async () => {
+        try {
+            await authService.logout();
+            toast({
+                title: "Logged out",
+                description: "You have been successfully logged out.",
+            });
+            navigate("/login");
+        } catch (error) {
+            toast({
+                title: "Error",
+                description: "Failed to logout. Please try again.",
+                variant: "destructive",
+            });
+        }
+    };
+
     // Sidebar component
     const renderSidebar = (isMobile: boolean) => (
         <div className="flex h-full flex-col">
@@ -263,7 +280,10 @@ export default function AdminLayout() {
                             Super
                         </Badge>
                     </button>
-                    <button className="flex w-full items-center gap-3 rounded-2xl px-3 py-2 text-sm font-medium hover:bg-rose-50 text-rose-600">
+                    <button
+                        className="flex w-full items-center gap-3 rounded-2xl px-3 py-2 text-sm font-medium hover:bg-rose-50 text-rose-600"
+                        onClick={handleLogout}
+                    >
                         <LogOut className="h-5 w-5" />
                         <span>Logout</span>
                     </button>
@@ -440,7 +460,10 @@ export default function AdminLayout() {
                                             Settings
                                         </DropdownMenuItem>
                                         <DropdownMenuSeparator />
-                                        <DropdownMenuItem className="text-rose-600 focus:bg-rose-50 focus:text-rose-700">
+                                        <DropdownMenuItem
+                                            className="text-rose-600 focus:bg-rose-50 focus:text-rose-700 cursor-pointer"
+                                            onClick={handleLogout}
+                                        >
                                             <LogOut className="mr-2 h-4 w-4" />
                                             Logout
                                         </DropdownMenuItem>

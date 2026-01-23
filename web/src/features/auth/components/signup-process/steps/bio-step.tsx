@@ -78,6 +78,7 @@ export default function BioStep({
           bio: bio,
           hourlyRate: parseFloat(formData.hourlyRate) || 0,
           skills: formData.skills.join(', '),
+          serviceId: formData.serviceId, // UUID for service relation
           serviceType: formData.serviceType,
         },
         educations,

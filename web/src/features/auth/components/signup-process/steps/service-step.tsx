@@ -19,9 +19,12 @@ export default function ServiceTypeStep({
   const [services, setServices] = useState<
     {
       id: string;
-      service_name: string;
-      service_description: string;
-      service_type: string;
+      name: string;
+      description: string;
+      service_type: string; // This might also be just 'name' or derived from it?
+      // Looking at the code, service_type is used for icon mapping.
+      // The backend doesn't seem to have service_type, just name.
+      // We might need to map name to icon logic.
     }[]
   >([]);
 
@@ -40,7 +43,11 @@ export default function ServiceTypeStep({
       url: "/services",
       options: { method: "GET" },
     })
-      .then((res) => setServices(res))
+      .then((res) => {
+        // Handle various response structures
+        const servicesData = res?.data?.services || res?.services || res?.data || res || [];
+        setServices(Array.isArray(servicesData) ? servicesData : []);
+      })
       .catch(() => { });
   }, []);
 
@@ -55,14 +62,20 @@ export default function ServiceTypeStep({
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
         {services.map((service) => {
-          const Icon = icons[service.service_type as keyof typeof icons] ?? Briefcase;
+          // Basic mapping logic for icons based on name since we don't have service_type
+          let typeKey = "ENGINEERING";
+          if (service.name.toUpperCase().includes("WRIT")) typeKey = "WRITING";
+          if (service.name.toUpperCase().includes("TUTOR") || service.name.toUpperCase().includes("TEACH")) typeKey = "TUTORING";
+
+          const Icon = icons[typeKey as keyof typeof icons] ?? Briefcase;
+
           return (
             <button
               key={service.id}
-              onClick={() => handleSelect(service.id, service.service_type as ServiceTypes)}
+              onClick={() => handleSelect(service.id, service.name.toUpperCase() as ServiceTypes)}
               className={`p-6 border-2 rounded-lg text-left transition-all hover:border-[#768de8] ${serviceId === service.id
-                ? "border-[#7682e8] bg-[#ccd0f59d]"
-                : "border-gray-200"
+                  ? "border-[#7682e8] bg-[#ccd0f59d]"
+                  : "border-gray-200"
                 }`}
             >
               <Icon
@@ -70,10 +83,10 @@ export default function ServiceTypeStep({
                   }`}
               />
               <h3 className="font-semibold text-lg mb-2">
-                {service.service_name}
+                {service.name}
               </h3>
               <p className="text-sm text-gray-600">
-                {service.service_description}
+                {service.description}
               </p>
             </button>
           );

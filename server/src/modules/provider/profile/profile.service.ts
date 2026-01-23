@@ -46,7 +46,7 @@ class ProfileService {
                 title: data.title,
                 bio: data.bio,
                 hourlyRate: data.hourlyRate,
-                serviceId: data.serviceType, // Now using serviceId directly
+                serviceId: data.serviceId || data.serviceType, // Use serviceId if provided, fallback to serviceType
                 skills: data.skills?.map(name => ({ skillName: name })),
                 experiences,
                 education,

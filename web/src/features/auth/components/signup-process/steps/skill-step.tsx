@@ -14,48 +14,11 @@ interface SkillsStepProps {
 
 interface FetchedSkill {
   id: string;
-  skill_name: string;
+  name: string;
   skill_description?: string;
 }
 
-const skillsByService = {
-  ENGINEERING: [
-    "Mechanical Design",
-    "CAD/CAM",
-    "Structural Analysis",
-    "Electrical Engineering",
-    "Civil Engineering",
-    "AutoCAD",
-    "SolidWorks",
-    "MATLAB",
-    "Project Management",
-    "Technical Documentation",
-  ],
-  WRITING: [
-    "Research Writing",
-    "Literature Review",
-    "Data Analysis",
-    "Academic Editing",
-    "Citation Management",
-    "Thesis Writing",
-    "Statistical Analysis",
-    "Academic Publishing",
-    "Proofreading",
-    "Content Writing",
-  ],
-  TUTORING: [
-    "Mathematics",
-    "Physics",
-    "Chemistry",
-    "Biology",
-    "English",
-    "Computer Science",
-    "Programming",
-    "Test Preparation",
-    "Curriculum Development",
-    "Online Teaching",
-  ],
-};
+
 
 export default function SkillsStep({
   skills,
@@ -68,11 +31,10 @@ export default function SkillsStep({
   const [fetchedSkills, setFetchedSkills] = useState<FetchedSkill[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Use fetched skills if available, otherwise fallback to demo data
   const availableSkills =
     fetchedSkills.length > 0
-      ? fetchedSkills.map((s) => s.skill_name)
-      : skillsByService[serviceId as keyof typeof skillsByService] || [];
+      ? fetchedSkills.map((s) => s.name)
+      : [];
 
   const toggleSkill = (skill: string) => {
     if (skills.includes(skill)) {
@@ -94,14 +56,19 @@ export default function SkillsStep({
   };
 
   useEffect(() => {
+    if (!serviceId) return;
+
     setIsLoading(true);
     apiClient({
       url: `/services/${serviceId}/skills`,
       options: { method: "GET" },
     })
       .then((res: any) => {
-        if (Array.isArray(res) && res.length > 0) {
-          setFetchedSkills(res);
+        // Handle various response structures
+        const skillsData = res?.data?.skills || res?.skills || res?.data || res || [];
+
+        if (Array.isArray(skillsData) && skillsData.length > 0) {
+          setFetchedSkills(skillsData);
         }
       })
       .catch(() => { })
@@ -154,8 +121,8 @@ export default function SkillsStep({
               onClick={() => toggleSkill(skill)}
               disabled={isLoading}
               className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${skills.includes(skill)
-                  ? "bg-[#768de8] text-white"
-                  : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                ? "bg-[#768de8] text-white"
+                : "bg-gray-100 text-gray-700 hover:bg-gray-200"
                 } ${isLoading ? "opacity-50 cursor-not-allowed" : ""}`}
             >
               {skill}

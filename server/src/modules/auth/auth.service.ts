@@ -275,6 +275,30 @@ class AuthenticationService {
         return user;
     }
 
+    // Verify OTP without completing registration (for early validation)
+    static async verifyOtp(
+        hashedOtp: string,
+        enteredOtp: string,
+        expiresIn: string,
+        next: NextFunction
+    ) {
+        // Check if expired
+        const isExpired = Date.now() > Date.parse(expiresIn);
+        if (isExpired) {
+            return next(
+                new AppError(401, "OTP has expired. Please request a new code.")
+            );
+        }
+
+        // Verify the hashed OTP with the entered one
+        const isVerified = await compare(enteredOtp, hashedOtp);
+        if (!isVerified) {
+            return next(new AppError(400, "Invalid verification code"));
+        }
+
+        return { verified: true };
+    }
+
     static async logout() {
         return;
     }

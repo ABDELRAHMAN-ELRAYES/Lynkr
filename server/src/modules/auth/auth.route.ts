@@ -8,6 +8,7 @@ import {
     registerVerification,
     forgetPassword,
     protect,
+    verifyOtp,
 } from "./auth.controller";
 import passport, { GoogleAuthResult } from "../../config/passport";
 import config from "../../config/config";
@@ -18,6 +19,7 @@ const AuthRouter = Router();
 AuthRouter.route("/login").post(login);
 AuthRouter.route("/register").post(register);
 AuthRouter.route("/register-verification").post(registerVerification);
+AuthRouter.route("/verify-otp").post(verifyOtp);
 AuthRouter.route("/forget-password").post(forgetPassword);
 AuthRouter.route("/reset-password").post(resetPassword);
 AuthRouter.route("/logout").post(logout);

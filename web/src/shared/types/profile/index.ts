@@ -50,6 +50,7 @@ export interface CreateFullProfileRequest {
         bio: string;
         hourlyRate?: number;
         skills?: string;
+        serviceId?: string;
         serviceType?: string;
     };
     educations?: {

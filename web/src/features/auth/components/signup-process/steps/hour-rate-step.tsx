@@ -16,7 +16,7 @@ export default function HourlyRateStep({
   onNext,
   onBack,
 }: HourlyRateStepProps) {
-  const [commissionRate, setCommissionRate] = useState(15);
+  const [commissionRate, setCommissionRate] = useState(15); // Default 15%
   const [rate, setRate] = useState(0);
   const [youllGet, setYoullGet] = useState(0);
 
@@ -26,12 +26,22 @@ export default function HourlyRateStep({
     setRate(newRate);
     setYoullGet(newRate - newRate * (commissionRate / 100));
   };
+
   useEffect(() => {
-    apiClient({ url: "/settings", options: { method: "GET" } }).then(
-      (response) => {
-        setCommissionRate(response.commission_rate);
-      }
-    );
+    // Try to fetch commission rate from settings, use default if fails
+    apiClient({ url: "/settings", options: { method: "GET" } })
+      .then((response) => {
+        if (response?.data?.settings?.commission_rate) {
+          setCommissionRate(response.data.settings.commission_rate);
+        } else if (response?.commission_rate) {
+          setCommissionRate(response.commission_rate);
+        }
+        // Otherwise keep the default 15%
+      })
+      .catch(() => {
+        // Settings not available, use default 15%
+        console.log("Using default commission rate of 15%");
+      });
   }, []);
   return (
     <div className="bg-white rounded-lg shadow-sm p-8">

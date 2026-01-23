@@ -183,6 +183,36 @@ export const authService = {
     },
 
     /**
+     * Verify OTP without completing registration
+     */
+    verifyOtp: async (hashedOtp: string, enteredOtp: string, expiresIn: string): Promise<{
+        success: boolean;
+        message: string;
+    }> => {
+        try {
+            const data = await apiClient({
+                url: '/auth/verify-otp',
+                options: {
+                    method: 'POST',
+                    body: JSON.stringify({ hashedOtp, enteredOtp, expiresIn }),
+                },
+                skipErrorToast: true,
+            });
+
+            return {
+                success: true,
+                message: data.message || 'OTP verified successfully',
+            };
+        } catch (error: unknown) {
+            const err = error as { message?: string; response?: { data?: { message?: string } } };
+            return {
+                success: false,
+                message: err.response?.data?.message || err.message || 'Invalid verification code',
+            };
+        }
+    },
+
+    /**
      * Logout the current user
      */
     logout: async (): Promise<LogoutResponse> => {

@@ -7,22 +7,83 @@ import { SortBy, SortOrder } from "./types/ISearch";
 
 /**
  * Create Provider Profile
+ * Handles both flat structure and nested frontend structure
  */
 export const createProviderProfile = catchAsync(
     async (request: Request, response: Response, next: NextFunction) => {
         const user = request.user as IUser;
-        const data: ICreateProfileData = { ...request.body, userId: user.id };
+        const body = request.body;
 
-        const profile = await ProfileService.createProviderProfile(user.id, data, next);
-        if (!profile) return;
+        // Transform frontend nested structure to backend flat structure
+        // Frontend sends: { profile: {...}, educations: { profileEducations: [...] }, ... }
+        // Backend expects: { title, bio, hourlyRate, skills: [...], experiences: [...], ... }
+
+        let transformedData: ICreateProfileData;
+
+        if (body.profile) {
+            // Frontend nested structure
+            const profile = body.profile;
+
+            // Parse skills from comma-separated string to array
+            const skillsArray = profile.skills
+                ? profile.skills.split(',').map((s: string) => s.trim()).filter((s: string) => s)
+                : [];
+
+            // Transform education data
+            const educationData = body.educations?.profileEducations?.map((edu: any) => ({
+                school: edu.school,
+                degree: edu.degree,
+                fieldOfStudy: edu.fieldOfStudy,
+                startDate: edu.startDate,
+                endDate: edu.endDate,
+                description: edu.description,
+            })) || [];
+
+            // Transform experience data
+            const experienceData = body.workHistories?.profileWorkHistories?.map((exp: any) => ({
+                title: exp.title,
+                company: exp.company,
+                location: exp.location || '',
+                country: exp.country || '',
+                startDate: exp.startDate,
+                endDate: exp.endDate,
+                description: exp.description,
+            })) || [];
+
+            // Transform language data
+            const languageData = body.languages?.profileLanguages?.map((lang: any) => ({
+                language: lang.language,
+                proficiency: lang.proficiency,
+            })) || [];
+
+            transformedData = {
+                userId: user.id,
+                title: profile.title,
+                bio: profile.bio,
+                hourlyRate: parseFloat(profile.hourlyRate) || 0,
+                serviceId: profile.serviceId, // UUID for service relation
+                serviceType: profile.serviceType,
+                skills: skillsArray,
+                experiences: experienceData,
+                education: educationData,
+                languages: languageData,
+            };
+        } else {
+            // Already flat structure
+            transformedData = { ...body, userId: user.id };
+        }
+
+        const createdProfile = await ProfileService.createProviderProfile(user.id, transformedData, next);
+        if (!createdProfile) return;
 
         response.status(201).json({
             status: "success",
             message: "Provider profile created successfully",
-            data: { profile },
+            data: { profile: createdProfile },
         });
     }
 );
+
 
 /**
  * Get Provider Profile by User ID

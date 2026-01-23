@@ -9,14 +9,17 @@ import { protect, checkPermissions } from "../auth/auth.controller";
 
 const SettingsRouter = Router();
 
-// All settings routes require admin access
-SettingsRouter.use(protect, checkPermissions([UserRole.ADMIN, UserRole.SUPER_ADMIN]));
+// Public route - anyone can read settings (e.g., commission rate)
+SettingsRouter.get("/", getAllSettings);
+SettingsRouter.get("/:id", getSetting);
 
-SettingsRouter.route("/")
-    .get(getAllSettings);
-
-SettingsRouter.route("/:id")
-    .get(getSetting)
-    .put(updateSetting);
+// Admin-only routes for updating settings
+SettingsRouter.put(
+    "/:id",
+    protect,
+    checkPermissions([UserRole.ADMIN, UserRole.SUPER_ADMIN]),
+    updateSetting
+);
 
 export default SettingsRouter;
+

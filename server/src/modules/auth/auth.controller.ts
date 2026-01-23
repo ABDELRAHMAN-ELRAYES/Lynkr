@@ -12,6 +12,35 @@ import { getRolePrivileges, getRoleAllowedTabs } from "../../config/rbac";
 import { attachAuthCookie } from "../../utils/jwt";
 import { AuthMiddleware } from "../../middlewares/auth.middleware";
 
+// Verify OTP without completing registration
+export const verifyOtp = catchAsync(
+  async (request: Request, response: Response, next: NextFunction) => {
+    const { hashedOtp, enteredOtp, expiresIn } = request.body;
+
+    if (!hashedOtp || !enteredOtp || !expiresIn) {
+      return response.status(400).json({
+        status: "fail",
+        message: "Missing required OTP data",
+      });
+    }
+
+    const result = await AuthenticationService.verifyOtp(
+      hashedOtp,
+      enteredOtp,
+      expiresIn,
+      next
+    );
+
+    if (!result) return;
+
+    response.status(200).json({
+      status: "success",
+      message: "OTP verified successfully",
+      data: result,
+    });
+  }
+);
+
 export const login = catchAsync(async (request: Request, response: Response, next: NextFunction) => {
   const data = await AuthenticationService.login(request.body, next);
   if (!data) return;

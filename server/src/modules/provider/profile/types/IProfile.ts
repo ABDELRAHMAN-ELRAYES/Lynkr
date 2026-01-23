@@ -21,6 +21,7 @@ export interface ICreateProfileData {
     title?: string;
     bio?: string;
     hourlyRate?: number;
+    serviceId?: string; // UUID for service relation
     serviceType?: string;
     skills?: string[]; // Array of skill names
     experiences?: ICreateExperienceData[];

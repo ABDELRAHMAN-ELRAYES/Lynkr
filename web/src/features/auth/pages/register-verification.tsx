@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import { Mail, AlertCircle, Loader2, RefreshCw } from "lucide-react";
 import { useAuth } from "@/shared/hooks/use-auth";
+import { authService } from "@/shared/services";
 import { LoadingModal } from "@/shared/components/common/loading-modal";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
@@ -153,11 +154,28 @@ export default function OTPVerificationPage() {
     setError("");
 
     try {
-      // Store the entered OTP and mark account as verified
-      // The actual OTP comparison happens on the backend via compare()
+      // Call backend to verify OTP
+      const result = await authService.verifyOtp(
+        otpData.code,
+        codeToVerify,
+        otpData.expiresIn
+      );
+
+      if (!result.success) {
+        setError(result.message || "Invalid verification code. Please try again.");
+        toast.error(result.message || "Invalid verification code. Please try again.");
+        setOtp(["", "", "", "", "", ""]);
+        setTimeout(() => {
+          inputRefs.current[0]?.focus();
+        }, 100);
+        setIsLoading(false);
+        return;
+      }
+
+      // OTP is verified - store it and proceed
       verifyAccount(codeToVerify);
       toast.success(
-        "Verified, You are being Redirected To Complete the registration process",
+        "Verified! You are being redirected to complete the registration process",
         {
           style: {
             background: "#ffffff",

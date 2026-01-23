@@ -102,6 +102,7 @@ app.use(
 app.use("/api/auth", authLimiter, AuthRouter);
 app.use("/api/users", UserRouter);
 app.use("/api/profiles", ProfileRouter);
+app.use("/api/providers", ProfileRouter); 
 app.use("/api/payments", PaymentRouter);
 app.use("/api/services", ServiceRouter);
 app.use("/api/subscriptions", SubscriptionRouter);

@@ -231,7 +231,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       });
 
       if (response.success && response.data) {
-        const userData = response.data;
+        // The backend returns { user: {...}, token, isVerified }
+        const userData = response.data.user || response.data;
         setUser({
           id: userData.id,
           role: userData.role as UserRole,
@@ -239,7 +240,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           lastName: userData.last_name || userData.lastName,
           email: userData.email,
           country: userData.country,
-          isActive: userData.is_active ?? true,
+          isActive: userData.is_active ?? userData.active ?? true,
         });
         setIsAuthenticated(true);
         return {

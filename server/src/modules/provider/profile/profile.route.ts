@@ -21,17 +21,26 @@ ProfileRouter.get("/search", searchProviderProfiles);
 ProfileRouter.get("/:id", getProviderProfileById);
 
 // Protected routes - Providers can manage their own profiles
+// Note: Supporting both PROVIDER_PENDING (backend enum) and PENDING_PROVIDER (frontend sends)
 ProfileRouter.post(
     "/",
     protect,
-    checkPermissions([UserRole.PROVIDER_PENDING, UserRole.PROVIDER_APPROVED]),
+    checkPermissions([UserRole.PROVIDER_PENDING, UserRole.PROVIDER_APPROVED, UserRole.PENDING_PROVIDER]),
+    createProviderProfile
+);
+
+// /full route - alias for profile creation used by frontend during onboarding
+ProfileRouter.post(
+    "/full",
+    protect,
+    checkPermissions([UserRole.PROVIDER_PENDING, UserRole.PROVIDER_APPROVED, UserRole.PENDING_PROVIDER]),
     createProviderProfile
 );
 
 ProfileRouter.put(
     "/:id",
     protect,
-    checkPermissions([UserRole.PROVIDER_PENDING, UserRole.PROVIDER_APPROVED]),
+    checkPermissions([UserRole.PROVIDER_PENDING, UserRole.PROVIDER_APPROVED, UserRole.PENDING_PROVIDER]),
     updateProviderProfile
 );
 
@@ -64,3 +73,4 @@ ProfileRouter.delete(
 );
 
 export default ProfileRouter;
+

@@ -7,6 +7,9 @@ export enum UserRole {
     PROVIDER_SUSPENDED = "PROVIDER_SUSPENDED",
     ADMIN = "ADMIN",
     SUPER_ADMIN = "SUPER_ADMIN",
+    // Frontend compatibility aliases (frontend uses these names)
+    PENDING_PROVIDER = "PENDING_PROVIDER",
+    REJECTED_PROVIDER = "REJECTED_PROVIDER",
 }
 
 export enum AdminPrivilege {
