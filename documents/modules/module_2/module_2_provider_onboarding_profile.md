@@ -103,6 +103,51 @@ This module ensures that:
 
 ---
 
+### 4.5 Application Rejection & Reapplication
+
+**Scenario: Viewing Rejection Status**
+
+1. Rejected provider logs into the platform
+2. System displays rejection notification/banner
+3. Provider navigates to application status page
+4. Provider sees:
+   * Rejection reason from admin
+   * Date of rejection
+   * Cooldown period remaining (3 days total)
+   * "Reapply" button (disabled during cooldown)
+
+**Acceptance Criteria**
+* Rejection reason must be clearly visible
+* Cooldown countdown updates daily
+* User receives clear guidance on next steps
+
+---
+
+### 4.6 Reapplication After Rejection
+
+**Scenario**
+
+1. Provider waits until 30-day cooldown expires
+2. Provider (optionally) updates their profile with improvements
+3. Provider clicks "Reapply" button
+4. System validates profile completeness
+5. New application is created with status `PENDING`
+6. Provider receives confirmation of submission
+7. Admin sees new application in review queue
+
+**Rules**
+* Previous rejection history visible to admins
+* Profile can be edited before reapplication
+* No limit on reapplication attempts
+* Each rejection starts a new 30-day cooldown
+
+**Acceptance Criteria**
+* Reapply button only enabled after cooldown ends
+* New application linked to updated profile
+* Admin can see full application history
+
+---
+
 ## 5. Error & Edge Case Handling
 
 ### Covered Scenarios

@@ -39,6 +39,7 @@ import Availability from "@/features/profile/components/Availability";
 import Documents from "@/features/profile/components/Documents";
 import Finance from "@/features/profile/components/Finance";
 import SettingsSection from "@/features/profile/components/Settings";
+import ApplicationStatusPage from "@/features/profile/pages/ApplicationStatusPage";
 
 // Services
 import ServicesPage from "@/features/services/pages/ServicesPage";
@@ -196,6 +197,14 @@ export const router = createBrowserRouter([
       <PendingProviderRoute>
         <ProviderApplyPage />
       </PendingProviderRoute>
+    ),
+  },
+  {
+    path: "/application-status",
+    element: (
+      <ProtectedRoute>
+        <ApplicationStatusPage />
+      </ProtectedRoute>
     ),
   },
   {

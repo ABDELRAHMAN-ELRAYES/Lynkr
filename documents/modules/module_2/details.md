@@ -207,6 +207,70 @@ Enable qualified users to apply as service providers, submit comprehensive profe
 
 ---
 
+### 8.3 Application Rejection & Reapplication Tasks
+
+**Rejection Handling:**
+* When admin rejects application:
+  * Store rejection reason (required)
+  * Set cooldown period (3 days from rejection date)
+  * Revert user role to **CLIENT**
+  * Send notification to user
+
+* User visibility after rejection:
+  * Display rejection reason prominently
+  * Show cooldown countdown (days remaining)
+  * Disable reapplication button during cooldown
+  * Provide guidance on how to improve application
+
+---
+
+### 8.4 Reapplication Workflow
+
+**Preconditions:**
+* Previous application was rejected
+* Cooldown period (3 days) has ended
+* User has updated their profile (recommended)
+
+**Flow:**
+1. User views application status page
+2. System checks cooldown period
+3. If cooldown ended → Enable "Reapply" button
+4. User clicks "Reapply"
+5. System validates profile completeness
+6. Create new application with status `PENDING`
+7. Update user role to `PROVIDER_PENDING`
+8. Notify user of successful submission
+
+**Rules:**
+* Each reapplication creates a new application record
+* Previous rejection history is preserved for admin review
+* No limit on number of reapplications (after each cooldown)
+* Profile edits are allowed between applications
+
+---
+
+### 8.5 Application Status Monitoring (Frontend)
+
+**Status Page Requirements:**
+* Display current application status: `PENDING` / `APPROVED` / `REJECTED`
+* Show application history (all past applications)
+* For each application show:
+  * Submission date
+  * Review date (if reviewed)
+  * Decision (if reviewed)
+  * Rejection reason (if rejected)
+  * Cooldown remaining (if rejected and in cooldown)
+
+**Status-Specific UI:**
+
+| Status | Display | Actions |
+|--------|---------|---------|
+| PENDING | "Under Review" + submission date | None (waiting) |
+| APPROVED | Success message | Link to profile |
+| REJECTED | Reason + cooldown countdown | Reapply (after cooldown) |
+
+---
+
 ## 9. Provider Status Visibility Tasks
 
 * Display provider status clearly in user profile

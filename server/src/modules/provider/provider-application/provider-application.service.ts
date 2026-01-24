@@ -5,7 +5,7 @@ import AppError from "../../../utils/app-error";
 import UserService from "../../user/user.service";
 import { UserRole } from "../../../enum/UserRole";
 
-const COOLDOWN_DAYS = 30;
+const COOLDOWN_DAYS = 3;
 
 class ProviderApplicationService {
     private static repository = ProviderApplicationRepository.getInstance();

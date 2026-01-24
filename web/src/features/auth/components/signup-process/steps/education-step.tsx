@@ -2,7 +2,7 @@
 
 import { Plus } from "lucide-react";
 import type { Education } from "@/shared/types/auth/signup";
-import EducationModal from "@/features/auth/components/signup-process/modals/educational-modal";
+import EducationModal from "@/shared/components/modals/EducationModal";
 import { useState } from "react";
 
 interface EducationStepProps {

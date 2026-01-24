@@ -1,8 +1,134 @@
-import { useState } from "react";
-import { Star, EyeOff, Bold, Italic, List, Link, Plus } from "lucide-react";
+import { useEffect, useState } from 'react';
+import { Star, EyeOff, Loader2, User, DollarSign, Clock, Briefcase, CheckCircle } from 'lucide-react';
+import { toast } from 'sonner';
+import { profileService } from '@/shared/services';
+import { useAuth } from '@/shared/hooks/use-auth';
+import type { ProviderProfile, Education, Experience, Language, ProfileSkill } from '@/shared/types/profile';
+import { ApplicationStatusTag } from '@/shared/components/common/tags';
+import { EducationSection } from './EducationSection';
+import { ExperienceSection } from './ExperienceSection';
+import { LanguageSection } from './LanguageSection';
+import { SkillsSection } from './SkillsSection';
+import Button from '@/shared/components/ui/Button';
 
 export default function Profile() {
-  const [publicProfile, setPublicProfile] = useState(true);
+  const { user } = useAuth();
+  const [profile, setProfile] = useState<ProviderProfile | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [isEditing, setIsEditing] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+
+  // Editable fields
+  const [title, setTitle] = useState('');
+  const [bio, setBio] = useState('');
+  const [hourlyRate, setHourlyRate] = useState('');
+
+  useEffect(() => {
+    fetchProfile();
+  }, [user]);
+
+  const fetchProfile = async () => {
+    if (!user?.id) return;
+
+    setLoading(true);
+    setError(null);
+    try {
+      const profileData = await profileService.getProfileByUserId(user.id);
+      setProfile(profileData);
+      setTitle(profileData.title || '');
+      setBio(profileData.bio || '');
+      setHourlyRate(profileData.hourlyRate?.toString() || '');
+    } catch (err) {
+      console.error('Failed to fetch profile:', err);
+      setError('Failed to load profile. You may not have a provider profile yet.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSaveProfile = async () => {
+    if (!profile?.id) return;
+
+    setIsSaving(true);
+    try {
+      const updated = await profileService.updateProfile(profile.id, {
+        title,
+        bio,
+        hourlyRate: parseFloat(hourlyRate) || undefined,
+      });
+      setProfile(updated);
+      setIsEditing(false);
+      toast.success('Profile updated successfully');
+    } catch (err) {
+      console.error('Failed to update profile:', err);
+      toast.error('Failed to update profile');
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleEducationUpdate = (educations: Education[]) => {
+    if (profile) {
+      setProfile({ ...profile, education: educations });
+    }
+  };
+
+  const handleExperienceUpdate = (experiences: Experience[]) => {
+    if (profile) {
+      setProfile({ ...profile, experiences });
+    }
+  };
+
+  const handleLanguageUpdate = (languages: Language[]) => {
+    if (profile) {
+      setProfile({ ...profile, languages });
+    }
+  };
+
+  const handleSkillUpdate = (skills: ProfileSkill[]) => {
+    if (profile) {
+      setProfile({ ...profile, skills });
+    }
+  };
+
+  // Loading state
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <Loader2 className="w-8 h-8 animate-spin text-[#768de8]" />
+      </div>
+    );
+  }
+
+  // Error state
+  if (error) {
+    return (
+      <div className="bg-white rounded-xl border border-gray-200 p-8 text-center">
+        <div className="text-gray-400 mb-4">
+          <User className="w-16 h-16 mx-auto" />
+        </div>
+        <h3 className="text-lg font-medium text-gray-900 mb-2">No Profile Found</h3>
+        <p className="text-gray-500">{error}</p>
+      </div>
+    );
+  }
+
+  // No profile state
+  if (!profile) {
+    return (
+      <div className="bg-white rounded-xl border border-gray-200 p-8 text-center">
+        <div className="text-gray-400 mb-4">
+          <User className="w-16 h-16 mx-auto" />
+        </div>
+        <h3 className="text-lg font-medium text-gray-900 mb-2">No Provider Profile</h3>
+        <p className="text-gray-500">You don't have a provider profile yet.</p>
+      </div>
+    );
+  }
+
+  const fullName = profile.user ? `${profile.user.firstName} ${profile.user.lastName}` : 'Provider';
+  const languageNames = profile.languages?.map((l) => l.language).join(', ') || 'Not specified';
 
   return (
     <>
@@ -10,241 +136,215 @@ export default function Profile() {
       <div className="bg-white rounded-xl border border-gray-200 p-6 mb-6">
         <div className="flex items-start justify-between">
           <div className="flex items-start space-x-6">
-            <img
-              src="https://api.builder.io/api/v1/image/assets/TEMP/6268682ad9d29eae98db9d5430565c52e74a3b10?width=192"
-              alt="Dr. Amina Khalid"
-              className="w-24 h-24 rounded-full object-cover"
-            />
+            <div className="w-24 h-24 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden">
+              {profile.user?.avatarUrl ? (
+                <img
+                  src={profile.user.avatarUrl}
+                  alt={fullName}
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <User className="w-12 h-12 text-gray-400" />
+              )}
+            </div>
             <div className="flex-1">
-              <h1 className="text-2xl font-bold text-gray-900 mb-1">
-                Dr. Amina Khalid
-              </h1>
+              <div className="flex items-center gap-3 mb-1">
+                <h1 className="text-2xl font-bold text-gray-900">{fullName}</h1>
+                <ApplicationStatusTag status={profile.isApproved ? 'APPROVED' : 'PENDING'} />
+              </div>
               <p className="text-sm text-gray-600 mb-4">
-                Thermal & CFD Specialist
+                {profile.title || 'Professional Title Not Set'}
               </p>
 
               <div className="flex items-center space-x-4 text-sm text-gray-500">
                 <div className="flex items-center">
                   <Star className="w-4 h-4 fill-yellow-400 text-yellow-400 mr-1" />
                   <span className="font-bold">4.9</span>
-                  <span className="ml-1">
-                    (<span className="font-bold">127</span> reviews)
-                  </span>
+                  <span className="ml-1">(<span className="font-bold">0</span> reviews)</span>
                 </div>
                 <span>|</span>
-                <span>
-                  <span className="font-bold">98</span>% response rate
-                </span>
-                <span>|</span>
-                <span>English, Arabic, French</span>
+                <span>{languageNames}</span>
               </div>
             </div>
           </div>
 
           <div className="flex flex-col space-y-3">
             <div className="flex items-center space-x-3">
-              <button className="cursor-pointer text-nowrap flex items-center h-[2.5rem] px-6 py-2 text-white text-xs rounded-lg bg-[#7682e8]">
-                Edit profile
-              </button>
-              <button className="cursor-pointer h-[2.5rem] p-2 border border-gray-600 rounded-lg flex gap-4 items-center">
-                <p className="text-xs text-gray-600 text-center">Anonymize</p>
-
+              <Button
+                onClick={() => isEditing ? handleSaveProfile() : setIsEditing(true)}
+                disabled={isSaving}
+                className="bg-[#768de8] hover:bg-[#5a6fd6] text-white border-none"
+              >
+                {isSaving ? (
+                  <>
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    Saving...
+                  </>
+                ) : isEditing ? (
+                  'Save Changes'
+                ) : (
+                  'Edit Profile'
+                )}
+              </Button>
+              {isEditing && (
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    setIsEditing(false);
+                    setTitle(profile.title || '');
+                    setBio(profile.bio || '');
+                    setHourlyRate(profile.hourlyRate?.toString() || '');
+                  }}
+                >
+                  Cancel
+                </Button>
+              )}
+              <button className="h-10 px-3 border border-gray-300 rounded-lg flex gap-2 items-center hover:bg-gray-50">
+                <span className="text-sm text-gray-600">Anonymize</span>
                 <EyeOff className="w-4 h-4 text-gray-600" />
               </button>
             </div>
-            <button className="cursor-pointer px-6 py-2 border border-gray-600 text-gray-600 text-xs rounded-lg hover:bg-gray-50">
-              Preview Profile
-            </button>
           </div>
         </div>
       </div>
 
       {/* Stats */}
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-6 mb-6">
-        <div className="text-center">
-          <div className="text-2xl font-bold text-gray-900">
-            85<span className="text-xs text-gray-500">$</span>
+        <div className="bg-white rounded-lg border border-gray-200 p-4 text-center">
+          <div className="flex items-center justify-center gap-1 text-2xl font-bold text-gray-900">
+            <DollarSign className="w-5 h-5" />
+            {profile.hourlyRate || 0}
           </div>
-          <div className="text-sm text-gray-500">Avg hourly</div>
+          <div className="text-sm text-gray-500">Hourly Rate</div>
         </div>
-        <div className="text-center">
-          <div className="text-2xl font-bold text-gray-900">
-            2<span className="text-xs text-gray-500">h</span>
+        <div className="bg-white rounded-lg border border-gray-200 p-4 text-center">
+          <div className="flex items-center justify-center gap-1 text-2xl font-bold text-gray-900">
+            <Clock className="w-5 h-5" />
+            2h
           </div>
-          <div className="text-xs text-gray-500">Response time</div>
+          <div className="text-sm text-gray-500">Response Time</div>
         </div>
-        <div className="text-center">
-          <div className="text-2xl font-bold text-gray-900">7</div>
-          <div className="text-xs text-gray-500">Active jobs</div>
+        <div className="bg-white rounded-lg border border-gray-200 p-4 text-center">
+          <div className="flex items-center justify-center gap-1 text-2xl font-bold text-gray-900">
+            <Briefcase className="w-5 h-5" />
+            0
+          </div>
+          <div className="text-sm text-gray-500">Active Jobs</div>
         </div>
-        <div className="text-center">
-          <div className="text-2xl font-bold text-gray-900">
-            12,450<span className="text-xs text-gray-500">$</span>
+        <div className="bg-white rounded-lg border border-gray-200 p-4 text-center">
+          <div className="flex items-center justify-center gap-1 text-2xl font-bold text-gray-900">
+            <DollarSign className="w-5 h-5" />
+            0
           </div>
-          <div className="text-xs text-gray-500">
-            Earnings (<span className="font-bold">30</span>d)
-          </div>
+          <div className="text-sm text-gray-500">Earnings (30d)</div>
         </div>
-        <div className="text-center">
-          <div className="text-2xl font-bold text-gray-900">
-            96<span className="text-xs text-gray-500">%</span>
+        <div className="bg-white rounded-lg border border-gray-200 p-4 text-center">
+          <div className="flex items-center justify-center gap-1 text-2xl font-bold text-gray-900">
+            <CheckCircle className="w-5 h-5" />
+            0%
           </div>
-          <div className="text-xs text-gray-500">Completion rate</div>
+          <div className="text-sm text-gray-500">Completion Rate</div>
         </div>
       </div>
 
-      {/* Public Profile Information */}
+      {/* Profile Content */}
       <div className="bg-white rounded-xl border border-gray-200 p-6">
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-xl text-gray-900">Public Profile Information</h2>
-          <div className="flex items-center space-x-2">
-            <span className="text-sm text-gray-600">Public Profile</span>
-            <button
-              onClick={() => setPublicProfile(!publicProfile)}
-              className={`relative w-11 h-6 rounded-full transition-colors ${publicProfile ? "bg-brand-blue" : "bg-gray-300"
-                }`}
-            >
-              <div
-                className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-transform ${publicProfile ? "translate-x-6" : "translate-x-1"
-                  }`}
-              />
-            </button>
-          </div>
+        <h2 className="text-xl font-semibold text-gray-900 mb-6">Profile Information</h2>
+
+        {/* Professional Title */}
+        <div className="mb-6">
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Professional Title
+          </label>
+          {isEditing ? (
+            <input
+              type="text"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              placeholder="e.g., Senior Software Engineer | Math Tutor"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#768de8]"
+            />
+          ) : (
+            <p className="text-gray-900">{profile.title || 'Not set'}</p>
+          )}
         </div>
 
         {/* Professional Bio */}
         <div className="mb-6">
-          <label className="block text-sm text-gray-700 mb-2">
+          <label className="block text-sm font-medium text-gray-700 mb-2">
             Professional Bio
           </label>
-          <div className="border border-gray-300 rounded-lg p-4">
-            <div className="flex items-center space-x-2 border-b border-gray-200 pb-2 mb-4">
-              <button className="p-1 hover:bg-gray-100 rounded">
-                <Bold className="w-3 h-3 text-gray-500" />
-              </button>
-              <button className="p-1 hover:bg-gray-100 rounded">
-                <Italic className="w-3 h-3 text-gray-500" />
-              </button>
-              <button className="p-1 hover:bg-gray-100 rounded">
-                <List className="w-4 h-4 text-gray-500" />
-              </button>
-              <button className="p-1 hover:bg-gray-100 rounded">
-                <Link className="w-5 h-4 text-gray-500" />
-              </button>
-            </div>
-            <p className="text-gray-700 leading-relaxed">
-              PhD in Mechanical Engineering with 8+ years of experience in
-              computational fluid dynamics and thermal analysis. Specialized in
-              ANSYS Fluent, OpenFOAM, and custom CFD solutions for aerospace and
-              automotive applications...
+          {isEditing ? (
+            <textarea
+              value={bio}
+              onChange={(e) => setBio(e.target.value)}
+              placeholder="Tell clients about your experience and expertise..."
+              rows={6}
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#768de8] resize-none"
+            />
+          ) : (
+            <p className="text-gray-700 whitespace-pre-wrap">
+              {profile.bio || 'No bio provided'}
             </p>
-          </div>
+          )}
         </div>
 
-        {/* Education */}
+        {/* Hourly Rate */}
         <div className="mb-6">
-          <div className="flex items-center justify-between mb-3">
-            <label className="text-sm text-gray-700">Education</label>
-            <button className="flex items-center text-sm text-gray-600 hover:text-gray-800">
-              <Plus className="w-3 h-3 mr-1" />
-              Add Degree
-            </button>
-          </div>
-          <div className="space-y-3">
-            <div className="border border-gray-200 rounded-lg p-4 flex items-center justify-between">
-              <div>
-                <h4 className="font-normal text-gray-900">
-                  PhD in Mechanical Engineering
-                </h4>
-                <p className="text-gray-600">MIT • 2018</p>
-              </div>
-              <button className="text-sm text-gray-600 hover:text-gray-800">
-                Edit
-              </button>
-            </div>
-            <div className="border border-gray-200 rounded-lg p-4 flex items-center justify-between">
-              <div>
-                <h4 className="font-normal text-gray-900">
-                  MSc in Aerospace Engineering
-                </h4>
-                <p className="text-gray-600">Stanford University • 2014</p>
-              </div>
-              <button className="text-sm text-gray-600 hover:text-gray-800">
-                Edit
-              </button>
-            </div>
-          </div>
-        </div>
-
-        {/* Research Interests */}
-        <div className="mb-6">
-          <label className="block text-sm text-gray-700 mb-3">
-            Research Interests
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Hourly Rate ($)
           </label>
-          <div className="flex flex-wrap gap-2 mb-3">
-            <span className="px-3 py-1 bg-gray-100 text-gray-700 text-sm rounded-full">
-              Computational Fluid Dynamics
-            </span>
-            <span className="px-3 py-1 bg-gray-100 text-gray-700 text-sm rounded-full">
-              Heat Transfer
-            </span>
-            <span className="px-3 py-1 bg-gray-100 text-gray-700 text-sm rounded-full">
-              Turbulence Modeling
-            </span>
-            <span className="px-3 py-1 bg-gray-100 text-gray-700 text-sm rounded-full">
-              Aerospace Applications
-            </span>
-          </div>
-          <input
-            type="text"
-            placeholder="Add research interest..."
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg text-gray-400 focus:outline-none focus:ring-2 focus:ring-brand-blue focus:border-transparent"
-          />
+          {isEditing ? (
+            <input
+              type="number"
+              value={hourlyRate}
+              onChange={(e) => setHourlyRate(e.target.value)}
+              placeholder="e.g., 50"
+              min="0"
+              className="w-full max-w-xs px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#768de8]"
+            />
+          ) : (
+            <p className="text-gray-900">${profile.hourlyRate || 0}/hr</p>
+          )}
         </div>
 
-        {/* Academic & Social Links */}
-        <div className="mb-8">
-          <label className="block text-sm text-gray-700 mb-3">
-            Academic & Social Links
-          </label>
-          <div className="space-y-3">
-            <input
-              type="text"
-              placeholder="https://orcid.org/0000-0002-1825-0097"
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-gray-400 focus:outline-none focus:ring-2 focus:ring-brand-blue"
-            />
-            <input
-              type="text"
-              placeholder="Google Scholar"
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-gray-400 focus:outline-none focus:ring-2 focus:ring-brand-blue"
-            />
-            <input
-              type="text"
-              placeholder="LinkedIn Profile"
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-gray-400 focus:outline-none focus:ring-2 focus:ring-brand-blue"
-            />
-          </div>
-        </div>
+        <hr className="my-6 text-gray-300" />
 
-        {/* Action Buttons */}
-        <div className="border-t border-gray-200 pt-6 flex items-center justify-between">
-          <div className="flex space-x-3">
-            <button className="cursor-pointer px-4 py-2 border border-gray-300 text-gray-600 rounded-lg hover:bg-gray-50">
-              Preview Public Profile
-            </button>
-            <button className="cursor-pointer px-4 py-2 border border-gray-300 text-gray-600 rounded-lg hover:bg-gray-50">
-              Download CV
-            </button>
-          </div>
-          <div className="flex space-x-3">
-            <button className="cursor-pointer px-4 py-2 border border-gray-300 text-gray-600 rounded-lg hover:bg-gray-50">
-              Cancel
-            </button>
-            <button className="cursor-pointer px-4 py-2 bg-[#7682e8] text-white rounded-lg">
-              Save Changes
-            </button>
-          </div>
-        </div>
+        {/* Skills Section */}
+        <SkillsSection
+          skills={profile.skills || []}
+          onUpdate={handleSkillUpdate}
+          isEditable={isEditing}
+        />
+
+        <hr className="my-6 text-gray-300" />
+
+        {/* Education Section */}
+        <EducationSection
+          profileId={profile.id}
+          educations={profile.education || []}
+          onUpdate={handleEducationUpdate}
+          isEditable={true}
+        />
+
+        <hr className="my-6 text-gray-300" />
+
+        {/* Experience Section */}
+        <ExperienceSection
+          profileId={profile.id}
+          experiences={profile.experiences || []}
+          onUpdate={handleExperienceUpdate}
+          isEditable={true}
+        />
+
+        <hr className="my-6 text-gray-300" />
+
+        {/* Languages Section */}
+        <LanguageSection
+          languages={profile.languages || []}
+          onUpdate={handleLanguageUpdate}
+          isEditable={isEditing}
+        />
       </div>
     </>
   );

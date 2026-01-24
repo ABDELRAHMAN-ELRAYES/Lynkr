@@ -2,7 +2,7 @@
 
 import { Plus } from "lucide-react";
 import type { Experience } from "@/shared/types/auth/signup";
-import ExperienceModal from "@/features/auth/components/signup-process/modals/experience-modal";
+import ExperienceModal from "@/shared/components/modals/ExperienceModal";
 import { useState } from "react";
 
 interface ExperienceStepProps {

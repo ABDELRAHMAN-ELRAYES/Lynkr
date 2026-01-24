@@ -45,6 +45,7 @@ type AuthContextType = {
   verifyAccount: (enteredOtp: string) => void;
   registerUser: (role: UserRole) => Promise<{ success: boolean; message: string }>;
   logout: () => Promise<{ success: boolean; message: string }>;
+  refreshUser: () => Promise<void>;
 };
 
 // The context itself
@@ -57,35 +58,37 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [pendingData, setPendingData] = useState<PendingDataType>();
 
-  // Check if there is an active session and get the current user data if there is a session
-  useEffect(() => {
-    const restoreSession = async () => {
-      try {
-        const response = await authService.getCurrentUser();
-        if (response.success && response.data) {
-          // Backend returns { data: { user: {...} } }
-          const userData = response.data.user || response.data;
-          const fetchedUser: User = {
-            id: userData.id || "",
-            firstName: userData.firstName || userData.first_name || "",
-            lastName: userData.lastName || userData.last_name || "",
-            email: userData.email || "",
-            country: userData.country || "",
-            isActive: userData.active ?? userData.isActive ?? userData.is_active ?? true,
-            role: (userData.role as UserRole) || "CLIENT",
-          };
-          setUser(fetchedUser);
-          setIsAuthenticated(true);
-        } else {
-          setIsAuthenticated(false);
-        }
-      } catch {
+  // Restore session / Refresh user
+  const refreshUser = async () => {
+    try {
+      const response = await authService.getCurrentUser();
+      if (response.success && response.data) {
+        // Backend returns { data: { user: {...} } }
+        const userData = response.data.user || response.data;
+        const fetchedUser: User = {
+          id: userData.id || "",
+          firstName: userData.firstName || userData.first_name || "",
+          lastName: userData.lastName || userData.last_name || "",
+          email: userData.email || "",
+          country: userData.country || "",
+          isActive: userData.active ?? userData.isActive ?? userData.is_active ?? true,
+          role: (userData.role as UserRole) || "CLIENT",
+        };
+        setUser(fetchedUser);
+        setIsAuthenticated(true);
+      } else {
         setIsAuthenticated(false);
-      } finally {
-        setIsLoading(false);
       }
-    };
-    restoreSession();
+    } catch {
+      setIsAuthenticated(false);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Check if there is an active session on mount
+  useEffect(() => {
+    refreshUser();
   }, []);
 
   // login handler
@@ -278,6 +281,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     pendingData,
     verifyAccount,
     registerUser,
+    refreshUser,
   };
 
   return (
