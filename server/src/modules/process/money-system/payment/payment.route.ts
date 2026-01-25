@@ -7,7 +7,7 @@ import {
 } from "./payment.controller";
 import { protect } from "../../../auth/auth.controller";
 
-const PaymentRouter = Router();
+const PaymentRouter:Router = Router();
 
 // Stripe webhook (must use raw body parser)
 PaymentRouter.post("/webhook", raw({ type: "application/json" }), handleStripeWebhook);

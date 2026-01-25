@@ -9,9 +9,9 @@ import { LoadingModal } from "./loading-modal";
 interface NavLink {
   name: string;
   path: string;
-  roles?: string[]; // If specified, only these roles can see the link
-  requiresAuth?: boolean; // If true, user must be authenticated
-  hideWhenAuth?: boolean; // If true, hide when authenticated
+  roles?: string[];
+  requiresAuth?: boolean; 
+  hideWhenAuth?: boolean; 
   icon?: React.ReactNode;
 }
 
@@ -23,23 +23,17 @@ const allLinks: NavLink[] = [
   {
     name: "Operations",
     path: "/operations",
-    requiresAuth: true, // Only visible to logged-in users
-  },
+    requiresAuth: true, 
+    },
   {
     name: "Services",
     path: "/services",
   },
   {
-    name: "Dashboard",
-    path: "/dashboard",
-    requiresAuth: true,
-    roles: ["CLIENT", "PROVIDER"], // Only clients and providers see Dashboard
-  },
-  {
     name: "Admin",
     path: "/admin",
     requiresAuth: true,
-    roles: ["ADMIN", "SUPER_ADMIN"], // Only admins see Admin link
+    roles: ["ADMIN", "SUPER_ADMIN"],
     icon: <Shield size={16} className="mr-1" />,
   },
 ];
@@ -199,17 +193,23 @@ const Navbar = () => {
                           </div>
                         </div>
                         <button
-                          onClick={() => handleRedirect("/profile")}
+                          onClick={() => {
+                            setIsProfileDropdownOpen(false);
+                            navigate("/profile");
+                          }}
                           className="w-full flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                         >
                           <User size={16} className="mr-2" /> Profile
                         </button>
-                        <a
-                          href="#"
-                          className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                        <button
+                          onClick={() => {
+                            setIsProfileDropdownOpen(false);
+                            navigate("/profile/settings");
+                          }}
+                          className="w-full flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                         >
                           <Settings size={16} className="mr-2" /> Settings
-                        </a>
+                        </button>
                         <div className="border-t border-gray-100"></div>
                         <button
                           onClick={handleLogout}
@@ -284,13 +284,19 @@ const Navbar = () => {
                       </div>
                     </div>
                     <button
-                      onClick={handleRedirect("/profile")}
+                      onClick={() => {
+                        setIsMobileMenuOpen(false);
+                        navigate("/profile");
+                      }}
                       className="block text-gray-700 hover:text-[#7682e8] px-3 py-2 rounded-md text-base font-medium transition-colors"
                     >
                       Profile
                     </button>
                     <button
-                      onClick={handleRedirect("/login")}
+                      onClick={() => {
+                        setIsMobileMenuOpen(false);
+                        navigate("/profile/settings");
+                      }}
                       className="block text-gray-700 hover:text-[#7682e8] px-3 py-2 rounded-md text-base font-medium transition-colors"
                     >
                       Settings

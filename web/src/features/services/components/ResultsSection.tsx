@@ -31,7 +31,8 @@ const ResultsSection: FC<ResultsSectionProps> = ({
     setIsProfileModalOpen(true);
   };
 
-  const handleRequest = (_providerId: string) => {
+  const handleRequest = (providerId: string) => {
+    setSelectedProviderId(providerId);
     setIsRequestModalOpen(true);
   };
 
@@ -74,12 +75,25 @@ const ResultsSection: FC<ResultsSectionProps> = ({
   return (
     <>
       {/* Request Modal */}
-      {isRequestModalOpen && (
+      {isRequestModalOpen && selectedProviderId && (
         <div className="fixed inset-0 bg-[#0000007d] z-[1005] flex items-center justify-center">
-          <OperationRequestForm
-            close={handleCloseRequestModal}
-            isOpen={isRequestModalOpen}
-          />
+          {(() => {
+            const provider = searchResult.profiles.find(p => p.id === selectedProviderId);
+            if (!provider) return null;
+            const providerName = provider.user
+              ? `${provider.user.firstName} ${provider.user.lastName}`
+              : "Provider";
+            return (
+              <OperationRequestForm
+                close={handleCloseRequestModal}
+                isOpen={isRequestModalOpen}
+                providerId={selectedProviderId}
+                providerName={providerName}
+                providerTitle={provider.title}
+                providerServiceId={provider.serviceId}
+              />
+            );
+          })()}
         </div>
       )}
 

@@ -6,6 +6,7 @@ import { UserRole } from "@/enum/UserRole";
 import { IUser } from "@/modules/user/types/IUser";
 import NotificationService from "@/modules/notification/notification.service";
 import ProfileRepository from "@/modules/provider/profile/profile.repository";
+import ProfileService from "@/modules/provider/profile/profile.service";
 
 class RequestService {
     private static repository = RequestRepository.getInstance();
@@ -133,6 +134,70 @@ class RequestService {
         }
 
         return await this.repository.updateRequestStatus(id, "CANCELLED");
+    }
+
+    static async acceptRequest(id: string, userId: string, next: NextFunction) {
+        const request = await this.repository.getRequestById(id);
+        if (!request) {
+            return next(new AppError(404, "Request not found"));
+        }
+
+        // Check if user is the target provider
+        if (!request.targetProviderId) {
+            return next(new AppError(400, "This request is not directed to a specific provider"));
+        }
+
+        const profile = await ProfileService.getProviderProfileByUserId(userId, next);
+        if (!profile || profile.id !== request.targetProviderId) {
+            return next(new AppError(403, "Only the target provider can accept this request"));
+        }
+
+        if (request.status !== "PENDING") {
+            return next(new AppError(400, `Cannot accept a request with status: ${request.status}`));
+        }
+
+        const updatedRequest = await this.repository.updateRequestStatus(id, "ACCEPTED");
+
+        // Notify client
+        await NotificationService.sendSystemNotification(
+            request.clientId,
+            "Request Accepted",
+            `Your request "${request.title}" has been accepted by the provider.`
+        );
+
+        return updatedRequest;
+    }
+
+    static async rejectRequest(id: string, userId: string, next: NextFunction) {
+        const request = await this.repository.getRequestById(id);
+        if (!request) {
+            return next(new AppError(404, "Request not found"));
+        }
+
+        // Check if user is the target provider
+        if (!request.targetProviderId) {
+            return next(new AppError(400, "This request is not directed to a specific provider"));
+        }
+
+        const profile = await ProfileService.getProviderProfileByUserId(userId, next);
+        if (!profile || profile.id !== request.targetProviderId) {
+            return next(new AppError(403, "Only the target provider can reject this request"));
+        }
+
+        if (request.status !== "PENDING") {
+            return next(new AppError(400, `Cannot reject a request with status: ${request.status}`));
+        }
+
+        const updatedRequest = await this.repository.updateRequestStatus(id, "REJECTED");
+
+        // Notify client
+        await NotificationService.sendSystemNotification(
+            request.clientId,
+            "Request Rejected",
+            `Your request "${request.title}" has been rejected by the provider.`
+        );
+
+        return updatedRequest;
     }
 
     static async publishExpiredRequests() {

@@ -14,7 +14,7 @@ import {
 import { AuthMiddleware } from "../../../middlewares/auth.middleware";
 import upload, { validateUploadedFileSize } from "../../../middlewares/file-upload";
 
-const ProjectRouter = Router();
+const ProjectRouter:Router = Router();
 
 // All routes require authentication
 ProjectRouter.use(AuthMiddleware.protect);

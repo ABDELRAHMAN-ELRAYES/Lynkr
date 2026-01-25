@@ -14,14 +14,23 @@ import {
   Settings,
   LogOut,
   Plus,
+  ClipboardList,
 } from "lucide-react";
 import Profile from "@/features/profile/components/Profile";
+import { ClientProfile } from "@/features/profile/components/ClientProfile";
 import Navbar from "@/shared/components/common/Navbar";
 import Footer from "@/shared/components/common/Footer";
 import Button from "@/shared/components/ui/Button";
+import { useAuth } from "@/shared/hooks/use-auth";
 
-const nav = [
-  { to: "", label: "Profile", icon: User, element: <Profile /> },
+// Provider navigation items
+const providerNav = [
+  { to: "", label: "Profile", icon: User },
+  {
+    to: "requests",
+    label: "Available Requests",
+    icon: ClipboardList,
+  },
   {
     to: "services",
     label: "Services & Pricing",
@@ -54,7 +63,51 @@ const nav = [
   },
 ];
 
+// Client navigation items
+const clientNav = [
+  { to: "", label: "Profile", icon: User },
+  {
+    to: "requests",
+    label: "My Requests",
+    icon: ClipboardList,
+  },
+  {
+    to: "settings",
+    label: "Settings",
+    icon: Settings,
+  },
+];
+
 function RightSidebar() {
+  const { user } = useAuth();
+  const isClient = user?.role === 'CLIENT';
+
+  if (isClient) {
+    return (
+      <aside className="w-80 p-6 space-y-6 hidden xl:block">
+        <div className="bg-white rounded-xl border border-gray-200 p-6">
+          <h3 className="text-lg text-gray-900 mb-4">Quick Actions</h3>
+          <div className="space-y-3">
+            <Button
+              onClick={() => window.location.href = '/services'}
+              className="cursor-pointer w-full flex items-center justify-center px-4 py-2 bg-[#7682e8] text-white rounded-lg"
+            >
+              <Plus className="w-4 h-4 mr-2" />
+              Browse Services
+            </Button>
+            <Button
+              onClick={() => window.location.href = '/requests'}
+              className="cursor-pointer w-full flex items-center justify-center px-4 py-2 border border-gray-600 text-gray-600 rounded-lg hover:bg-gray-50"
+            >
+              <ClipboardList className="w-4 h-4 mr-2" />
+              View My Requests
+            </Button>
+          </div>
+        </div>
+      </aside>
+    );
+  }
+
   return (
     <aside className="w-80 p-6 space-y-6 hidden xl:block">
       <div className="bg-white rounded-xl border border-gray-200 p-6">
@@ -79,7 +132,14 @@ function RightSidebar() {
         <h3 className="text-lg text-gray-900 mb-4">Quick Actions</h3>
         <div className="space-y-3">
           <Button
-            className="cursor-pointer w-full flex items-center justify-center px-4 py-2 bg-[#7682e8] text-white rounded-lg "
+            onClick={() => window.location.href = '/profile/requests'}
+            className="cursor-pointer w-full flex items-center justify-center px-4 py-2 bg-[#7682e8] text-white rounded-lg"
+          >
+            <ClipboardList className="w-4 h-4 mr-2" />
+            View Available Requests
+          </Button>
+          <Button
+            className="cursor-pointer w-full flex items-center justify-center px-4 py-2 border border-gray-600 text-gray-600 rounded-lg hover:bg-gray-50"
           >
             <Plus className="w-4 h-4 mr-2 " />
             Create New Service
@@ -138,6 +198,10 @@ function RightSidebar() {
 
 export default function ProfileLayout() {
   const { pathname } = useLocation();
+  const { user } = useAuth();
+  const isClient = user?.role === 'CLIENT';
+  const nav = isClient ? clientNav : providerNav;
+
   return (
     <div className="min-h-screen ">
       <Navbar />
@@ -145,15 +209,14 @@ export default function ProfileLayout() {
         <aside className="w-64 bg-white border border-gray-200 rounded-xl min-h-screen hidden md:block mt-[24px]">
           <div className="p-6">
             <h2 className="text-lg font-normal text-gray-900 mb-8">
-              Profile Management
+              {isClient ? "Account" : "Profile Management"}
             </h2>
             <nav className="space-y-2">
               {nav.map(({ to, label, icon: Icon }) => {
                 const active =
-                  pathname === to ||
-                  (to !== "/profile"
-                    ? pathname.startsWith(to)
-                    : pathname === "/" || pathname.startsWith("/profile"));
+                  (to === "" && pathname === "/profile") ||
+                  (to !== "" && pathname === `/profile/${to}`) ||
+                  (to !== "" && pathname.startsWith(`/profile/${to}/`));
                 return (
                   <Link
                     key={to}

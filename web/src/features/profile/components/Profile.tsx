@@ -9,10 +9,16 @@ import { EducationSection } from './EducationSection';
 import { ExperienceSection } from './ExperienceSection';
 import { LanguageSection } from './LanguageSection';
 import { SkillsSection } from './SkillsSection';
+import { ClientProfile } from './ClientProfile';
 import Button from '@/shared/components/ui/Button';
 
 export default function Profile() {
   const { user } = useAuth();
+  
+  // Show ClientProfile for clients
+  if (user?.role === 'CLIENT') {
+    return <ClientProfile />;
+  }
   const [profile, setProfile] = useState<ProviderProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);

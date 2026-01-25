@@ -299,12 +299,16 @@ const ProviderDetailPage: FC = () => {
             </div>
 
             {/* Request Modal */}
-            {isRequestModalOpen && (
+            {isRequestModalOpen && profile && (
                 <div className="fixed inset-0 bg-[#0000007d] z-[1005] flex items-center justify-center p-4">
                     <div className="w-full max-w-7xl max-h-[90vh] overflow-y-auto">
                         <OperationRequestForm
                             close={() => setIsRequestModalOpen(false)}
                             isOpen={isRequestModalOpen}
+                            providerId={profile.id}
+                            providerName={fullName}
+                            providerTitle={profile.title}
+                            providerServiceId={profile.serviceId}
                         />
                     </div>
                 </div>

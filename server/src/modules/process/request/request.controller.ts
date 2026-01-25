@@ -46,16 +46,6 @@ export const createRequest = async (req: Request, res: Response, next: NextFunct
 };
 
 export const getRequests = async (req: Request, res: Response, next: NextFunction) => {
-    // If client -> get own requests
-    // If provider -> get direct + public requests matching categories
-
-    // Check if user is acting as client or provider?
-    // For now, based on role/context. 
-    // Simplified: Return client requests if role is CLIENT, Provider requests if PROVIDER.
-
-    // Note: A user can be both. We might need a query param ?view=client or provider.
-    // Defaulting to filtering by createdBy (client) if no param.
-
     const user = req.user as any;
 
     if (user.role === 'CLIENT') {
@@ -68,10 +58,8 @@ export const getRequests = async (req: Request, res: Response, next: NextFunctio
             return next(new AppError(404, "Provider profile not found"));
         }
 
-        // Extract category from profile service (single service)
-        const categories = profile.service ? [profile.service.name] : [];
-
-        const requests = await RequestService.getRequestsForProvider(profile.id, categories, next);
+        // Only return requests directed to this provider (targetProviderId matches)
+        const requests = await RequestService.getRequestsForProvider(profile.id, [], next);
         return res.status(200).json({ status: "success", data: requests });
     } else {
         // Admin or other
@@ -81,7 +69,9 @@ export const getRequests = async (req: Request, res: Response, next: NextFunctio
 };
 
 export const getRequestById = async (req: Request, res: Response, next: NextFunction) => {
-    const request = await RequestService.getRequestById(req.params.id, req.user as any, next);
+    const id = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
+
+    const request = await RequestService.getRequestById(id, req.user as any, next);
     if (request) {
         res.status(200).json({
             status: "success",
@@ -92,7 +82,9 @@ export const getRequestById = async (req: Request, res: Response, next: NextFunc
 
 export const updateRequest = async (req: Request, res: Response, next: NextFunction) => {
     const updateData = { ...req.body, files: req.files };
-    const updatedRequest = await RequestService.updateRequest(req.params.id, updateData, (req.user as any).id, next);
+    const id = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
+
+    const updatedRequest = await RequestService.updateRequest(id, updateData, (req.user as any).id, next);
     if (updatedRequest) {
         res.status(200).json({
             status: "success",
@@ -102,11 +94,39 @@ export const updateRequest = async (req: Request, res: Response, next: NextFunct
 };
 
 export const cancelRequest = async (req: Request, res: Response, next: NextFunction) => {
-    const request = await RequestService.cancelRequest(req.params.id, (req.user as any).id, next);
+    const id = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
+
+    const request = await RequestService.cancelRequest(id, (req.user as any).id, next);
     if (request) {
         res.status(200).json({
             status: "success",
             data: request,
         });
     }
+};
+
+export const acceptRequest = async (req: Request, res: Response, next: NextFunction) => {
+
+    const id = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
+    const request = await RequestService.acceptRequest(id, (req.user as any).id, next);
+    if (request) {
+        return res.status(200).json({
+            status: "success",
+            data: request,
+        });
+    }
+
+};
+
+export const rejectRequest = async (req: Request, res: Response, next: NextFunction) => {
+    const id = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
+
+    const request = await RequestService.rejectRequest(id, (req.user as any).id, next);
+    if (request) {
+        return res.status(200).json({
+            status: "success",
+            data: request,
+        });
+    }
+
 };

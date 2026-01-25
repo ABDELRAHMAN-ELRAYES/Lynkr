@@ -155,25 +155,49 @@ class RequestRepository {
 
     async getRequestsForProvider(providerId: string, serviceCategories: string[]) {
         try {
+            // Only return requests directed to this specific provider
             return await this.prisma.request.findMany({
                 where: {
-                    OR: [
-                        { targetProviderId: providerId }, // Direct requests
-                        {
-                            isPublic: true,
-                            category: { in: serviceCategories },
-                            status: "PUBLIC"
-                        }
-                    ],
+                    targetProviderId: providerId, // Only direct requests
                     status: { not: "DRAFT" }
                 },
                 orderBy: { createdAt: 'desc' },
                 include: {
                     client: {
                         select: {
+                            id: true,
                             firstName: true,
                             lastName: true,
+                            email: true,
+                            username: true,
                         }
+                    },
+                    targetProvider: {
+                        include: {
+                            user: {
+                                select: {
+                                    firstName: true,
+                                    lastName: true,
+                                }
+                            }
+                        }
+                    },
+                    proposals: {
+                        include: {
+                            providerProfile: {
+                                include: {
+                                    user: {
+                                        select: {
+                                            firstName: true,
+                                            lastName: true,
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    _count: {
+                        select: { proposals: true }
                     }
                 }
             });

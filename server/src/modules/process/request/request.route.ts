@@ -5,12 +5,14 @@ import {
     getRequestById,
     updateRequest,
     cancelRequest,
+    acceptRequest,
+    rejectRequest,
 } from "./request.controller";
 import upload from "../../../middlewares/file-upload";
 import { compressImages } from "../../../middlewares/compress-image";
 import { protect } from "../../auth/auth.controller";
 
-const RequestRouter = Router();
+const RequestRouter: Router = Router();
 
 RequestRouter.use(protect);
 
@@ -22,6 +24,14 @@ RequestRouter.post(
 );
 
 RequestRouter.get("/", getRequests);
+
+// Specific routes MUST come before the generic :id route to avoid route conflicts
+// Using explicit route patterns to ensure they match before :id
+RequestRouter.post("/:id/cancel", cancelRequest);
+RequestRouter.post("/:id/accept", acceptRequest);
+RequestRouter.post("/:id/reject", rejectRequest);
+
+// Generic routes come after specific ones
 RequestRouter.get("/:id", getRequestById);
 
 RequestRouter.put(
@@ -29,12 +39,6 @@ RequestRouter.put(
     upload.array("files"),
     compressImages,
     updateRequest
-);
-
-RequestRouter.post(
-    "/:id/cancel",
-    // checkPermissions([UserRole.CLIENT]),
-    cancelRequest
 );
 
 export default RequestRouter;

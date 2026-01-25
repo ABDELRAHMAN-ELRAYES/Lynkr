@@ -51,6 +51,10 @@ import OperationsPage from "@/features/operations/pages/OperationsPage";
 // Project
 import ProjectDetails from "@/features/project/pages/ProjectPage";
 
+// Request
+import { RequestsListPage } from "@/features/request/pages/RequestsListPage";
+import { RequestDetailPage } from "@/features/request/pages/RequestDetailPage";
+
 // Payment
 import SuccessPayment from "@/features/payment/pages/payment-page";
 import CancelPayment from "@/features/payment/pages/cancel-payment";
@@ -95,6 +99,14 @@ export const router = createBrowserRouter([
     element: <ProviderDetailPage />,
   },
   {
+    path: "/requests/:id",
+    element: (
+      <ProtectedRoute>
+        <RequestDetailPage />
+      </ProtectedRoute>
+    ),
+  },
+  {
     path: "/operation",
     element: <ProjectDetails />,
   },
@@ -117,6 +129,10 @@ export const router = createBrowserRouter([
       {
         path: "",
         element: <Profile />,
+      },
+      {
+        path: "requests",
+        element: <RequestsListPage />,
       },
       {
         path: "services",

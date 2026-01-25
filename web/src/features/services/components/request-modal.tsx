@@ -602,8 +602,8 @@ export default function OperationRequestForm({
                   value={projectTitle}
                   onChange={(e) => setProjectTitle(e.target.value)}
                   className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm transition-all ${isNearTitleLimit
-                      ? "border-orange-300 focus:ring-orange-500"
-                      : "border-gray-300"
+                    ? "border-orange-300 focus:ring-orange-500"
+                    : "border-gray-300"
                     }`}
                   maxLength={titleLimit}
                 />
@@ -745,8 +745,8 @@ export default function OperationRequestForm({
                     type="button"
                     onClick={() => setIsPreviewMode(!isPreviewMode)}
                     className={`p-2 rounded-md transition-colors shrink-0 ${isPreviewMode
-                        ? "bg-blue-100 text-blue-600"
-                        : "hover:bg-gray-200 text-gray-600"
+                      ? "bg-blue-100 text-blue-600"
+                      : "hover:bg-gray-200 text-gray-600"
                       }`}
                     title={isPreviewMode ? "Edit Mode" : "Preview Mode"}
                   >
@@ -787,8 +787,8 @@ export default function OperationRequestForm({
               </label>
               <div
                 className={`border-2 border-dashed rounded-xl p-6 text-center transition-all duration-200 ${isDragOver
-                    ? "border-blue-400 bg-blue-50 scale-[1.02]"
-                    : "border-gray-300 hover:border-gray-400 hover:bg-gray-50"
+                  ? "border-blue-400 bg-blue-50 scale-[1.02]"
+                  : "border-gray-300 hover:border-gray-400 hover:bg-gray-50"
                   }`}
                 onDragOver={handleDragOver}
                 onDragLeave={handleDragLeave}
@@ -1012,29 +1012,6 @@ export default function OperationRequestForm({
               <label className="block text-sm font-semibold text-gray-900 mb-4">
                 Budget <span className="text-red-500">*</span>
               </label>
-              <div className="flex gap-3 mb-4">
-                <button
-                  type="button"
-                  onClick={() => setBudgetType("Fixed")}
-                  className={`flex-1 px-4 py-3 text-sm font-medium rounded-lg transition-all ${budgetType === "Fixed"
-                      ? "bg-blue-100 text-blue-700 border-2 border-blue-300 shadow-sm"
-                      : "bg-white text-gray-700 border-2 border-gray-300 hover:bg-gray-50"
-                    }`}
-                >
-                  Fixed
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setBudgetType("Hourly")}
-                  className={`flex-1 px-4 py-3 text-sm font-medium rounded-lg transition-all ${budgetType === "Hourly"
-                      ? "bg-blue-100 text-blue-700 border-2 border-blue-300 shadow-sm"
-                      : "bg-white text-gray-700 border-2 border-gray-300 hover:bg-gray-50"
-                    }`}
-                >
-                  Hourly
-                </button>
-              </div>
-
               <div className="grid grid-cols-2 gap-3">
                 <input
                   type="text"
@@ -1054,21 +1031,6 @@ export default function OperationRequestForm({
                   placeholder="To"
                   className="px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
                 />
-              </div>
-              <div className="mt-3">
-                <div className="relative">
-                  <select
-                    value={currency}
-                    onChange={(e) => setCurrency(e.target.value)}
-                    className="w-full appearance-none px-4 py-3 pr-10 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white text-sm"
-                  >
-                    <option value="USD">USD</option>
-                    <option value="EUR">EUR</option>
-                    <option value="GBP">GBP</option>
-                    <option value="CAD">CAD</option>
-                  </select>
-                  <ChevronDown className="absolute right-3 top-3.5 h-4 w-4 text-gray-400 pointer-events-none" />
-                </div>
               </div>
             </div>
 
@@ -1116,9 +1078,7 @@ export default function OperationRequestForm({
                   Submit Request
                 </Button>
               </div>
-              <Button className="text-sm bg-transparent border-2 text-gray-800 hover:bg-gray-500 hover:text-white transition-colors font-medium">
-                Save draft
-              </Button>
+            
             </div>
           </div>
         </div>

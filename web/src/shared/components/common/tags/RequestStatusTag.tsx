@@ -2,7 +2,7 @@ import * as React from "react";
 import { StatusTag, type ColorScheme, type TagSize } from "./StatusTag";
 import { cn } from "@/shared/lib/utils";
 
-export type RequestStatus = "PENDING" | "PUBLIC" | "ACCEPTED" | "EXPIRED" | "CANCELLED";
+export type RequestStatus = "DRAFT" | "PENDING" | "PUBLIC" | "ACCEPTED" | "REJECTED" | "EXPIRED" | "CANCELLED";
 
 export interface RequestStatusTagProps extends React.HTMLAttributes<HTMLSpanElement> {
     status: RequestStatus;
@@ -10,9 +10,11 @@ export interface RequestStatusTagProps extends React.HTMLAttributes<HTMLSpanElem
 }
 
 const statusConfig: Record<RequestStatus, { label: string; colorScheme: ColorScheme }> = {
+    DRAFT: { label: "Draft", colorScheme: "neutral" },
     PENDING: { label: "Pending", colorScheme: "warning" },
     PUBLIC: { label: "Public", colorScheme: "sky" },
     ACCEPTED: { label: "Accepted", colorScheme: "emerald" },
+    REJECTED: { label: "Rejected", colorScheme: "rose" },
     EXPIRED: { label: "Expired", colorScheme: "neutral" },
     CANCELLED: { label: "Cancelled", colorScheme: "rose" },
 };

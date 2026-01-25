@@ -6,7 +6,7 @@ import {
 } from "./escrow.controller";
 import { protect } from "../../../auth/auth.controller";
 
-const EscrowRouter = Router();
+const EscrowRouter:Router = Router();
 
 // All routes require authentication
 EscrowRouter.use(protect);
