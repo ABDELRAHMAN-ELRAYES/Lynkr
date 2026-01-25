@@ -1,3 +1,7 @@
+// Load .env file FIRST before any other imports
+import dotenv from 'dotenv';
+dotenv.config();
+
 import http from "http";
 import app from "./app";
 import config from "./config/config";

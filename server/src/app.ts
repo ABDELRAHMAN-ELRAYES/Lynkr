@@ -1,4 +1,6 @@
 import express from "express";
+import type { Application } from "express";
+
 import morgan from "morgan";
 import path from "path";
 import helmet from "helmet";
@@ -65,7 +67,7 @@ import { bodyParser, cookieParserMiddleware, corsMiddleware, formParser } from "
 
 export const ROOT_DIR: string = process.cwd();
 
-const app = express();
+const app: Application = express();
 
 // Security middleware
 app.use(helmet({
@@ -102,7 +104,7 @@ app.use(
 app.use("/api/auth", authLimiter, AuthRouter);
 app.use("/api/users", UserRouter);
 app.use("/api/profiles", ProfileRouter);
-app.use("/api/providers", ProfileRouter); 
+app.use("/api/providers", ProfileRouter);
 app.use("/api/payments", PaymentRouter);
 app.use("/api/services", ServiceRouter);
 app.use("/api/subscriptions", SubscriptionRouter);

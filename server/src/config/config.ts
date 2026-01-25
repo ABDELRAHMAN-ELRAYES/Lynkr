@@ -1,7 +1,3 @@
-import dotenv from "dotenv";
-
-dotenv.config();
-
 interface Config {
     port: number;
     env: string;
@@ -63,7 +59,7 @@ interface Config {
 }
 
 const config: Config = {
-    port: parseInt(process.env.PORT || "8080", 10),
+    port: parseInt(process.env.PORT || "3000", 10),
     env: process.env.NODE_ENV || "development",
     databaseUrl: process.env.DATABASE_URL || "",
     jwt: {

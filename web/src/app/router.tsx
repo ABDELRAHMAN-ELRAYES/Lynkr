@@ -43,6 +43,7 @@ import ApplicationStatusPage from "@/features/profile/pages/ApplicationStatusPag
 
 // Services
 import ServicesPage from "@/features/services/pages/ServicesPage";
+import ProviderDetailPage from "@/features/services/pages/ProviderDetailPage";
 
 // Operations
 import OperationsPage from "@/features/operations/pages/OperationsPage";
@@ -88,6 +89,10 @@ export const router = createBrowserRouter([
   {
     path: "/services",
     element: <ServicesPage />,
+  },
+  {
+    path: "/providers/:id",
+    element: <ProviderDetailPage />,
   },
   {
     path: "/operation",

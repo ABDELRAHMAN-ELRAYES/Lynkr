@@ -16,6 +16,7 @@ export interface ProviderProfile {
     title?: string;
     bio?: string;
     hourlyRate?: number;
+    averageRating?: number;
     isApproved: boolean;
     serviceId?: string;
     createdAt: string;
