@@ -598,19 +598,19 @@ export default function OperationRequestForm({
     <div className="fixed inset-0 z-[1005] flex items-center justify-center p-4 overflow-y-auto bg-black/50">
       <div className="w-full max-w-7xl mx-auto bg-white rounded-xl shadow-2xl overflow-hidden my-auto">
         {/* Header */}
-        <div className="bg-[#7682e86b] px-4 sm:px-6 py-4 border-b border-gray-200 sticky top-0 z-10">
+        <div className="bg-gradient-to-r from-[#7682e8] to-[#5a67d8] px-4 sm:px-6 py-4 border-b border-gray-200 sticky top-0 z-10">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2 sm:gap-4 min-w-0 flex-1">
               <div className="w-10 h-10 sm:w-14 sm:h-14 rounded-full bg-gradient-to-br from-blue-100 to-blue-200 flex items-center justify-center ring-2 ring-white shadow-md shrink-0">
-                <span className="text-lg sm:text-xl font-bold text-blue-600">
+                <span className="text-lg sm:text-xl font-bold white">
                   {providerName.charAt(0).toUpperCase()}
                 </span>
               </div>
               <div className="min-w-0 flex-1">
-                <h2 className="text-base sm:text-xl font-bold text-gray-900 truncate">
+                <h2 className="text-base sm:text-xl font-bold text-white truncate">
                   {providerName}
                 </h2>
-                <p className="text-xs sm:text-sm text-gray-600 truncate">{providerTitle || "Service Provider"}</p>
+                <p className="text-xs sm:text-sm text-gray-600 truncate text-white">{providerTitle || "Service Provider"}</p>
               </div>
             </div>
             <Button

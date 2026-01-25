@@ -205,10 +205,6 @@ export default function Profile() {
                   Cancel
                 </Button>
               )}
-              <button className="h-10 px-3 border border-gray-300 rounded-lg flex gap-2 items-center hover:bg-gray-50">
-                <span className="text-sm text-gray-600">Anonymize</span>
-                <EyeOff className="w-4 h-4 text-gray-600" />
-              </button>
             </div>
           </div>
         </div>
