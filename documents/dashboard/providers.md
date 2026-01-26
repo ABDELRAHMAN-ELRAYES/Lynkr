@@ -166,14 +166,14 @@ Show before/after comparison:
 
 | Action | Method | Endpoint |
 |--------|--------|----------|
-| Get Applications | GET | `/api/v1/provider-applications` |
-| Get Application | GET | `/api/v1/provider-applications/:id` |
-| Approve Application | PATCH | `/api/v1/provider-applications/:id/approve` |
-| Reject Application | PATCH | `/api/v1/provider-applications/:id/reject` |
-| Get All Profiles | GET | `/api/v1/profiles` |
-| Get Profile | GET | `/api/v1/profiles/:id` |
-| Approve Update | PATCH | `/api/v1/profiles/:id/approve` |
-| Reject Update | PATCH | `/api/v1/profiles/:id/reject` |
+| Get Applications | GET | `/api/provider-applications` |
+| Get Application | GET | `/api/provider-applications/:id` |
+| Approve Application | PATCH | `/api/provider-applications/:id/approve` |
+| Reject Application | PATCH | `/api/provider-applications/:id/reject` |
+| Get All Profiles | GET | `/api/profiles` |
+| Get Profile | GET | `/api/profiles/:id` |
+| Approve Update | PATCH | `/api/profiles/:id/approve` |
+| Reject Update | PATCH | `/api/profiles/:id/reject` |
 
 ---
 

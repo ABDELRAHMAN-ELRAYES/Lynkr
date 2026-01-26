@@ -117,10 +117,10 @@ Ensure **timely, reliable, and context-aware notifications** for all user-facing
 *   **Grouping**: Notifications support grouping by entity (e.g., "5 new messages in Project X").
 
 **API Endpoints (Notification Module)**:
-*   `GET /api/v1/notifications` - Get paginated list of notifications.
+*   `GET /api/notifications` - Get paginated list of notifications.
     *   *Query Params*: `page`, `limit`, `type` (optional).
-*   `GET /api/v1/notifications/unread-count` - Get count of unread items (for UI badges).
-*   `PATCH /api/v1/notifications/read-all` - Mark all visible notifications as read.
-*   `PATCH /api/v1/notifications/:id/read` - Mark specific notification as read.
-*   `DELETE /api/v1/notifications/:id` - Delete notification (Hide from view).
+*   `GET /api/notifications/unread-count` - Get count of unread items (for UI badges).
+*   `PATCH /api/notifications/read-all` - Mark all visible notifications as read.
+*   `PATCH /api/notifications/:id/read` - Mark specific notification as read.
+*   `DELETE /api/notifications/:id` - Delete notification (Hide from view).
 

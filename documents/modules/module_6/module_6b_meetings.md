@@ -88,12 +88,12 @@ model Meeting {
 
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-| POST | `/api/v1/meetings` | Create/schedule meeting |
-| GET | `/api/v1/meetings/project/:projectId` | Get project meetings |
-| GET | `/api/v1/meetings/:id/token` | Get Agora token to join |
-| PATCH | `/api/v1/meetings/:id/start` | Mark meeting started |
-| PATCH | `/api/v1/meetings/:id/end` | Mark meeting ended |
-| DELETE | `/api/v1/meetings/:id` | Cancel scheduled meeting |
+| POST | `/api/meetings` | Create/schedule meeting |
+| GET | `/api/meetings/project/:projectId` | Get project meetings |
+| GET | `/api/meetings/:id/token` | Get Agora token to join |
+| PATCH | `/api/meetings/:id/start` | Mark meeting started |
+| PATCH | `/api/meetings/:id/end` | Mark meeting ended |
+| DELETE | `/api/meetings/:id` | Cancel scheduled meeting |
 
 ---
 
@@ -116,14 +116,14 @@ model Meeting {
 ### Initiating a Call
 ```javascript
 // 1. Request meeting
-const res = await fetch("/api/v1/meetings", {
+const res = await fetch("/api/meetings", {
     method: "POST",
     body: JSON.stringify({ projectId, guestId, type: "instant" })
 });
 const { meetingId, channelName } = await res.json();
 
 // 2. Get token
-const tokenRes = await fetch(`/api/v1/meetings/${meetingId}/token`);
+const tokenRes = await fetch(`/api/meetings/${meetingId}/token`);
 const { token, uid } = await tokenRes.json();
 
 // 3. Join Agora channel

@@ -157,9 +157,9 @@ Reviews may be flagged for:
 
 | Action | Method | Endpoint |
 |--------|--------|----------|
-| Get Reviews | GET | `/api/v1/reviews` |
-| Get Review | GET | `/api/v1/reviews/:id` |
-| Delete Review | DELETE | `/api/v1/reviews/:id` |
+| Get Reviews | GET | `/api/reviews` |
+| Get Review | GET | `/api/reviews/:id` |
+| Delete Review | DELETE | `/api/reviews/:id` |
 
 ---
 

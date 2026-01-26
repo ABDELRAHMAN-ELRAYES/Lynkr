@@ -176,14 +176,14 @@ The Payments page provides financial oversight including transaction history, es
 
 | Action | Method | Endpoint |
 |--------|--------|----------|
-| Get Payments | GET | `/api/v1/payments` |
-| Get Payment | GET | `/api/v1/payments/:id` |
-| Process Refund | POST | `/api/v1/payments/:id/refund` |
-| Get All Escrows | GET | `/api/v1/escrow` |
-| Get Project Escrow | GET | `/api/v1/escrow/project/:projectId` |
-| Get Withdrawals | GET | `/api/v1/escrow/withdrawals` |
-| Approve Withdrawal | PATCH | `/api/v1/escrow/withdrawals/:id/approve` |
-| Reject Withdrawal | PATCH | `/api/v1/escrow/withdrawals/:id/reject` |
+| Get Payments | GET | `/api/payments` |
+| Get Payment | GET | `/api/payments/:id` |
+| Process Refund | POST | `/api/payments/:id/refund` |
+| Get All Escrows | GET | `/api/escrow` |
+| Get Project Escrow | GET | `/api/escrow/project/:projectId` |
+| Get Withdrawals | GET | `/api/escrow/withdrawals` |
+| Approve Withdrawal | PATCH | `/api/escrow/withdrawals/:id/approve` |
+| Reject Withdrawal | PATCH | `/api/escrow/withdrawals/:id/reject` |
 
 ---
 

@@ -9,12 +9,12 @@
 *   Conflict detection prevents overlapping slots for the same instructor.
 
 **API Endpoints (Slot Module)**:
-*   `POST /api/v1/teaching/slots` - Create single availability slot.
-*   `POST /api/v1/teaching/slots/bulk` - Create multiple slots (e.g., recurring logic).
-*   `GET /api/v1/teaching/slots/my` - List instructor's own slots.
-*   `GET /api/v1/teaching/slots/provider/:providerId` - Public view of an instructor's calendar.
-*   `PATCH /api/v1/teaching/slots/:id` - Update slot details.
-*   `DELETE /api/v1/teaching/slots/:id` - Delete/Cancel slot.
+*   `POST /api/teaching/slots` - Create single availability slot.
+*   `POST /api/teaching/slots/bulk` - Create multiple slots (e.g., recurring logic).
+*   `GET /api/teaching/slots/my` - List instructor's own slots.
+*   `GET /api/teaching/slots/provider/:providerId` - Public view of an instructor's calendar.
+*   `PATCH /api/teaching/slots/:id` - Update slot details.
+*   `DELETE /api/teaching/slots/:id` - Delete/Cancel slot.
 
 ### 7.2 Booking & Session Management
 **Logic**:
@@ -24,13 +24,13 @@
 *   **Capacity**: Slots can have max attendees (default 1 for private, >1 for group).
 
 **API Endpoints (Session Module)**:
-*   `POST /api/v1/teaching/sessions/book` - Book a slot.
+*   `POST /api/teaching/sessions/book` - Book a slot.
     *   *Payload*: `slotId`, `studentNotes`.
-*   `GET /api/v1/teaching/sessions/my` - List student's scheduled sessions.
-*   `GET /api/v1/teaching/sessions/instructor` - List instructor's upcoming sessions.
-*   `GET /api/v1/teaching/sessions/:id` - Session details.
-*   `PATCH /api/v1/teaching/sessions/:id/start` - Instructor starts session.
-*   `PATCH /api/v1/teaching/sessions/:id/complete` - Mark session completed.
-*   `PATCH /api/v1/teaching/sessions/:id/cancel` - Cancel session (releases Slot).
-*   `POST /api/v1/teaching/sessions/:id/join` - Join active session.
-*   `POST /api/v1/teaching/sessions/:id/leave` - Leave session.
+*   `GET /api/teaching/sessions/my` - List student's scheduled sessions.
+*   `GET /api/teaching/sessions/instructor` - List instructor's upcoming sessions.
+*   `GET /api/teaching/sessions/:id` - Session details.
+*   `PATCH /api/teaching/sessions/:id/start` - Instructor starts session.
+*   `PATCH /api/teaching/sessions/:id/complete` - Mark session completed.
+*   `PATCH /api/teaching/sessions/:id/cancel` - Cancel session (releases Slot).
+*   `POST /api/teaching/sessions/:id/join` - Join active session.
+*   `POST /api/teaching/sessions/:id/leave` - Leave session.

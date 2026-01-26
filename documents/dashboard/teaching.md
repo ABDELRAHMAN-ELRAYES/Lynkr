@@ -135,10 +135,10 @@ The Teaching page provides oversight of teaching sessions and provider availabil
 
 | Action | Method | Endpoint |
 |--------|--------|----------|
-| Get Sessions | GET | `/api/v1/teaching/sessions` |
-| Get Session | GET | `/api/v1/teaching/sessions/:id` |
-| Get Participants | GET | `/api/v1/teaching/sessions/:id/participants` |
-| Get Slots | GET | `/api/v1/teaching/slots` |
+| Get Sessions | GET | `/api/teaching/sessions` |
+| Get Session | GET | `/api/teaching/sessions/:id` |
+| Get Participants | GET | `/api/teaching/sessions/:id/participants` |
+| Get Slots | GET | `/api/teaching/slots` |
 
 ---
 

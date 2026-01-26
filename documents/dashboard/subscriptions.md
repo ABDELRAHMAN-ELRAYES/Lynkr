@@ -143,14 +143,14 @@ The Subscriptions page manages subscription plans and monitors active provider s
 
 | Action | Method | Endpoint |
 |--------|--------|----------|
-| Get All Plans | GET | `/api/v1/subscriptions/plans` |
-| Create Plan | POST | `/api/v1/subscriptions/plans` |
-| Update Plan | PATCH | `/api/v1/subscriptions/plans/:id` |
-| Toggle Plan Status | PATCH | `/api/v1/subscriptions/plans/:id/status` |
-| Delete Plan | DELETE | `/api/v1/subscriptions/plans/:id` |
-| Get Subscriptions | GET | `/api/v1/subscriptions` |
-| Get Expiring | GET | `/api/v1/subscriptions?expiringIn=7` |
-| Cancel Subscription | DELETE | `/api/v1/subscriptions/:id` |
+| Get All Plans | GET | `/api/subscriptions/plans` |
+| Create Plan | POST | `/api/subscriptions/plans` |
+| Update Plan | PATCH | `/api/subscriptions/plans/:id` |
+| Toggle Plan Status | PATCH | `/api/subscriptions/plans/:id/status` |
+| Delete Plan | DELETE | `/api/subscriptions/plans/:id` |
+| Get Subscriptions | GET | `/api/subscriptions` |
+| Get Expiring | GET | `/api/subscriptions?expiringIn=7` |
+| Cancel Subscription | DELETE | `/api/subscriptions/:id` |
 
 ---
 

@@ -112,11 +112,11 @@ Provide a **structured system for users to report issues or complaints**, ensuri
     4.  Admin takes action (optional, e.g., Suspend User).
 
 **API Endpoints (Report Module)**:
-*   `POST /api/v1/reports` - Submit a report.
+*   `POST /api/reports` - Submit a report.
     *   *Payload*: `targetId`, `targetType` (User/Project/Request), `reason`, `description`.
-*   `GET /api/v1/reports/my` - List reports submitted by me.
-*   `GET /api/v1/reports/:id` - Get details.
-*   `GET /api/v1/reports/admin/all` - Admin: List all reports.
-*   `PATCH /api/v1/reports/:id/status` - Admin: Update status.
-*   `POST /api/v1/reports/:id/action` - Admin: Trigger automated action (block user etc.).
+*   `GET /api/reports/my` - List reports submitted by me.
+*   `GET /api/reports/:id` - Get details.
+*   `GET /api/reports/admin/all` - Admin: List all reports.
+*   `PATCH /api/reports/:id/status` - Admin: Update status.
+*   `POST /api/reports/:id/action` - Admin: Trigger automated action (block user etc.).
 

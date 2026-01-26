@@ -231,14 +231,14 @@ Read-only view of project conversation:
 
 | Action | Method | Endpoint |
 |--------|--------|----------|
-| Get All Projects | GET | `/api/v1/projects` |
-| Get Project | GET | `/api/v1/projects/:id` |
-| Get Project Files | GET | `/api/v1/projects/:id/files` |
-| Delete File | DELETE | `/api/v1/projects/:id/files/:fileId` |
-| Get Activities | GET | `/api/v1/projects/:id/activities` |
-| Get Messages | GET | `/api/v1/conversations/:id/messages` |
-| Get Escrow | GET | `/api/v1/escrow/project/:projectId` |
-| Issue Refund | POST | `/api/v1/payments/:id/refund` |
+| Get All Projects | GET | `/api/projects` |
+| Get Project | GET | `/api/projects/:id` |
+| Get Project Files | GET | `/api/projects/:id/files` |
+| Delete File | DELETE | `/api/projects/:id/files/:fileId` |
+| Get Activities | GET | `/api/projects/:id/activities` |
+| Get Messages | GET | `/api/conversations/:id/messages` |
+| Get Escrow | GET | `/api/escrow/project/:projectId` |
+| Issue Refund | POST | `/api/payments/:id/refund` |
 
 ---
 

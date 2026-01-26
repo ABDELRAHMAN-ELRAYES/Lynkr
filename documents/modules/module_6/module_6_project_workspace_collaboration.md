@@ -223,7 +223,7 @@ At this point, the platform supports **controlled project execution and collabor
 The Project Activity system functions as an **Audit Log** and **Timeline**. It tracks every significant action taken within a project lifecycle to provide transparency and accountability to both the Client and Provider. It answers the question: *"Who did what, and when?"*
 
 ### 11.2 API Endpoints
-**Base URL:** `/api/v1/projects`
+**Base URL:** `/api/projects`
 
 | Method | Endpoint | Description | Access |
 | :--- | :--- | :--- | :--- |

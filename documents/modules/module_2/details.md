@@ -316,12 +316,12 @@ Module 2 is complete when:
     *   *Reject*: Updates status to `REJECTED`, sets cooldown period (30 days).
 
 **API Endpoints (Provider Application Module)**:
-*   `POST /api/v1/provider-applications` (submitApplication) - Submit current profile for review.
-*   `GET /api/v1/provider-applications/me` - Get my application status history.
-*   `GET /api/v1/provider-applications` (Admin) - List pending applications.
-*   `GET /api/v1/provider-applications/:id` (Admin) - View application details.
-*   `PATCH /api/v1/provider-applications/:id/approve` (Admin) - Approve application.
-*   `PATCH /api/v1/provider-applications/:id/reject` (Admin) - Reject application.
+*   `POST /api/provider-applications` (submitApplication) - Submit current profile for review.
+*   `GET /api/provider-applications/me` - Get my application status history.
+*   `GET /api/provider-applications` (Admin) - List pending applications.
+*   `GET /api/provider-applications/:id` (Admin) - View application details.
+*   `PATCH /api/provider-applications/:id/approve` (Admin) - Approve application.
+*   `PATCH /api/provider-applications/:id/reject` (Admin) - Reject application.
 
 ### 12.2 Provider Profile Management
 **Logic**:
@@ -330,30 +330,30 @@ Module 2 is complete when:
 *   Profile management is restricted based on status (locked when Pending/Approved in some fields).
 
 **API Endpoints (Profile Module)**:
-*   `POST /api/v1/provider-profiles` - Create initial profile.
-*   `PUT /api/v1/provider-profiles/:id` - Update profile details.
-*   `GET /api/v1/provider-profiles/:id` - Get specific profile.
-*   `GET /api/v1/provider-profiles/user/:userId` - Get profile by user ID.
-*   `GET /api/v1/provider-profiles` - List all approved profiles (Public directory).
-*   `GET /api/v1/provider-profiles/search` - Search profiles with filters.
-*   `POST /api/v1/provider-profiles/:id/approve` (Admin) - Direct profile approval.
-*   `POST /api/v1/provider-profiles/:id/reject` (Admin) - Direct profile rejection.
-*   `DELETE /api/v1/provider-profiles/:id` (Admin) - Delete profile.
+*   `POST /api/provider-profiles` - Create initial profile.
+*   `PUT /api/provider-profiles/:id` - Update profile details.
+*   `GET /api/provider-profiles/:id` - Get specific profile.
+*   `GET /api/provider-profiles/user/:userId` - Get profile by user ID.
+*   `GET /api/provider-profiles` - List all approved profiles (Public directory).
+*   `GET /api/provider-profiles/search` - Search profiles with filters.
+*   `POST /api/provider-profiles/:id/approve` (Admin) - Direct profile approval.
+*   `POST /api/provider-profiles/:id/reject` (Admin) - Direct profile rejection.
+*   `DELETE /api/provider-profiles/:id` (Admin) - Delete profile.
 
 ### 12.3 Professional History (Sub-modules)
 **Education**:
-*   `POST /api/v1/provider/education`
-*   `GET /api/v1/provider/education/profile/:profileId`
-*   `GET /api/v1/provider/education/:id`
-*   `PUT /api/v1/provider/education/:id`
-*   `DELETE /api/v1/provider/education/:id`
+*   `POST /api/provider/education`
+*   `GET /api/provider/education/profile/:profileId`
+*   `GET /api/provider/education/:id`
+*   `PUT /api/provider/education/:id`
+*   `DELETE /api/provider/education/:id`
 
 **Experience**:
-*   `POST /api/v1/provider/experience`
-*   `GET /api/v1/provider/experience/profile/:profileId`
-*   `GET /api/v1/provider/experience/:id`
-*   `PUT /api/v1/provider/experience/:id`
-*   `DELETE /api/v1/provider/experience/:id`
+*   `POST /api/provider/experience`
+*   `GET /api/provider/experience/profile/:profileId`
+*   `GET /api/provider/experience/:id`
+*   `PUT /api/provider/experience/:id`
+*   `DELETE /api/provider/experience/:id`
 
 **Skills & Languages**:
 *   Managed via Profile update (nested or separate endpoints depending on precise implementation - currently via Profile service).

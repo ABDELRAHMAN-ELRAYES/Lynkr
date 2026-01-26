@@ -12,16 +12,16 @@ This document defines all administrative responsibilities across Lynkr's platfor
 
 | Action | Description | API Endpoint |
 |--------|-------------|--------------|
-| View All Users | Paginated list with search, filter by role/status | `GET /api/v1/users` |
-| View Batch Users | Paginated with filters | `GET /api/v1/users/batch` |
-| View User Details | Complete user profile with activity | `GET /api/v1/users/:id` |
-| **Create User** | Add new user with role | `POST /api/v1/users` |
-| **Create Batch Users** | Bulk user creation | `POST /api/v1/users/batch` |
-| Update User Information | Modify user data | `PUT /api/v1/users/:id` |
-| Update User Profile | Modify profile details | `PUT /api/v1/users/:id/profile` |
-| Update User Status | Activate/Deactivate accounts | `PATCH /api/v1/users/:id` |
-| Update User Password | Admin-initiated password change | `PATCH /api/v1/users/:id/password` |
-| Delete User | Remove user from system | `DELETE /api/v1/users/:id` |
+| View All Users | Paginated list with search, filter by role/status | `GET /api/users` |
+| View Batch Users | Paginated with filters | `GET /api/users/batch` |
+| View User Details | Complete user profile with activity | `GET /api/users/:id` |
+| **Create User** | Add new user with role | `POST /api/users` |
+| **Create Batch Users** | Bulk user creation | `POST /api/users/batch` |
+| Update User Information | Modify user data | `PUT /api/users/:id` |
+| Update User Profile | Modify profile details | `PUT /api/users/:id/profile` |
+| Update User Status | Activate/Deactivate accounts | `PATCH /api/users/:id` |
+| Update User Password | Admin-initiated password change | `PATCH /api/users/:id/password` |
+| Delete User | Remove user from system | `DELETE /api/users/:id` |
 
 ### 1.2 Creating New Users (Admin-Initiated)
 
@@ -41,7 +41,7 @@ This document defines all administrative responsibilities across Lynkr's platfor
 
 ```json
 // Example: Create Admin User
-POST /api/v1/users
+POST /api/users
 {
   "email": "newadmin@lynkr.com",
   "password": "SecurePassword123!",
@@ -59,7 +59,7 @@ For onboarding multiple users at once:
 
 ```json
 // Example: Create Multiple Users
-POST /api/v1/users/batch
+POST /api/users/batch
 {
   "users": [
     {
@@ -115,7 +115,7 @@ After creating an admin user, assign specific privileges:
 
 ```json
 // Example: Assign Privileges
-PATCH /api/v1/users/:adminId/privileges
+PATCH /api/users/:adminId/privileges
 {
   "privileges": [
     "MANAGE_USERS",
@@ -129,11 +129,11 @@ PATCH /api/v1/users/:adminId/privileges
 
 | Metric | Description | API Endpoint |
 |--------|-------------|--------------|
-| Total Users | Count by role | `GET /api/v1/users/statistics` |
+| Total Users | Count by role | `GET /api/users/statistics` |
 | Active Users | Currently active accounts | Included in statistics |
 | Inactive Users | Deactivated/banned accounts | Included in statistics |
 | Users by Role | Breakdown: Clients, Providers, Admins | Included in statistics |
-| Min Batch Users | Minimal user list by role | `GET /api/v1/users/min-batch` |
+| Min Batch Users | Minimal user list by role | `GET /api/users/min-batch` |
 
 ### 1.5 Admin Actions on Users
 
@@ -151,20 +151,20 @@ PATCH /api/v1/users/:adminId/privileges
 
 | Action | Description | API Endpoint |
 |--------|-------------|--------------|
-| View All Applications | List with status filter | `GET /api/v1/provider-applications` |
-| View Pending Applications | Filter by PENDING status | `GET /api/v1/provider-applications?status=PENDING` |
-| View Application Details | Full application data | `GET /api/v1/provider-applications/:id` |
-| Approve Application | Change user role to PROVIDER | `PATCH /api/v1/provider-applications/:id/approve` |
-| Reject Application | Reject with feedback message | `PATCH /api/v1/provider-applications/:id/reject` |
+| View All Applications | List with status filter | `GET /api/provider-applications` |
+| View Pending Applications | Filter by PENDING status | `GET /api/provider-applications?status=PENDING` |
+| View Application Details | Full application data | `GET /api/provider-applications/:id` |
+| Approve Application | Change user role to PROVIDER | `PATCH /api/provider-applications/:id/approve` |
+| Reject Application | Reject with feedback message | `PATCH /api/provider-applications/:id/reject` |
 
 ### 2.2 Provider Profile Review
 
 | Action | Description | API Endpoint |
 |--------|-------------|--------------|
-| View All Profiles | List provider profiles | `GET /api/v1/profiles` |
-| View Profile Details | Complete profile info | `GET /api/v1/profiles/:id` |
-| Approve Profile Update | Review and approve changes | `PATCH /api/v1/profiles/:id/approve` |
-| Reject Profile Update | Return with feedback | `PATCH /api/v1/profiles/:id/reject` |
+| View All Profiles | List provider profiles | `GET /api/profiles` |
+| View Profile Details | Complete profile info | `GET /api/profiles/:id` |
+| Approve Profile Update | Review and approve changes | `PATCH /api/profiles/:id/approve` |
+| Reject Profile Update | Return with feedback | `PATCH /api/profiles/:id/reject` |
 
 ### 2.3 Application Review Checklist
 
@@ -199,11 +199,11 @@ PENDING → APPROVED → (User becomes PROVIDER)
 
 | Action | Description | API Endpoint |
 |--------|-------------|--------------|
-| View All Services | List all service categories | `GET /api/v1/services` |
-| View Service Details | Single service with skills | `GET /api/v1/services/:id` |
-| Create Service | Add new service category | `POST /api/v1/services` |
-| Update Service | Modify service name/description | `PATCH /api/v1/services/:id` |
-| Delete Service | Remove service (if no providers) | `DELETE /api/v1/services/:id` |
+| View All Services | List all service categories | `GET /api/services` |
+| View Service Details | Single service with skills | `GET /api/services/:id` |
+| Create Service | Add new service category | `POST /api/services` |
+| Update Service | Modify service name/description | `PATCH /api/services/:id` |
+| Delete Service | Remove service (if no providers) | `DELETE /api/services/:id` |
 
 #### Service Data Model
 
@@ -230,9 +230,9 @@ PENDING → APPROVED → (User becomes PROVIDER)
 
 | Action | Description | API Endpoint |
 |--------|-------------|--------------|
-| View Skills by Service | Skills under a service category | `GET /api/v1/services/:id/skills` |
-| Create Skill | Add skill to service | `POST /api/v1/services/:id/skills` |
-| Delete Skill | Remove skill from service | `DELETE /api/v1/services/:id/skills/:skillId` |
+| View Skills by Service | Skills under a service category | `GET /api/services/:id/skills` |
+| Create Skill | Add skill to service | `POST /api/services/:id/skills` |
+| Delete Skill | Remove skill from service | `DELETE /api/services/:id/skills/:skillId` |
 
 #### Skill Data Model
 
@@ -277,10 +277,10 @@ PENDING → APPROVED → (User becomes PROVIDER)
 
 | Action | Description | API Endpoint |
 |--------|-------------|--------------|
-| View All Reports | Paginated list with filters | `GET /api/v1/reports` |
-| View Report Details | Full report with context | `GET /api/v1/reports/:id` |
-| Update Report Status | Change status workflow | `PATCH /api/v1/reports/:id/status` |
-| Add Admin Action | Log action taken | `POST /api/v1/reports/:id/actions` |
+| View All Reports | Paginated list with filters | `GET /api/reports` |
+| View Report Details | Full report with context | `GET /api/reports/:id` |
+| Update Report Status | Change status workflow | `PATCH /api/reports/:id/status` |
+| Add Admin Action | Log action taken | `POST /api/reports/:id/actions` |
 
 ### 4.2 Report Status Workflow
 
@@ -327,11 +327,11 @@ PENDING → APPROVED → (User becomes PROVIDER)
 
 | Action | Description | API Endpoint |
 |--------|-------------|--------------|
-| View All Plans | List subscription tiers | `GET /api/v1/subscriptions/plans` |
-| Create Plan | Add new subscription tier | `POST /api/v1/subscriptions/plans` |
-| Update Plan | Modify plan details | `PATCH /api/v1/subscriptions/plans/:id` |
-| Toggle Plan Status | Activate/deactivate | `PATCH /api/v1/subscriptions/plans/:id/status` |
-| Delete Plan | Remove (if no subscribers) | `DELETE /api/v1/subscriptions/plans/:id` |
+| View All Plans | List subscription tiers | `GET /api/subscriptions/plans` |
+| Create Plan | Add new subscription tier | `POST /api/subscriptions/plans` |
+| Update Plan | Modify plan details | `PATCH /api/subscriptions/plans/:id` |
+| Toggle Plan Status | Activate/deactivate | `PATCH /api/subscriptions/plans/:id/status` |
+| Delete Plan | Remove (if no subscribers) | `DELETE /api/subscriptions/plans/:id` |
 
 ### 5.2 Plan Data Model
 
@@ -348,10 +348,10 @@ PENDING → APPROVED → (User becomes PROVIDER)
 
 | Action | Description | API Endpoint |
 |--------|-------------|--------------|
-| View Active Subscriptions | All active subs | `GET /api/v1/subscriptions?status=ACTIVE` |
-| View Expiring Soon | Expire within N days | `GET /api/v1/subscriptions?expiringIn=7` |
-| View Expired | Recently expired | `GET /api/v1/subscriptions?status=EXPIRED` |
-| Cancel Subscription | Admin-initiated cancel | `DELETE /api/v1/subscriptions/:id` |
+| View Active Subscriptions | All active subs | `GET /api/subscriptions?status=ACTIVE` |
+| View Expiring Soon | Expire within N days | `GET /api/subscriptions?expiringIn=7` |
+| View Expired | Recently expired | `GET /api/subscriptions?status=EXPIRED` |
+| Cancel Subscription | Admin-initiated cancel | `DELETE /api/subscriptions/:id` |
 
 ### 5.4 Subscription Lifecycle
 
@@ -368,24 +368,24 @@ PENDING → ACTIVE → EXPIRED
 
 | Action | Description | API Endpoint |
 |--------|-------------|--------------|
-| View All Payments | Transaction list | `GET /api/v1/payments` |
-| View Payment Details | Single transaction | `GET /api/v1/payments/:id` |
-| Process Refund | Refund to client | `POST /api/v1/payments/:id/refund` |
+| View All Payments | Transaction list | `GET /api/payments` |
+| View Payment Details | Single transaction | `GET /api/payments/:id` |
+| Process Refund | Refund to client | `POST /api/payments/:id/refund` |
 
 ### 6.2 Escrow Oversight
 
 | Action | Description | API Endpoint |
 |--------|-------------|--------------|
-| View All Escrows | Active escrow holdings | `GET /api/v1/escrow` |
-| View Project Escrow | Specific project | `GET /api/v1/escrow/project/:projectId` |
+| View All Escrows | Active escrow holdings | `GET /api/escrow` |
+| View Project Escrow | Specific project | `GET /api/escrow/project/:projectId` |
 
 ### 6.3 Provider Withdrawal Management
 
 | Action | Description | API Endpoint |
 |--------|-------------|--------------|
-| View Withdrawal Requests | Pending withdrawals | `GET /api/v1/escrow/withdrawals` |
-| Approve Withdrawal | Process payout | `PATCH /api/v1/escrow/withdrawals/:id/approve` |
-| Reject Withdrawal | Deny with reason | `PATCH /api/v1/escrow/withdrawals/:id/reject` |
+| View Withdrawal Requests | Pending withdrawals | `GET /api/escrow/withdrawals` |
+| Approve Withdrawal | Process payout | `PATCH /api/escrow/withdrawals/:id/approve` |
+| Reject Withdrawal | Deny with reason | `PATCH /api/escrow/withdrawals/:id/reject` |
 
 ### 6.4 Financial Dashboard Metrics
 
@@ -406,9 +406,9 @@ PENDING → ACTIVE → EXPIRED
 
 | Action | Description | API Endpoint |
 |--------|-------------|--------------|
-| View All Requests | All client requests | `GET /api/v1/requests` |
-| View Request Details | Single request with full info | `GET /api/v1/requests/:id` |
-| View Proposals | Proposals submitted for request | `GET /api/v1/requests/:id/proposals` |
+| View All Requests | All client requests | `GET /api/requests` |
+| View Request Details | Single request with full info | `GET /api/requests/:id` |
+| View Proposals | Proposals submitted for request | `GET /api/requests/:id/proposals` |
 
 #### Request Details Include:
 - Client information
@@ -423,9 +423,9 @@ PENDING → ACTIVE → EXPIRED
 
 | Action | Description | API Endpoint |
 |--------|-------------|--------------|
-| View All Projects | All platform projects | `GET /api/v1/projects` |
-| View Project Details | Complete project information | `GET /api/v1/projects/:id` |
-| View User's Projects | Projects for specific user | `GET /api/v1/projects/me` |
+| View All Projects | All platform projects | `GET /api/projects` |
+| View Project Details | Complete project information | `GET /api/projects/:id` |
+| View User's Projects | Projects for specific user | `GET /api/projects/me` |
 
 #### Project Details Response Includes:
 
@@ -460,9 +460,9 @@ PENDING → ACTIVE → EXPIRED
 
 | Action | Description | API Endpoint |
 |--------|-------------|--------------|
-| View Project Files | List all uploaded files | `GET /api/v1/projects/:id/files` |
+| View Project Files | List all uploaded files | `GET /api/projects/:id/files` |
 | File Details | Single file info | Included in file list |
-| Delete File | Admin removal if inappropriate | `DELETE /api/v1/projects/:id/files/:fileId` |
+| Delete File | Admin removal if inappropriate | `DELETE /api/projects/:id/files/:fileId` |
 
 #### File Information:
 
@@ -480,7 +480,7 @@ PENDING → ACTIVE → EXPIRED
 
 | Action | Description | API Endpoint |
 |--------|-------------|--------------|
-| View Activities | Full activity history | `GET /api/v1/projects/:id/activities` |
+| View Activities | Full activity history | `GET /api/projects/:id/activities` |
 
 #### Activity Types Logged:
 
@@ -523,9 +523,9 @@ PENDING → ACTIVE → EXPIRED
 
 | Action | Description | API Endpoint |
 |--------|-------------|--------------|
-| View Project Conversation | Get conversation ID | `GET /api/v1/projects/:id` (includes conversationId) |
-| View Messages | All messages in conversation | `GET /api/v1/conversations/:id/messages` |
-| Message History | Paginated message list | `GET /api/v1/conversations/:id/messages?page=1&limit=50` |
+| View Project Conversation | Get conversation ID | `GET /api/projects/:id` (includes conversationId) |
+| View Messages | All messages in conversation | `GET /api/conversations/:id/messages` |
+| Message History | Paginated message list | `GET /api/conversations/:id/messages?page=1&limit=50` |
 
 #### Message Information:
 
@@ -542,7 +542,7 @@ PENDING → ACTIVE → EXPIRED
 
 | Action | Description | API Endpoint |
 |--------|-------------|--------------|
-| View Project Escrow | Escrow for specific project | `GET /api/v1/escrow/project/:projectId` |
+| View Project Escrow | Escrow for specific project | `GET /api/escrow/project/:projectId` |
 
 #### Escrow Information:
 
@@ -569,12 +569,12 @@ When a report or dispute is received:
 
 1. **Review Report**: Access complaint details and evidence
 2. **Project Investigation**:
-   - View project details (`GET /api/v1/projects/:id`)
-   - Read message history (`GET /api/v1/conversations/:id/messages`)
-   - Check activity timeline (`GET /api/v1/projects/:id/activities`)
-   - Review uploaded files (`GET /api/v1/projects/:id/files`)
+   - View project details (`GET /api/projects/:id`)
+   - Read message history (`GET /api/conversations/:id/messages`)
+   - Check activity timeline (`GET /api/projects/:id/activities`)
+   - Review uploaded files (`GET /api/projects/:id/files`)
 3. **Financial Review**:
-   - Check escrow status (`GET /api/v1/escrow/project/:id`)
+   - Check escrow status (`GET /api/escrow/project/:id`)
    - View payment history
 4. **Resolution Actions**:
    - Mediate between parties via admin messaging
@@ -592,9 +592,9 @@ When a report or dispute is received:
 
 | Action | Description | API Endpoint |
 |--------|-------------|--------------|
-| View All Reviews | Platform reviews | `GET /api/v1/reviews` |
-| View Review Details | Single review | `GET /api/v1/reviews/:id` |
-| Delete Review | Remove inappropriate | `DELETE /api/v1/reviews/:id` |
+| View All Reviews | Platform reviews | `GET /api/reviews` |
+| View Review Details | Single review | `GET /api/reviews/:id` |
+| Delete Review | Remove inappropriate | `DELETE /api/reviews/:id` |
 
 ### 8.2 Review Moderation Criteria
 
@@ -614,15 +614,15 @@ When a report or dispute is received:
 
 | Action | Description | API Endpoint |
 |--------|-------------|--------------|
-| View All Sessions | Scheduled/completed | `GET /api/v1/teaching/sessions` |
-| View Session Details | Single session | `GET /api/v1/teaching/sessions/:id` |
-| View Session Participants | Attendance | `GET /api/v1/teaching/sessions/:id/participants` |
+| View All Sessions | Scheduled/completed | `GET /api/teaching/sessions` |
+| View Session Details | Single session | `GET /api/teaching/sessions/:id` |
+| View Session Participants | Attendance | `GET /api/teaching/sessions/:id/participants` |
 
 ### 9.2 Slot Management View
 
 | Action | Description | API Endpoint |
 |--------|-------------|--------------|
-| View Provider Slots | Provider availability | `GET /api/v1/teaching/slots?providerId=:id` |
+| View Provider Slots | Provider availability | `GET /api/teaching/slots?providerId=:id` |
 
 ---
 
@@ -694,82 +694,82 @@ Based on privileges, admins see different dashboard tabs:
 
 ### User Management
 ```
-GET    /api/v1/users
-GET    /api/v1/users/:id
-PATCH  /api/v1/users/:id
-PATCH  /api/v1/users/:id/status
-PATCH  /api/v1/users/:id/role
-DELETE /api/v1/users/:id
+GET    /api/users
+GET    /api/users/:id
+PATCH  /api/users/:id
+PATCH  /api/users/:id/status
+PATCH  /api/users/:id/role
+DELETE /api/users/:id
 ```
 
 ### Provider Applications
 ```
-GET    /api/v1/provider-applications
-GET    /api/v1/provider-applications/:id
-PATCH  /api/v1/provider-applications/:id/approve
-PATCH  /api/v1/provider-applications/:id/reject
+GET    /api/provider-applications
+GET    /api/provider-applications/:id
+PATCH  /api/provider-applications/:id/approve
+PATCH  /api/provider-applications/:id/reject
 ```
 
 ### Services & Skills
 ```
-GET    /api/v1/services
-GET    /api/v1/services/:id
-POST   /api/v1/services
-PATCH  /api/v1/services/:id
-DELETE /api/v1/services/:id
-GET    /api/v1/services/:id/skills
-POST   /api/v1/services/:id/skills
-DELETE /api/v1/services/:id/skills/:skillId
+GET    /api/services
+GET    /api/services/:id
+POST   /api/services
+PATCH  /api/services/:id
+DELETE /api/services/:id
+GET    /api/services/:id/skills
+POST   /api/services/:id/skills
+DELETE /api/services/:id/skills/:skillId
 ```
 
 ### Reports & Moderation
 ```
-GET    /api/v1/reports
-GET    /api/v1/reports/:id
-PATCH  /api/v1/reports/:id/status
-POST   /api/v1/reports/:id/actions
+GET    /api/reports
+GET    /api/reports/:id
+PATCH  /api/reports/:id/status
+POST   /api/reports/:id/actions
 ```
 
 ### Subscriptions
 ```
-GET    /api/v1/subscriptions/plans
-POST   /api/v1/subscriptions/plans
-PATCH  /api/v1/subscriptions/plans/:id
-DELETE /api/v1/subscriptions/plans/:id
-GET    /api/v1/subscriptions
+GET    /api/subscriptions/plans
+POST   /api/subscriptions/plans
+PATCH  /api/subscriptions/plans/:id
+DELETE /api/subscriptions/plans/:id
+GET    /api/subscriptions
 ```
 
 ### Payments & Escrow
 ```
-GET    /api/v1/payments
-GET    /api/v1/payments/:id
-POST   /api/v1/payments/:id/refund
-GET    /api/v1/escrow
-GET    /api/v1/escrow/project/:projectId
-GET    /api/v1/escrow/withdrawals
-PATCH  /api/v1/escrow/withdrawals/:id/approve
-PATCH  /api/v1/escrow/withdrawals/:id/reject
+GET    /api/payments
+GET    /api/payments/:id
+POST   /api/payments/:id/refund
+GET    /api/escrow
+GET    /api/escrow/project/:projectId
+GET    /api/escrow/withdrawals
+PATCH  /api/escrow/withdrawals/:id/approve
+PATCH  /api/escrow/withdrawals/:id/reject
 ```
 
 ### Projects & Requests
 ```
-GET    /api/v1/requests
-GET    /api/v1/requests/:id
-GET    /api/v1/projects
-GET    /api/v1/projects/:id
-GET    /api/v1/projects/:id/activities
+GET    /api/requests
+GET    /api/requests/:id
+GET    /api/projects
+GET    /api/projects/:id
+GET    /api/projects/:id/activities
 ```
 
 ### Reviews
 ```
-GET    /api/v1/reviews
-GET    /api/v1/reviews/:id
-DELETE /api/v1/reviews/:id
+GET    /api/reviews
+GET    /api/reviews/:id
+DELETE /api/reviews/:id
 ```
 
 ### Teaching
 ```
-GET    /api/v1/teaching/sessions
-GET    /api/v1/teaching/sessions/:id
-GET    /api/v1/teaching/slots
+GET    /api/teaching/sessions
+GET    /api/teaching/sessions/:id
+GET    /api/teaching/slots
 ```

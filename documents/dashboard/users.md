@@ -41,15 +41,15 @@ The Users page provides complete user management capabilities including viewing,
 
 | Action | Method | Endpoint |
 |--------|--------|----------|
-| Fetch Users | GET | `/api/v1/users/batch` |
-| Get Statistics | GET | `/api/v1/users/statistics` |
-| Get Single User | GET | `/api/v1/users/:id` |
-| Create User | POST | `/api/v1/users` |
-| Create Batch Users | POST | `/api/v1/users/batch` |
-| Update User | PUT | `/api/v1/users/:id` |
-| Update Status | PATCH | `/api/v1/users/:id` |
-| Update Password | PATCH | `/api/v1/users/:id/password` |
-| Delete User | DELETE | `/api/v1/users/:id` |
+| Fetch Users | GET | `/api/users/batch` |
+| Get Statistics | GET | `/api/users/statistics` |
+| Get Single User | GET | `/api/users/:id` |
+| Create User | POST | `/api/users` |
+| Create Batch Users | POST | `/api/users/batch` |
+| Update User | PUT | `/api/users/:id` |
+| Update Status | PATCH | `/api/users/:id` |
+| Update Password | PATCH | `/api/users/:id/password` |
+| Delete User | DELETE | `/api/users/:id` |
 
 ---
 

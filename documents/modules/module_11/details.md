@@ -8,10 +8,10 @@
 *   **Management**: Admin can create/update plans.
 
 **API Endpoints (Subscription Module)**:
-*   `GET /api/v1/subscriptions/plans` - List available plans.
-*   `GET /api/v1/subscriptions/plans/:id` - Get plan details.
-*   `POST /api/v1/subscriptions/plans` (Admin) - Create new plan.
-*   `PATCH /api/v1/subscriptions/plans/:id` (Admin) - Update plan.
+*   `GET /api/subscriptions/plans` - List available plans.
+*   `GET /api/subscriptions/plans/:id` - Get plan details.
+*   `POST /api/subscriptions/plans` (Admin) - Create new plan.
+*   `PATCH /api/subscriptions/plans/:id` (Admin) - Update plan.
 
 ### 11.2 Purchase & Management
 **Logic**:
@@ -24,9 +24,9 @@
 *   **Cancellation**: User can cancel auto-renewal (if implemented) or terminate.
 
 **API Endpoints**:
-*   `POST /api/v1/subscriptions/purchase` - Buy a subscription.
+*   `POST /api/subscriptions/purchase` - Buy a subscription.
     *   *Payload*: `planId`, `paymentMethodId` (Stripe).
-*   `GET /api/v1/subscriptions/my` - Get current active subscription.
-*   `GET /api/v1/subscriptions/my/history` - View past subscriptions.
-*   `PATCH /api/v1/subscriptions/:id/cancel` - Cancel active subscription.
-*   `GET /api/v1/subscriptions/admin/all` (Admin) - View all user subscriptions.
+*   `GET /api/subscriptions/my` - Get current active subscription.
+*   `GET /api/subscriptions/my/history` - View past subscriptions.
+*   `PATCH /api/subscriptions/:id/cancel` - Cancel active subscription.
+*   `GET /api/subscriptions/admin/all` (Admin) - View all user subscriptions.

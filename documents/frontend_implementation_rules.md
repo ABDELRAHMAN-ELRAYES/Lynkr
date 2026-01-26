@@ -299,16 +299,16 @@ Reference the backend API endpoints from module `details.md` files:
 
 | Module | Base Path | Reference |
 |--------|-----------|-----------|
-| Auth | `/api/v1/auth/` | `documents/modules/module_1/details.md` |
-| Users | `/api/v1/users/` | `documents/modules/module_1/details.md` |
-| Providers | `/api/v1/providers/` | `documents/modules/module_2/details.md` |
-| Requests | `/api/v1/requests/` | `documents/modules/module_4/details.md` |
-| Proposals | `/api/v1/proposals/` | `documents/modules/module_4/details.md` |
-| Projects | `/api/v1/projects/` | `documents/modules/module_6/details.md` |
-| Conversations | `/api/v1/conversations/` | `documents/modules/module_6/details.md` |
-| Messages | `/api/v1/messages/` | `documents/modules/module_6/details.md` |
-| Meetings | `/api/v1/meetings/` | `documents/modules/module_6/details.md` |
-| Payments | `/api/v1/payments/` | `documents/modules/module_5/details.md` |
+| Auth | `/api/auth/` | `documents/modules/module_1/details.md` |
+| Users | `/api/users/` | `documents/modules/module_1/details.md` |
+| Providers | `/api/providers/` | `documents/modules/module_2/details.md` |
+| Requests | `/api/requests/` | `documents/modules/module_4/details.md` |
+| Proposals | `/api/proposals/` | `documents/modules/module_4/details.md` |
+| Projects | `/api/projects/` | `documents/modules/module_6/details.md` |
+| Conversations | `/api/conversations/` | `documents/modules/module_6/details.md` |
+| Messages | `/api/messages/` | `documents/modules/module_6/details.md` |
+| Meetings | `/api/meetings/` | `documents/modules/module_6/details.md` |
+| Payments | `/api/payments/` | `documents/modules/module_5/details.md` |
 
 ### 5.3 Error Handling Pattern
 

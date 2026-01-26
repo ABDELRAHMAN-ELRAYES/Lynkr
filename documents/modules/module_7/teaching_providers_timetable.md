@@ -237,35 +237,35 @@ Enable teaching providers to define available time slots, allow students to book
 ### Slots
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-| POST | `/api/v1/teaching/slots` | Create slot(s) |
-| GET | `/api/v1/teaching/slots/my` | Get tutor's slots |
-| GET | `/api/v1/teaching/slots/provider/:id` | Get provider's public slots |
-| PATCH | `/api/v1/teaching/slots/:id` | Update slot |
-| DELETE | `/api/v1/teaching/slots/:id` | Delete slot |
+| POST | `/api/teaching/slots` | Create slot(s) |
+| GET | `/api/teaching/slots/my` | Get tutor's slots |
+| GET | `/api/teaching/slots/provider/:id` | Get provider's public slots |
+| PATCH | `/api/teaching/slots/:id` | Update slot |
+| DELETE | `/api/teaching/slots/:id` | Delete slot |
 
 ### Sessions
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-| POST | `/api/v1/teaching/sessions/book` | Book slot & pay |
-| GET | `/api/v1/teaching/sessions/my` | Student's sessions |
-| GET | `/api/v1/teaching/sessions/instructor` | Tutor's sessions |
-| GET | `/api/v1/teaching/sessions/:id` | Session details |
-| PATCH | `/api/v1/teaching/sessions/:id/start` | Start session |
-| PATCH | `/api/v1/teaching/sessions/:id/complete` | End session |
-| PATCH | `/api/v1/teaching/sessions/:id/cancel` | Cancel session |
+| POST | `/api/teaching/sessions/book` | Book slot & pay |
+| GET | `/api/teaching/sessions/my` | Student's sessions |
+| GET | `/api/teaching/sessions/instructor` | Tutor's sessions |
+| GET | `/api/teaching/sessions/:id` | Session details |
+| PATCH | `/api/teaching/sessions/:id/start` | Start session |
+| PATCH | `/api/teaching/sessions/:id/complete` | End session |
+| PATCH | `/api/teaching/sessions/:id/cancel` | Cancel session |
 
 ### Files (for sessions)
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-| POST | `/api/v1/teaching/sessions/:id/files` | Upload file |
-| GET | `/api/v1/teaching/sessions/:id/files` | List files |
-| DELETE | `/api/v1/teaching/sessions/:id/files/:fileId` | Delete file |
+| POST | `/api/teaching/sessions/:id/files` | Upload file |
+| GET | `/api/teaching/sessions/:id/files` | List files |
+| DELETE | `/api/teaching/sessions/:id/files/:fileId` | Delete file |
 
 ### Messages (1-to-1 only)
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-| POST | `/api/v1/teaching/sessions/:id/messages` | Send message |
-| GET | `/api/v1/teaching/sessions/:id/messages` | Get messages |
+| POST | `/api/teaching/sessions/:id/messages` | Send message |
+| GET | `/api/teaching/sessions/:id/messages` | Get messages |
 
 ---
 

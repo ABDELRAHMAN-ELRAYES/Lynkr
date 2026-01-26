@@ -15,11 +15,11 @@
     *   Adherence (1-5) (Commitment)
 
 **API Endpoints (Review Module)**:
-*   `POST /api/v1/reviews/projects/:projectId` - Submit review for a project.
+*   `POST /api/reviews/projects/:projectId` - Submit review for a project.
     *   *Payload*: `communication`, `quality`, `adherence` (optional), `comment`, `isAnonymous`.
-*   `POST /api/v1/reviews/sessions/:sessionId` - Submit review for a teaching session.
-*   `GET /api/v1/reviews/projects/:projectId/eligibility` - Check if user can review.
-*   `GET /api/v1/reviews/sessions/:sessionId/eligibility` - Check if user can review.
+*   `POST /api/reviews/sessions/:sessionId` - Submit review for a teaching session.
+*   `GET /api/reviews/projects/:projectId/eligibility` - Check if user can review.
+*   `GET /api/reviews/sessions/:sessionId/eligibility` - Check if user can review.
 
 ### 8.2 Review Aggregation & Display
 **Logic**:
@@ -28,7 +28,7 @@
 *   **Anonymous**: Option to hide reviewer name from public view (but known to system).
 
 **API Endpoints**:
-*   `GET /api/v1/reviews/given` - Reviews submitted by current user.
-*   `GET /api/v1/reviews/received` - Reviews about current user.
-*   `GET /api/v1/reviews/provider/:providerUserId` - Public list of reviews for a provider.
-*   `GET /api/v1/reviews/:id` - Get single review details.
+*   `GET /api/reviews/given` - Reviews submitted by current user.
+*   `GET /api/reviews/received` - Reviews about current user.
+*   `GET /api/reviews/provider/:providerUserId` - Public list of reviews for a provider.
+*   `GET /api/reviews/:id` - Get single review details.

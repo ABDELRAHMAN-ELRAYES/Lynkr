@@ -143,14 +143,14 @@ Toggle between:
 
 | Action | Method | Endpoint |
 |--------|--------|----------|
-| Get All Services | GET | `/api/v1/services` |
-| Get Service | GET | `/api/v1/services/:id` |
-| Create Service | POST | `/api/v1/services` |
-| Update Service | PATCH | `/api/v1/services/:id` |
-| Delete Service | DELETE | `/api/v1/services/:id` |
-| Get Skills | GET | `/api/v1/services/:id/skills` |
-| Create Skill | POST | `/api/v1/services/:id/skills` |
-| Delete Skill | DELETE | `/api/v1/services/:id/skills/:skillId` |
+| Get All Services | GET | `/api/services` |
+| Get Service | GET | `/api/services/:id` |
+| Create Service | POST | `/api/services` |
+| Update Service | PATCH | `/api/services/:id` |
+| Delete Service | DELETE | `/api/services/:id` |
+| Get Skills | GET | `/api/services/:id/skills` |
+| Create Skill | POST | `/api/services/:id/skills` |
+| Delete Skill | DELETE | `/api/services/:id/skills/:skillId` |
 
 ---
 

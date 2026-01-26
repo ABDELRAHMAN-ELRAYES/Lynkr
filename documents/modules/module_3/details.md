@@ -136,11 +136,11 @@ Module 3 is complete when:
 *   Providers select from these during onboarding.
 
 **API Endpoints (Service Module)**:
-*   `GET /api/v1/services` - List all available service categories.
-*   `GET /api/v1/services/:id` - Get service details.
-*   `GET /api/v1/services/:id/skills` - Get valid skills for a service category.
-*   `POST /api/v1/services` (Admin) - Create new service.
-*   `POST /api/v1/services/:id/skills` (Admin) - Add skill to service.
+*   `GET /api/services` - List all available service categories.
+*   `GET /api/services/:id` - Get service details.
+*   `GET /api/services/:id/skills` - Get valid skills for a service category.
+*   `POST /api/services` (Admin) - Create new service.
+*   `POST /api/services/:id/skills` (Admin) - Add skill to service.
 
 ### 8.2 Provider Search & Discovery
 **Logic**:
@@ -150,9 +150,9 @@ Module 3 is complete when:
 *   **Results**: Paginated list of profiles with summary data.
 
 **API Endpoints (Profile Module)**:
-*   `GET /api/v1/provider-profiles/search` - Main search endpoint.
+*   `GET /api/provider-profiles/search` - Main search endpoint.
     *   *Query Params*: `q` (name), `service`, `minPrice`, `maxPrice`, `language`, `minRating`, `sortBy`, `sortOrder`, `page`, `limit`.
-*   `GET /api/v1/provider-profiles` - Directory listing (typically all approved).
+*   `GET /api/provider-profiles` - Directory listing (typically all approved).
 
 ### 8.3 Provider Details
 **Logic**:
@@ -160,5 +160,5 @@ Module 3 is complete when:
 *   Strictly filters non-approved profiles unless viewed by Admin or Owner.
 
 **API Endpoints**:
-*   `GET /api/v1/provider-profiles/:id` - Get detailed public profile.
+*   `GET /api/provider-profiles/:id` - Get detailed public profile.
 

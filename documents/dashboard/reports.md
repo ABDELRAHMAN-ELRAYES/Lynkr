@@ -204,10 +204,10 @@ Each report has an action log:
 
 | Action | Method | Endpoint |
 |--------|--------|----------|
-| Get Reports | GET | `/api/v1/reports` |
-| Get Report | GET | `/api/v1/reports/:id` |
-| Update Status | PATCH | `/api/v1/reports/:id/status` |
-| Add Action | POST | `/api/v1/reports/:id/actions` |
+| Get Reports | GET | `/api/reports` |
+| Get Report | GET | `/api/reports/:id` |
+| Update Status | PATCH | `/api/reports/:id/status` |
+| Add Action | POST | `/api/reports/:id/actions` |
 
 ---
 

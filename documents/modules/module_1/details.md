@@ -246,8 +246,8 @@ Module 1 is complete when:
     5.  User submits OTP.
     6.  On success, user status is updated to ACTIVE, and a JWT token is issued.
 *   **API Endpoints**:
-    *   `POST /api/v1/auth/register` (register) - Initiate registration.
-    *   `POST /api/v1/auth/register-verification` (registerVerification) - Verify OTP and complete registration.
+    *   `POST /api/auth/register` (register) - Initiate registration.
+    *   `POST /api/auth/register-verification` (registerVerification) - Verify OTP and complete registration.
 
 **2. Login Strategy**
 *   **Logic**:
@@ -255,7 +255,7 @@ Module 1 is complete when:
     2.  System verifies hash.
     3.  If valid, issues JWT token (cookie + response).
 *   **API Endpoints**:
-    *   `POST /api/v1/auth/login` (login)
+    *   `POST /api/auth/login` (login)
 
 **3. Google OAuth**
 *   **Logic**:
@@ -265,29 +265,29 @@ Module 1 is complete when:
     4.  If email exists: Log in.
     5.  If new: Redirect to frontend callback with pre-filled data to complete registration.
 *   **API Endpoints**:
-    *   `GET /api/v1/auth/google` - Start OAuth flow.
-    *   `GET /api/v1/auth/google/callback` - Handle Google response.
+    *   `GET /api/auth/google` - Start OAuth flow.
+    *   `GET /api/auth/google/callback` - Handle Google response.
 
 **4. Password Management**
 *   **Logic**:
     *   *Forgot Password*: Generates reset token -> Emails link.
     *   *Reset Password*: Validates token -> Updates password.
 *   **API Endpoints**:
-    *   `POST /api/v1/auth/forget-password` (forgetPassword)
-    *   `POST /api/v1/auth/reset-password` (resetPassword)
+    *   `POST /api/auth/forget-password` (forgetPassword)
+    *   `POST /api/auth/reset-password` (resetPassword)
 
 ### 10.2 User Management APIs (Module: `user`)
 
 *   **API Endpoints**:
-    *   `GET /api/v1/users/me` (AuthRouter) - Get current user context.
-    *   `GET /api/v1/users/:id` - Get public user details.
-    *   `PUT /api/v1/users/:id` - Update basic user info.
-    *   `PATCH /api/v1/users/:id/profile` - Update user profile fields.
-    *   `PATCH /api/v1/users/:id` - Update user status (Admin/Self).
-    *   `POST /api/v1/users` - Create user (Admin).
-    *   `GET /api/v1/users` - List all users (Admin).
-    *   `DELETE /api/v1/users/:id` - Delete user.
-    *   `PATCH /api/v1/users/:id/password` - Update password (Authenticated).
-    *   `POST /api/v1/users/batch` - Create batch users (Admin/Dev).
-    *   `GET /api/v1/users/statistics` - User statistics (Admin).
+    *   `GET /api/users/me` (AuthRouter) - Get current user context.
+    *   `GET /api/users/:id` - Get public user details.
+    *   `PUT /api/users/:id` - Update basic user info.
+    *   `PATCH /api/users/:id/profile` - Update user profile fields.
+    *   `PATCH /api/users/:id` - Update user status (Admin/Self).
+    *   `POST /api/users` - Create user (Admin).
+    *   `GET /api/users` - List all users (Admin).
+    *   `DELETE /api/users/:id` - Delete user.
+    *   `PATCH /api/users/:id/password` - Update password (Authenticated).
+    *   `POST /api/users/batch` - Create batch users (Admin/Dev).
+    *   `GET /api/users/statistics` - User statistics (Admin).
 

@@ -73,13 +73,13 @@
     3.  Server emits socket event to room `conversation_{id}`.
 
 **API Endpoints (Messaging Module)**:
-*   `GET /api/v1/conversations` - List all conversations.
-*   `GET /api/v1/conversations/:id` - Get conversation metadata.
-*   `GET /api/v1/conversations/project/:projectId` - Find conversation for a project.
-*   `GET /api/v1/messages/conversation/:conversationId` - Get message history (Paginated).
-*   `POST /api/v1/messages` - Send a message.
+*   `GET /api/conversations` - List all conversations.
+*   `GET /api/conversations/:id` - Get conversation metadata.
+*   `GET /api/conversations/project/:projectId` - Find conversation for a project.
+*   `GET /api/messages/conversation/:conversationId` - Get message history (Paginated).
+*   `POST /api/messages` - Send a message.
     *   *Payload*: `conversationId`, `content`, `type` (text/file).
-*   `PATCH /api/v1/messages/conversation/:conversationId/read` - Mark all as read.
+*   `PATCH /api/messages/conversation/:conversationId/read` - Mark all as read.
 
 ### 4.2 Video Meetings (Agora)
 **Logic**:
@@ -92,12 +92,12 @@
     4.  End meeting -> `COMPLETED`.
 
 **API Endpoints (Meeting Module)**:
-*   `POST /api/v1/meetings` - Schedule/Create meeting.
-*   `GET /api/v1/meetings/me` - List my meetings.
-*   `GET /api/v1/meetings/:id` - Get meeting details.
-*   `GET /api/v1/meetings/:id/token` - Generate Agora Token (RtcTokenBuilder).
-*   `PATCH /api/v1/meetings/:id/start` - Host starts meeting.
-*   `PATCH /api/v1/meetings/:id/end` - Host ends meeting.
-*   `PATCH /api/v1/meetings/:id/accept` - Participant accepts invite.
-*   `PATCH /api/v1/meetings/:id/decline` - Participant declines invite.
+*   `POST /api/meetings` - Schedule/Create meeting.
+*   `GET /api/meetings/me` - List my meetings.
+*   `GET /api/meetings/:id` - Get meeting details.
+*   `GET /api/meetings/:id/token` - Generate Agora Token (RtcTokenBuilder).
+*   `PATCH /api/meetings/:id/start` - Host starts meeting.
+*   `PATCH /api/meetings/:id/end` - Host ends meeting.
+*   `PATCH /api/meetings/:id/accept` - Participant accepts invite.
+*   `PATCH /api/meetings/:id/decline` - Participant declines invite.
 

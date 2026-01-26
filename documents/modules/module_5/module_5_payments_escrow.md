@@ -115,7 +115,7 @@ The Escrow System is a financial safety mechanism acting as a neutral third part
 - **For Providers:** It proves the client's commitment and ability to pay.
 
 ### 7.2 API Endpoints
-**Base URL:** `/api/v1/escrow`
+**Base URL:** `/api/escrow`
 
 | Method | Endpoint | Description | Access |
 | :--- | :--- | :--- | :--- |
@@ -144,7 +144,7 @@ The Escrow System is a financial safety mechanism acting as a neutral third part
 
 #### C. Releasing Funds (Completion Phase)
 *   **Trigger:** Client confirms project completion.
-*   **Code Location:** `ProjectService.confirmProjectComplete` (Route: `PATCH /api/v1/projects/:id/confirm`)
+*   **Code Location:** `ProjectService.confirmProjectComplete` (Route: `PATCH /api/projects/:id/confirm`)
 *   **Logic:**
     1.  Project must be in `COMPLETED` status (marked by provider).
     2.  `EscrowRepository.releaseEscrow` executes a **Database Transaction**:
@@ -155,7 +155,7 @@ The Escrow System is a financial safety mechanism acting as a neutral third part
 
 #### D. Withdrawing Funds (Payout Phase)
 *   **Trigger:** Provider requests withdrawal.
-*   **Code Location:** `EscrowService.requestWithdrawal` (Route: `POST /api/v1/escrow/withdraw`)
+*   **Code Location:** `EscrowService.requestWithdrawal` (Route: `POST /api/escrow/withdraw`)
 *   **Logic:**
     1.  Validates amount (>0, >=$10 min, <= availableBalance).
     2.  `EscrowRepository.createWithdrawal` executes:

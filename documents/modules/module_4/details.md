@@ -164,13 +164,13 @@ Module 4 is complete when:
     *   Client can Cancel at any time before Acceptance.
 
 **API Endpoints (Request Module)**:
-*   `POST /api/v1/requests` - Create request (Direct or Public).
+*   `POST /api/requests` - Create request (Direct or Public).
     *   *Payload*: `title`, `description`, `serviceId`, `features`, `priceMax`, `deadline`, `providerId` (optional).
     *   *Files*: Multipart upload support.
-*   `GET /api/v1/requests` - List my requests (Client) or available requests (Provider).
-*   `GET /api/v1/requests/:id` - Get request details.
-*   `PUT /api/v1/requests/:id` - Update request (Draft/Pending only).
-*   `POST /api/v1/requests/:id/cancel` - Cancel request.
+*   `GET /api/requests` - List my requests (Client) or available requests (Provider).
+*   `GET /api/requests/:id` - Get request details.
+*   `PUT /api/requests/:id` - Update request (Draft/Pending only).
+*   `POST /api/requests/:id/cancel` - Cancel request.
 
 ### 8.2 Proposal Workflow
 **Logic**:
@@ -184,14 +184,14 @@ Module 4 is complete when:
     5.  **Project Created**: System automatically instantiates a `Project` and `Escrow` bucket from the accepted proposal.
 
 **API Endpoints (Proposal Module)**:
-*   `POST /api/v1/proposals` - Submit proposal.
+*   `POST /api/proposals` - Submit proposal.
     *   *Payload*: `requestId`, `price`, `deliveryTime`, `coverLetter`.
-*   `GET /api/v1/proposals/request/:requestId` - Get all proposals for a specific request (Client only).
-*   `GET /api/v1/proposals/:id` - Get proposal details.
-*   `PUT /api/v1/proposals/:id` - Update proposal (before action).
-*   `PATCH /api/v1/proposals/:id/accept` - Client accepts proposal. Triggers Project creation.
-*   `PATCH /api/v1/proposals/:id/reject` - Client rejects proposal.
-*   `DELETE /api/v1/proposals/:id` - Withdraw proposal.
+*   `GET /api/proposals/request/:requestId` - Get all proposals for a specific request (Client only).
+*   `GET /api/proposals/:id` - Get proposal details.
+*   `PUT /api/proposals/:id` - Update proposal (before action).
+*   `PATCH /api/proposals/:id/accept` - Client accepts proposal. Triggers Project creation.
+*   `PATCH /api/proposals/:id/reject` - Client rejects proposal.
+*   `DELETE /api/proposals/:id` - Withdraw proposal.
 
 ### 8.3 Automation
 *   **Cron Job**: `startAutoPublishJob` runs every 15 minutes. Checks for `PENDING` requests older than 3 days where `autoPublish=true`. Updates status to `PUBLIC`.
