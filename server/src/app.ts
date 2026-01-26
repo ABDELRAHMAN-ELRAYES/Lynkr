@@ -1,5 +1,5 @@
 import express from "express";
-import type { Application } from "express";
+import type { Express } from "express";
 
 import morgan from "morgan";
 import path from "path";
@@ -67,7 +67,7 @@ import { bodyParser, cookieParserMiddleware, corsMiddleware, formParser } from "
 
 export const ROOT_DIR: string = process.cwd();
 
-const app: Application = express();
+const app: Express = express();
 
 // Security middleware
 app.use(helmet({

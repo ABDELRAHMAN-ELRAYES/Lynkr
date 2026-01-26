@@ -7,6 +7,7 @@ import {
     cancelRequest,
     acceptRequest,
     rejectRequest,
+    getPublicRequests,
 } from "./request.controller";
 import upload from "../../../middlewares/file-upload";
 import { compressImages } from "../../../middlewares/compress-image";
@@ -24,6 +25,7 @@ RequestRouter.post(
 );
 
 RequestRouter.get("/", getRequests);
+RequestRouter.get("/public", getPublicRequests);
 
 // Specific routes MUST come before the generic :id route to avoid route conflicts
 // Using explicit route patterns to ensure they match before :id

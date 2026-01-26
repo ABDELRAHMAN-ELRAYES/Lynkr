@@ -153,13 +153,27 @@ class RequestRepository {
         }
     }
 
-    async getRequestsForProvider(providerId: string, serviceCategories: string[]) {
+    async getRequestsForProvider(providerId: string, serviceCategory?: string) {
         try {
-            // Only return requests directed to this specific provider
+            // Build the OR conditions for the query
+            const orConditions: any[] = [
+                { targetProviderId: providerId } // Direct requests targeted to this provider
+            ];
+
+            // Add public requests if service category is provided
+            if (serviceCategory) {
+                orConditions.push({
+                    isPublic: true,
+                    status: "PUBLIC",
+                    category: serviceCategory
+                });
+            }
+
+            // Return direct requests + public requests matching service category
             return await this.prisma.request.findMany({
                 where: {
-                    targetProviderId: providerId, // Only direct requests
-                    status: { not: "DRAFT" }
+                    status: { not: "DRAFT" },
+                    OR: orConditions
                 },
                 orderBy: { createdAt: 'desc' },
                 include: {
@@ -263,6 +277,74 @@ class RequestRepository {
         } catch (error) {
             console.error("Error getting expired requests:", error);
             return [];
+        }
+    }
+
+    /**
+     * Get paginated public requests with optional category filter
+     */
+    async getPublicRequests(params: {
+        page: number;
+        limit: number;
+        category?: string;
+        search?: string;
+    }) {
+        try {
+            const { page, limit, category, search } = params;
+            const skip = (page - 1) * limit;
+
+            // Build where clause
+            const where: any = {
+                status: "PUBLIC",
+                isPublic: true,
+            };
+
+            // Filter by category if provided
+            if (category) {
+                where.category = category;
+            }
+
+            // Search filter
+            if (search) {
+                where.OR = [
+                    { title: { contains: search, mode: 'insensitive' } },
+                    { description: { contains: search, mode: 'insensitive' } },
+                ];
+            }
+
+            // Get total count
+            const total = await this.prisma.request.count({ where });
+
+            // Get paginated results
+            const requests = await this.prisma.request.findMany({
+                where,
+                orderBy: { createdAt: 'desc' },
+                skip,
+                take: limit,
+                include: {
+                    client: {
+                        select: {
+                            id: true,
+                            firstName: true,
+                            lastName: true,
+                            username: true,
+                        }
+                    },
+                    _count: {
+                        select: { proposals: true }
+                    }
+                }
+            });
+
+            return {
+                requests,
+                total,
+                page,
+                limit,
+                totalPages: Math.ceil(total / limit),
+            };
+        } catch (error) {
+            throw new AppError(500, "Failed to get public requests");
         }
     }
 }

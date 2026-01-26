@@ -54,6 +54,7 @@ import ProjectDetails from "@/features/project/pages/ProjectPage";
 // Request
 import { RequestsListPage } from "@/features/request/pages/RequestsListPage";
 import { RequestDetailPage } from "@/features/request/pages/RequestDetailPage";
+import { PublicRequestsPage } from "@/features/request/pages/PublicRequestsPage";
 
 // Payment
 import SuccessPayment from "@/features/payment/pages/payment-page";
@@ -103,6 +104,14 @@ export const router = createBrowserRouter([
     element: (
       <ProtectedRoute>
         <RequestDetailPage />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "/public-requests",
+    element: (
+      <ProtectedRoute>
+        <PublicRequestsPage />
       </ProtectedRoute>
     ),
   },

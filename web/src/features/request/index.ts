@@ -6,3 +6,4 @@ export { ProposalForm } from './components/ProposalForm';
 // Export pages
 export { RequestsListPage } from './pages/RequestsListPage';
 export { RequestDetailPage } from './pages/RequestDetailPage';
+export { PublicRequestsPage } from './pages/PublicRequestsPage';

@@ -1,5 +1,5 @@
 import React, { useRef, useState, useMemo } from "react";
-import { Menu, X, User, LogOut, Settings, Mail, Shield } from "lucide-react";
+import { Menu, X, User, LogOut, Settings, Mail, Shield, Briefcase } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/shared/hooks/use-auth";
 import { toast } from "sonner";
@@ -10,8 +10,8 @@ interface NavLink {
   name: string;
   path: string;
   roles?: string[];
-  requiresAuth?: boolean; 
-  hideWhenAuth?: boolean; 
+  requiresAuth?: boolean;
+  hideWhenAuth?: boolean;
   icon?: React.ReactNode;
 }
 
@@ -23,11 +23,18 @@ const allLinks: NavLink[] = [
   {
     name: "Operations",
     path: "/operations",
-    requiresAuth: true, 
-    },
+    requiresAuth: true,
+  },
   {
     name: "Services",
     path: "/services",
+  },
+  {
+    name: "Browse Requests",
+    path: "/public-requests",
+    requiresAuth: true,
+    roles: ["PROVIDER_APPROVED"],
+    icon: <Briefcase size={16} className="mr-1" />,
   },
   {
     name: "Admin",

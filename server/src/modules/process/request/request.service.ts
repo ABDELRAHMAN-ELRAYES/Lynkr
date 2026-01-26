@@ -97,8 +97,17 @@ class RequestService {
         return await this.repository.getRequestsByClientId(clientId);
     }
 
-    static async getRequestsForProvider(providerId: string, serviceCategories: string[], _next: NextFunction) {
-        return await this.repository.getRequestsForProvider(providerId, serviceCategories);
+    static async getRequestsForProvider(providerId: string, serviceCategory?: string, _next?: NextFunction) {
+        return await this.repository.getRequestsForProvider(providerId, serviceCategory);
+    }
+
+    static async getPublicRequests(params: {
+        page: number;
+        limit: number;
+        category?: string;
+        search?: string;
+    }) {
+        return await this.repository.getPublicRequests(params);
     }
 
     static async updateRequest(id: string, data: IUpdateRequestData, userId: string, next: NextFunction) {

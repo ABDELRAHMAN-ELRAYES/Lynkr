@@ -1,6 +1,5 @@
 import { FC, useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Plus, Search } from 'lucide-react';
+import { Plus, Search, FileText } from 'lucide-react';
 import { RequestCard } from '../components/RequestCard';
 import { requestService } from '@/shared/services/request.service';
 import type { Request } from '@/shared/types/request';
@@ -8,15 +7,16 @@ import { toast } from 'sonner';
 import Button from '@/shared/components/ui/Button';
 import { Input } from '@/shared/components/ui/input';
 import { useAuth } from '@/shared/hooks/use-auth';
+import OperationRequestForm from '@/shared/components/common/modals/request-modal';
 
 export const RequestsListPage: FC = () => {
-    const navigate = useNavigate();
     const { user } = useAuth();
     const [loading, setLoading] = useState(true);
     const [requests, setRequests] = useState<Request[]>([]);
     const [filteredRequests, setFilteredRequests] = useState<Request[]>([]);
     const [searchQuery, setSearchQuery] = useState('');
     const [statusFilter, setStatusFilter] = useState<string>('all');
+    const [showCreateModal, setShowCreateModal] = useState(false);
 
     const viewType = user?.role === 'CLIENT' ? 'client' : 'provider';
 
@@ -79,6 +79,11 @@ export const RequestsListPage: FC = () => {
         }
     };
 
+    const handleModalClose = () => {
+        setShowCreateModal(false);
+        loadRequests();
+    };
+
 
     if (loading) {
         return (
@@ -106,6 +111,16 @@ export const RequestsListPage: FC = () => {
                                 : 'Browse and respond to service requests'}
                         </p>
                     </div>
+                    {/* Create Public Request Button for Clients */}
+                    {viewType === 'client' && (
+                        <Button
+                            onClick={() => setShowCreateModal(true)}
+                            className="bg-[#7682e8] hover:bg-[#5a67d8] text-white"
+                        >
+                            <FileText className="h-4 w-4 mr-2" />
+                            Create Public Request
+                        </Button>
+                    )}
                 </div>
 
                 {/* Filters */}
@@ -127,7 +142,6 @@ export const RequestsListPage: FC = () => {
                             className="px-3 py-2 border border-gray-300 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-[#7682e8]"
                         >
                             <option value="all">All Status</option>
-                            <option value="DRAFT">Draft</option>
                             <option value="PENDING">Pending</option>
                             <option value="PUBLIC">Public</option>
                             <option value="ACCEPTED">Accepted</option>
@@ -150,7 +164,7 @@ export const RequestsListPage: FC = () => {
                         </p>
                         {requests.length === 0 && viewType === 'client' && (
                             <Button
-                                onClick={() => navigate('/requests/create')}
+                                onClick={() => setShowCreateModal(true)}
                                 className="mt-4"
                             >
                                 <Plus className="h-4 w-4 mr-2" />
@@ -171,6 +185,20 @@ export const RequestsListPage: FC = () => {
                     </div>
                 )}
             </main>
+
+            {/* Create Public Request Modal */}
+            {showCreateModal && (
+                <div className="fixed inset-0 bg-[#0000007d] z-[1005] flex items-center justify-center p-4">
+                    <div className="w-full max-w-7xl max-h-[90vh] overflow-y-auto">
+                        <OperationRequestForm
+                            close={handleModalClose}
+                            isOpen={showCreateModal}
+                            providerName="All Providers"
+                            providerTitle="Post a public request visible to all providers"
+                        />
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

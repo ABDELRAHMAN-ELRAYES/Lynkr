@@ -52,20 +52,66 @@ export const getRequests = async (req: Request, res: Response, next: NextFunctio
         const requests = await RequestService.getRequestsByClientId(user.id, next);
         return res.status(200).json({ status: "success", data: requests });
     } else if (user.role.startsWith('PROVIDER')) {
-        // Need provider profile ID
+        // Need provider profile ID and service category
         const profile = await ProfileService.getProviderProfileByUserId(user.id, next);
         if (!profile) {
             return next(new AppError(404, "Provider profile not found"));
         }
 
-        // Only return requests directed to this provider (targetProviderId matches)
-        const requests = await RequestService.getRequestsForProvider(profile.id, [], next);
+        // Get provider's service category for filtering public requests
+        const serviceCategory = profile.service?.name;
+
+        // Return direct requests + public requests in provider's service category
+        const requests = await RequestService.getRequestsForProvider(profile.id, serviceCategory, next);
         return res.status(200).json({ status: "success", data: requests });
     } else {
         // Admin or other
         // return all?
         return res.status(200).json({ status: "success", data: [] });
     }
+};
+
+/**
+ * Get paginated public requests for providers
+ */
+export const getPublicRequests = async (req: Request, res: Response, next: NextFunction) => {
+    const user = req.user as any;
+
+    // Only providers can access this endpoint
+    if (!user.role.startsWith('PROVIDER')) {
+        return next(new AppError(403, "Only providers can access public requests"));
+    }
+
+    // Get provider profile for category filtering
+    const profile = await ProfileService.getProviderProfileByUserId(user.id, next);
+    if (!profile) {
+        return next(new AppError(404, "Provider profile not found"));
+    }
+
+    // Parse query parameters
+    const page = parseInt(req.query.page as string) || 1;
+    const limit = parseInt(req.query.limit as string) || 10;
+    const search = req.query.search as string | undefined;
+    // Default to provider's service category, but allow override
+    const category = (req.query.category as string) || profile.service?.name;
+
+    const result = await RequestService.getPublicRequests({
+        page,
+        limit,
+        category,
+        search,
+    });
+
+    return res.status(200).json({
+        status: "success",
+        data: result.requests,
+        pagination: {
+            page: result.page,
+            limit: result.limit,
+            total: result.total,
+            totalPages: result.totalPages,
+        },
+    });
 };
 
 export const getRequestById = async (req: Request, res: Response, next: NextFunction) => {

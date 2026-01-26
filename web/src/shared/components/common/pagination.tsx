@@ -80,7 +80,7 @@ export const Pagination: React.FC<PaginationProps> = ({
                     onClick={() => onPageChange(page as number)}
                     className={cn(
                         "h-9 w-9 p-0",
-                        currentPage === page ? "pointer-events-none" : "hover:bg-gray-100"
+                        currentPage === page ? "pointer-events-none bg-[#7682e8]" : "hover:bg-gray-100"
                     )}
                 >
                     {page}

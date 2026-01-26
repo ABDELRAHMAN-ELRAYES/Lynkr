@@ -1,5 +1,6 @@
 import { FC } from 'react';
-import { DollarSign, Clock, User, FileText } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { DollarSign, Clock, User, FileText, Star, ExternalLink } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '@/shared/components/ui/card';
 import { ProposalStatusTag } from '@/shared/components/common/tags';
 import Button from '@/shared/components/ui/Button';
@@ -23,9 +24,19 @@ export const ProposalCard: FC<ProposalCardProps> = ({
     onWithdraw,
     showActions = true,
 }) => {
+    const navigate = useNavigate();
     const canAccept = viewType === 'client' && proposal.status === 'PENDING';
     const canReject = viewType === 'client' && proposal.status === 'PENDING';
     const canWithdraw = viewType === 'provider' && proposal.status === 'PENDING';
+
+    // Get provider rating if available (from provider profile data)
+    const providerRating = (proposal.provider as any)?.averageRating;
+
+    const handleViewProfile = () => {
+        if (proposal.provider?.id) {
+            navigate(`/providers/${proposal.provider.id}`);
+        }
+    };
 
     return (
         <Card className="hover:shadow-md transition-shadow">
@@ -47,6 +58,26 @@ export const ProposalCard: FC<ProposalCardProps> = ({
                                 {proposal.provider.title}
                             </p>
                         )}
+                        {/* Provider Rating and Profile Link */}
+                        <div className="flex items-center gap-3 mt-2">
+                            {providerRating && providerRating > 0 && (
+                                <div className="flex items-center gap-1">
+                                    <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+                                    <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                                        {Number(providerRating).toFixed(1)}
+                                    </span>
+                                </div>
+                            )}
+                            {viewType === 'client' && proposal.provider?.id && (
+                                <button
+                                    onClick={handleViewProfile}
+                                    className="flex items-center gap-1 text-xs text-[#7682e8] hover:underline"
+                                >
+                                    <ExternalLink className="h-3 w-3" />
+                                    View Profile
+                                </button>
+                            )}
+                        </div>
                     </div>
                     <ProposalStatusTag status={proposal.status} />
                 </div>

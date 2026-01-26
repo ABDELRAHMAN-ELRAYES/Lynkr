@@ -61,6 +61,45 @@ export const requestService = {
     },
 
     /**
+     * Get paginated public requests for providers
+     */
+    getPublicRequests: async (params: {
+        page?: number;
+        limit?: number;
+        category?: string;
+        search?: string;
+    } = {}): Promise<{
+        data: Request[];
+        pagination: {
+            page: number;
+            limit: number;
+            total: number;
+            totalPages: number;
+        };
+    }> => {
+        const queryParams = new URLSearchParams();
+        if (params.page) queryParams.append('page', params.page.toString());
+        if (params.limit) queryParams.append('limit', params.limit.toString());
+        if (params.category) queryParams.append('category', params.category);
+        if (params.search) queryParams.append('search', params.search);
+
+        const response = await apiClient({
+            url: `/requests/public?${queryParams.toString()}`,
+            options: { method: 'GET' },
+        });
+
+        return {
+            data: response.data || [],
+            pagination: response.pagination || {
+                page: 1,
+                limit: 10,
+                total: 0,
+                totalPages: 0,
+            },
+        };
+    },
+
+    /**
      * Get request by ID
      */
     getRequestById: async (id: string): Promise<Request> => {

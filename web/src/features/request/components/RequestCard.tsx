@@ -1,6 +1,6 @@
 import { FC } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Calendar, DollarSign, Clock, User } from 'lucide-react';
+import { Calendar, DollarSign, Clock, User, MessageSquare } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '@/shared/components/ui/card';
 import { RequestStatusTag } from '@/shared/components/common/tags';
 import Button from '@/shared/components/ui/Button';
@@ -23,6 +23,9 @@ export const RequestCard: FC<RequestCardProps> = ({ request, viewType = 'client'
     const canCancel = viewType === 'client' &&
         (request.status === 'DRAFT' || request.status === 'PENDING' || request.status === 'PUBLIC');
 
+    // Get proposal count from _count or proposals array
+    const proposalCount = (request as any)._count?.proposals ?? request.proposals?.length ?? 0;
+
     return (
         <Card className="hover:shadow-md transition-shadow border border-gray-300">
             <CardHeader>
@@ -35,7 +38,16 @@ export const RequestCard: FC<RequestCardProps> = ({ request, viewType = 'client'
                             {request.description}
                         </CardDescription>
                     </div>
-                    <RequestStatusTag status={request.status} />
+                    <div className="flex items-center gap-2">
+                        {/* Proposal Count Badge */}
+                        {proposalCount > 0 && viewType === 'client' && (
+                            <div className="flex items-center gap-1 px-2 py-1 bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-200 rounded-full text-xs font-medium">
+                                <MessageSquare className="h-3 w-3" />
+                                <span>{proposalCount} {proposalCount === 1 ? 'Proposal' : 'Proposals'}</span>
+                            </div>
+                        )}
+                        <RequestStatusTag status={request.status} />
+                    </div>
                 </div>
             </CardHeader>
 
@@ -87,13 +99,6 @@ export const RequestCard: FC<RequestCardProps> = ({ request, viewType = 'client'
                         <div className="flex items-center gap-1.5">
                             <User className="h-4 w-4" />
                             <span>Direct to: {request.targetProvider.user?.firstName} {request.targetProvider.user?.lastName}</span>
-                        </div>
-                    )}
-
-                    {request.proposals && request.proposals.length > 0 && (
-                        <div className="flex items-center gap-1.5">
-                            <span className="font-medium">Proposals:</span>
-                            <span>{request.proposals.length}</span>
                         </div>
                     )}
                 </div>
