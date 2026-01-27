@@ -24,7 +24,7 @@ import AdminLayout from "@/features/admin/pages/AdminLayout";
 import DashboardPage from "@/features/admin/pages/dashboard/DashboardPage";
 import UsersPage from "@/features/admin/pages/users/UsersPage";
 import AdminServicesPage from "@/features/admin/pages/services/ServicesPage";
-import ProjectsPage from "@/features/admin/pages/projects/ProjectsPage";
+import DashboardProjectsPage from "@/features/admin/pages/projects/ProjectsPage";
 import OrdersPage from "@/features/admin/pages/orders/OrdersPage";
 import PaymentsPage from "@/features/admin/pages/payments/PaymentsPage";
 import AnalyticsPage from "@/features/admin/pages/analytics/AnalyticsPage";
@@ -45,11 +45,13 @@ import ApplicationStatusPage from "@/features/profile/pages/ApplicationStatusPag
 import ServicesPage from "@/features/services/pages/ServicesPage";
 import ProviderDetailPage from "@/features/services/pages/ProviderDetailPage";
 
-// Operations
-import OperationsPage from "@/features/operations/pages/OperationsPage";
-
 // Project
 import ProjectDetails from "@/features/project/pages/ProjectPage";
+import ProjectsPage from "@/features/projects/pages/PorjectsPage";
+
+// Meeting
+import MeetingRoomPage from "@/features/meeting/pages/MeetingRoomPage";
+
 
 // Request
 import { RequestsListPage } from "@/features/request/pages/RequestsListPage";
@@ -80,7 +82,7 @@ export const router = createBrowserRouter([
       { path: "dashboard", element: <DashboardPage /> },
       { path: "users", element: <UsersPage /> },
       { path: "services", element: <AdminServicesPage /> },
-      { path: "projects", element: <ProjectsPage /> },
+      { path: "projects", element: <DashboardProjectsPage /> },
       { path: "orders", element: <OrdersPage /> },
       { path: "payments", element: <PaymentsPage /> },
       { path: "analytics", element: <AnalyticsPage /> },
@@ -88,8 +90,28 @@ export const router = createBrowserRouter([
     ],
   },
   {
-    path: "/operations",
-    element: <OperationsPage />,
+    path: "/projects",
+    element: (
+      <ProtectedRoute>
+        <ProjectsPage />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "/projects/:id",
+    element: (
+      <ProtectedRoute>
+        <ProjectDetails />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "/meeting/:id",
+    element: (
+      <ProtectedRoute>
+        <MeetingRoomPage />
+      </ProtectedRoute>
+    ),
   },
   {
     path: "/services",

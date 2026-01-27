@@ -1,192 +1,422 @@
-import React, { useState } from "react";
-
+import React, { useState, useEffect, useRef } from "react";
+import { useParams, useNavigate } from "react-router-dom";
 import Button from "@/shared/components/ui/Button";
-import EditText from "@/shared/components/ui/EditText";
 import Navbar from "@/shared/components/common/Navbar";
 import Footer from "@/shared/components/common/Footer";
-import { loadStripe } from "@stripe/stripe-js";
+import { ProjectStatusTag, MeetingStatusTag } from "@/shared/components/common/tags";
+import { projectService } from "@/shared/services/project.service";
+import { conversationService } from "@/shared/services/conversation.service";
+import { messageService } from "@/shared/services/message.service";
+import { meetingService } from "@/shared/services/meeting.service";
+import type {
+  Project,
+  Conversation,
+  Message,
+  Meeting,
+  ProjectFile,
+  ProjectActivity,
+} from "@/shared/types/project";
+import { useAuth } from "@/shared/hooks/use-auth";
+import { useWebSocket } from "@/shared/hooks/useWebSocket";
+import {
+  Loader2,
+  Send,
+  Paperclip,
+  Video,
+  Calendar,
+  Download,
+  Trash2,
+  FileIcon,
+  Upload,
+  CheckCircle,
+  XCircle,
+  Clock,
+  Users,
+  MessageSquare,
+  Activity,
+  AlertCircle,
+  Check,
+  CheckCheck,
+} from "lucide-react";
+import axios from "axios";
+import { toast } from "sonner";
 
-interface Participant {
-  id: string;
-  name: string;
-  role: string;
-  avatar: string;
-  isOnline?: boolean;
-}
+const ProjectDetailPage: React.FC = () => {
+  const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
+  const { user } = useAuth();
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
-interface Message {
-  id: string;
-  sender: string;
-  content: string;
-  timestamp: string;
-  isOwn: boolean;
-  avatar: string;
-}
+  // Get token for WebSocket auth
+  const token = localStorage.getItem('accessToken');
 
-interface Deliverable {
-  id: string;
-  name: string;
-  size: string;
-  uploadedBy: string;
-  isLocked: boolean;
-  icon: string;
-}
-const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
-const stripePublishableKey = import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY;
-const stripePromise = loadStripe(stripePublishableKey);
+  // Socket.IO for real-time messaging
+  const {
+    connected: wsConnected,
+    messages: wsMessages,
+    typingUsers,
+    projectActivities: wsActivities,
+    joinConversation,
+    leaveConversation,
+    joinProject,
+    leaveProject,
+    sendTypingIndicator,
+  } = useWebSocket(token);
 
-const ProjectDetails: React.FC = () => {
-  const [isProjectDetailsExpanded, setIsProjectDetailsExpanded] =
-    useState(true);
+  // State
+  const [project, setProject] = useState<Project | null>(null);
+  const [conversation, setConversation] = useState<Conversation | null>(null);
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [files, setFiles] = useState<ProjectFile[]>([]);
+  const [activities, setActivities] = useState<ProjectActivity[]>([]);
+  const [meetings, setMeetings] = useState<Meeting[]>([]);
+
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [sendingMessage, setSendingMessage] = useState(false);
+  const [uploadingFile, setUploadingFile] = useState(false);
   const [messageText, setMessageText] = useState("");
-  const [messages] = useState<Message[]>([
-    {
-      id: "1",
-      sender: "Dr. Amina Khalid",
-      content:
-        "Hello! I have reviewed your project requirements. I have some clarifying questions about the heat exchanger geometry.",
-      timestamp: "2 hours ago",
-      isOwn: false,
-      avatar: "/images/img_mask_group.svg",
-    },
-    {
-      id: "2",
-      sender: "You",
-      content:
-        "Sure! The geometry specifications are in the attached PDF. Let me know if you need additional details.",
-      timestamp: "1 hour ago",
-      isOwn: true,
-      avatar: "/images/img_mask_group_black_900.svg",
-    },
-  ]);
 
-  const [participants] = useState<Participant[]>([
-    {
-      id: "1",
-      name: "Dr. Amina Khalid",
-      role: "Instructor",
-      avatar: "/images/img_mask_group.svg",
-      isOnline: true,
-    },
-    {
-      id: "2",
-      name: "You",
-      role: "Client",
-      avatar: "/images/img_mask_group_black_900.svg",
-    },
-  ]);
+  const [isProjectDetailsExpanded, setIsProjectDetailsExpanded] = useState(true);
+  const [activeTab, setActiveTab] = useState<"chat" | "files" | "activity">("chat");
 
-  const [deliverables] = useState<Deliverable[]>([
-    {
-      id: "1",
-      name: "simulation_results.zip",
-      size: "120 MB • Uploaded by Dr. Amina Khalid",
-      uploadedBy: "Dr. Amina Khalid",
-      isLocked: true,
-      icon: "/images/img_div.svg",
-    },
-    {
-      id: "2",
-      name: "literature_review.pdf",
-      size: "1.2 MB • Uploaded by Dr. Amina Khalid",
-      uploadedBy: "Dr. Amina Khalid",
-      isLocked: false,
-      icon: "/images/img_div_blue_gray_700.svg",
-    },
-  ]);
+  // Data fetching
+  useEffect(() => {
+    if (id) {
+      fetchProjectData();
+    }
+  }, [id]);
 
-  const handleSendMessage = () => {
-    if (messageText.trim()) {
-      // Handle message sending logic here
+  // Auto-scroll to bottom of messages
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages]);
+
+  // Join conversation/project rooms when data is loaded
+  useEffect(() => {
+    if (conversation?.id && wsConnected) {
+      joinConversation(conversation.id);
+    }
+    return () => leaveConversation();
+  }, [conversation?.id, wsConnected, joinConversation, leaveConversation]);
+
+  useEffect(() => {
+    if (id && wsConnected) {
+      joinProject(id);
+    }
+    return () => leaveProject();
+  }, [id, wsConnected, joinProject, leaveProject]);
+
+  // Handle incoming WebSocket messages
+  useEffect(() => {
+    if (wsMessages.length > 0 && conversation) {
+      // Filter messages for this conversation and add any new ones
+      const newMessages = wsMessages.filter(
+        (wsMsg) => wsMsg.conversationId === conversation.id &&
+          !messages.some((msg) => msg.id === wsMsg.id)
+      );
+      if (newMessages.length > 0) {
+        setMessages((prev) => [...prev, ...newMessages]);
+      }
+    }
+  }, [wsMessages, conversation?.id]);
+
+  // Handle incoming WebSocket activity updates
+  useEffect(() => {
+    if (wsActivities.length > 0 && id) {
+      // Filter activities for this project and add any new ones
+      const newActivities = wsActivities.filter(
+        (wsActivity) => wsActivity.projectId === id &&
+          !activities.some((act) => act.id === wsActivity.id)
+      );
+      if (newActivities.length > 0) {
+        setActivities((prev) => [...newActivities, ...prev]);
+      }
+    }
+  }, [wsActivities, id]);
+
+  const fetchProjectData = async () => {
+    if (!id) return;
+
+    try {
+      setLoading(true);
+      setError(null);
+
+      // Fetch all data in parallel
+      const [projectData, filesData, activitiesData, meetingsData] =
+        await Promise.all([
+          projectService.getProjectById(id),
+          projectService.getProjectFiles(id),
+          projectService.getProjectActivities(id),
+          meetingService.getProjectMeetings(id),
+        ]);
+
+      setProject(projectData);
+      setFiles(filesData);
+      setActivities(activitiesData);
+      setMeetings(meetingsData);
+
+      // Fetch conversation and messages
+      try {
+        const conv = await conversationService.getConversationByProjectId(id);
+        setConversation(conv);
+
+        if (conv?.id) {
+          const messagesData = await messageService.getMessagesByConversation(
+            conv.id
+          );
+          setMessages(messagesData.messages || []);
+          // Mark messages as read
+          await messageService.markConversationAsRead(conv.id);
+        }
+      } catch (convErr) {
+        console.log("No conversation found for project");
+      }
+    } catch (err) {
+      if (axios.isAxiosError(err)) {
+        setError(err.response?.data?.message || "Failed to load project");
+      } else {
+        setError("An unexpected error occurred");
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSendMessage = async () => {
+    if (!messageText.trim() || !conversation?.id) return;
+
+    try {
+      setSendingMessage(true);
+      const newMessage = await messageService.sendMessage({
+        conversationId: conversation.id,
+        content: messageText.trim(),
+      });
+      setMessages((prev) => [...prev, newMessage]);
       setMessageText("");
+    } catch (err) {
+      toast.error("Failed to send message");
+    } finally {
+      setSendingMessage(false);
     }
   };
 
-  const handleCheckout = async () => {
-    const res = await fetch(`${apiBaseUrl}/api/v1/payments/session`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        price: 50.54,
-        email: "client@example.com",
-        currency: "usd",
-      }),
-      credentials: "include",
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !id) return;
+
+    try {
+      setUploadingFile(true);
+      const uploadedFile = await projectService.uploadProjectFile(id, file);
+      setFiles((prev) => [...prev, uploadedFile]);
+      toast.success("File uploaded successfully");
+      // Refresh activities
+      const activitiesData = await projectService.getProjectActivities(id);
+      setActivities(activitiesData);
+    } catch (err) {
+      toast.error("Failed to upload file");
+    } finally {
+      setUploadingFile(false);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = "";
+      }
+    }
+  };
+
+  const handleDeleteFile = async (fileId: string) => {
+    if (!id) return;
+
+    try {
+      await projectService.deleteProjectFile(id, fileId);
+      setFiles((prev) => prev.filter((f) => f.id !== fileId));
+      toast.success("File deleted");
+      // Refresh activities
+      const activitiesData = await projectService.getProjectActivities(id);
+      setActivities(activitiesData);
+    } catch (err) {
+      toast.error("Failed to delete file");
+    }
+  };
+
+  const handleMarkComplete = async () => {
+    if (!id) return;
+
+    try {
+      const updated = await projectService.markProjectComplete(id);
+      setProject(updated);
+      toast.success("Project marked as complete");
+      // Refresh activities
+      const activitiesData = await projectService.getProjectActivities(id);
+      setActivities(activitiesData);
+    } catch (err) {
+      toast.error("Failed to mark project as complete");
+    }
+  };
+
+  const handleConfirmComplete = async () => {
+    if (!id) return;
+
+    try {
+      const updated = await projectService.confirmProjectComplete(id);
+      setProject(updated);
+      toast.success("Project completion confirmed. Funds released.");
+      // Refresh activities
+      const activitiesData = await projectService.getProjectActivities(id);
+      setActivities(activitiesData);
+    } catch (err) {
+      toast.error("Failed to confirm completion");
+    }
+  };
+
+  const handleCancelProject = async () => {
+    if (!id) return;
+
+    if (!window.confirm("Are you sure you want to cancel this project?")) return;
+
+    try {
+      const updated = await projectService.cancelProject(id);
+      setProject(updated);
+      toast.success("Project cancelled");
+    } catch (err) {
+      toast.error("Failed to cancel project");
+    }
+  };
+
+  const handleScheduleMeeting = async () => {
+    if (!id || !project) return;
+
+    try {
+      // For instant meeting, no scheduledAt
+      const guestId =
+        user?.id === project.clientId
+          ? project.provider?.user?.id
+          : project.clientId;
+
+      if (!guestId) {
+        toast.error("Could not determine meeting participant");
+        return;
+      }
+
+      const meeting = await meetingService.createMeeting({
+        projectId: id,
+        guestId,
+      });
+      setMeetings((prev) => [...prev, meeting]);
+      toast.success("Meeting created");
+    } catch (err) {
+      toast.error("Failed to create meeting");
+    }
+  };
+
+  const handleJoinMeeting = async (meetingId: string) => {
+    try {
+      const tokenData = await meetingService.getJoinToken(meetingId);
+      // Navigate to meeting page or open in new window
+      navigate(`/meeting/${meetingId}`, { state: tokenData });
+    } catch (err) {
+      toast.error("Failed to join meeting");
+    }
+  };
+
+  const formatDate = (dateString?: string) => {
+    if (!dateString) return "Not set";
+    return new Date(dateString).toLocaleDateString("en-US", {
+      month: "short",
+      day: "numeric",
+      year: "numeric",
     });
-
-    const data = await res.json();
-    const stripe = await stripePromise;
-
-    if (stripe && data.url) {
-      window.location.href = data.url; // Redirect to Stripe Checkout
-    }
   };
+
+  const formatTime = (dateString: string) => {
+    return new Date(dateString).toLocaleTimeString("en-US", {
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  };
+
+  const formatCurrency = (amount: number) => {
+    return new Intl.NumberFormat("en-US", {
+      style: "currency",
+      currency: "USD",
+    }).format(amount);
+  };
+
+  const formatFileSize = (bytes: number) => {
+    if (bytes < 1024) return bytes + " B";
+    if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + " KB";
+    return (bytes / (1024 * 1024)).toFixed(1) + " MB";
+  };
+
+  const isProvider = user?.role === "PROVIDER" || user?.role === "PENDING_PROVIDER";
+  const isClient = user?.role === "CLIENT";
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-global-5">
+        <Navbar />
+        <div className="flex items-center justify-center min-h-[60vh]">
+          <Loader2 className="w-8 h-8 animate-spin text-primary" />
+        </div>
+      </div>
+    );
+  }
+
+  if (error || !project) {
+    return (
+      <div className="min-h-screen bg-global-5">
+        <Navbar />
+        <div className="flex flex-col items-center justify-center min-h-[60vh] gap-4">
+          <AlertCircle className="w-12 h-12 text-red-500" />
+          <p className="text-lg text-global-4">{error || "Project not found"}</p>
+          <Button onClick={() => navigate("/projects")}>Back to Projects</Button>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="w-full bg-global-5 border-2 border-[#ced4da]">
+    <div className="w-full bg-global-5">
       <div className="flex flex-col w-full">
         {/* Header */}
         <Navbar />
 
         {/* Main Content */}
-        <div className="w-full max-w-[90rem] mx-auto py-6">
+        <div className="w-full max-w-[90rem] mx-auto py-6 px-4">
           <div className="flex flex-col gap-6 mt-[7rem]">
             {/* Project Header Card */}
             <div className="bg-global-4 rounded-xl p-6">
               <div className="flex flex-col lg:flex-row justify-between items-start gap-6">
                 <div className="flex-1">
-                  <h1 className="text-xl sm:text-2xl font-inter font-normal text-global-1 mb-3">
-                    Heat Exchanger Optimization for MSc Thesis
-                  </h1>
+                  <div className="flex items-center gap-3 mb-3">
+                    <h1 className="text-xl sm:text-2xl font-inter font-semibold text-global-1">
+                      {project.title}
+                    </h1>
+                    <ProjectStatusTag status={project.status} />
+                  </div>
                   <p className="text-base font-inter font-normal text-global-5 mb-4">
-                    Advanced CFD simulation and thermal analysis for academic
-                    research project
+                    {project.description || "No description provided"}
                   </p>
 
-                  {/* Tags */}
-                  <div className="flex flex-wrap gap-2 mb-4">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="cursor-pointer px-3 py-1 text-sm font-inter font-normal text-global-1 bg-global-5 border border-primary rounded-[14px]"
-                    >
-                      MSc
-                    </Button>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="cursor-pointer px-3 py-1 text-sm font-inter font-normal text-global-1 bg-global-5 border border-primary rounded-[14px]"
-                    >
-                      CFD
-                    </Button>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="cursor-pointer px-3 py-1 text-sm font-inter font-normal text-global-1 bg-global-5 border border-primary rounded-[14px]"
-                    >
-                      Thermal
-                    </Button>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="cursor-pointer px-3 py-1 text-sm font-inter font-normal text-global-1 bg-global-5 border border-primary rounded-[14px]"
-                    >
-                      APA
-                    </Button>
+                  {/* Participants */}
+                  <div className="flex items-center gap-2 text-sm text-global-5">
+                    <Users size={16} />
+                    <span>
+                      {project.client?.name || "Client"} ↔{" "}
+                      {project.provider?.user?.name || "Provider"}
+                    </span>
                   </div>
                 </div>
 
                 {/* Project Info */}
-                <div className="flex flex-col gap-6 items-start sm:items-center">
-                  <div className="text-right w-full">
+                <div className="flex flex-col gap-4 items-end">
+                  <div className="text-right">
                     <p className="text-sm font-inter font-normal text-global-6 mb-1">
                       Budget
                     </p>
                     <div className="flex items-baseline justify-end">
                       <span className="text-[2rem] font-inter font-semibold text-global-1">
-                        1,200
-                      </span>
-                      <span className="text-xs font-inter font-semibold text-global-6">
-                        $
+                        {formatCurrency(project.totalPrice)}
                       </span>
                     </div>
                   </div>
@@ -194,32 +424,77 @@ const ProjectDetails: React.FC = () => {
                     <p className="text-sm font-inter font-normal text-global-6 mb-1">
                       Deadline
                     </p>
-                    <p className="text-base font-inter font-normal text-global-1 mb-1">
-                      Jan 15, 2025
-                    </p>
-                    <p className="text-xs font-inter font-normal text-global-5">
-                      3 days left
+                    <p className="text-base font-inter font-normal text-global-1">
+                      {formatDate(project.deadline)}
                     </p>
                   </div>
                 </div>
               </div>
 
               {/* Action Buttons */}
-              <div className="flex flex-col sm:flex-row gap-2 mt-6">
+              <div className="flex flex-wrap gap-2 mt-6">
+                {/* Provider Actions */}
+                {isProvider && project.status === "IN_PROGRESS" && (
+                  <Button
+                    className="bg-green-600 hover:bg-green-700 text-white flex items-center gap-2"
+                    onClick={handleMarkComplete}
+                  >
+                    <CheckCircle size={16} />
+                    Mark Complete
+                  </Button>
+                )}
+
+                {/* Client Actions */}
+                {isClient && project.status === "AWAITING_REVIEW" && (
+                  <Button
+                    className="bg-green-600 hover:bg-green-700 text-white flex items-center gap-2"
+                    onClick={handleConfirmComplete}
+                  >
+                    <CheckCircle size={16} />
+                    Confirm Completion
+                  </Button>
+                )}
+
+                {isClient && project.status === "IN_PROGRESS" && (
+                  <Button
+                    variant="outline"
+                    className="border-red-500 text-red-500 hover:bg-red-50 flex items-center gap-2"
+                    onClick={handleCancelProject}
+                  >
+                    <XCircle size={16} />
+                    Cancel Project
+                  </Button>
+                )}
+
+                {/* Meeting Button */}
+                <Button
+                  className="bg-global-1 text-global-8 flex items-center gap-2"
+                  onClick={handleScheduleMeeting}
+                >
+                  <Video size={16} />
+                  Start Meeting
+                </Button>
+
+                {/* Upload Button */}
                 <Button
                   variant="outline"
-                  className="cursor-pointer flex items-center bg-rose-500  justify-center gap-2 px-4 py-2 text-sm font-inter font-normal text-global-1 bg-global-5 border border-[#d4d4d4] rounded-lg"
+                  className="flex items-center gap-2"
+                  onClick={() => fileInputRef.current?.click()}
+                  disabled={uploadingFile}
                 >
-                  <img
-                    src="/images/img_i.svg"
-                    alt="join"
-                    className="w-[14px] h-[16px]"
-                  />
-                  Join Meeting
+                  {uploadingFile ? (
+                    <Loader2 size={16} className="animate-spin" />
+                  ) : (
+                    <Upload size={16} />
+                  )}
+                  Upload File
                 </Button>
-                <Button className="cursor-pointer px-4 py-2 text-sm font-inter font-normal text-global-8 bg-global-1 rounded-lg">
-                  Upload Deliverable
-                </Button>
+                <input
+                  type="file"
+                  ref={fileInputRef}
+                  className="hidden"
+                  onChange={handleFileUpload}
+                />
               </div>
             </div>
 
@@ -230,14 +505,15 @@ const ProjectDetails: React.FC = () => {
                 {/* Project Details */}
                 <div className="bg-global-5 border border-primary rounded-xl p-6">
                   <div className="flex justify-between items-center mb-4">
-                    <h2 className="text-xl font-inter font-normal text-global-1">
+                    <h2 className="text-xl font-inter font-medium text-global-1">
                       Project Details
                     </h2>
                     <Button
+                      variant="ghost"
+                      size="sm"
                       onClick={() =>
                         setIsProjectDetailsExpanded(!isProjectDetailsExpanded)
                       }
-                      className="cursor-pointer p-1"
                     >
                       <img
                         src="/images/img_arrow_down.svg"
@@ -251,318 +527,270 @@ const ProjectDetails: React.FC = () => {
                   {isProjectDetailsExpanded && (
                     <div className="space-y-4">
                       <p className="text-base font-inter font-normal text-global-4 leading-6">
-                        This project involves comprehensive CFD analysis and
-                        optimization of heat exchanger designs for MSc thesis
-                        research. The work includes thermal performance
-                        evaluation, pressure drop analysis, and design
-                        recommendations.
+                        {project.description || "No description provided"}
                       </p>
 
-                      <div className="mt-5">
-                        <h3 className="text-base font-inter font-normal text-global-1 mb-2">
-                          Requirements:
-                        </h3>
-                        <div className="space-y-1">
-                          <p className="text-base font-inter font-normal text-global-4">
-                            • ANSYS Fluent simulation setup and execution
-                          </p>
-                          <p className="text-base font-inter font-normal text-global-4">
-                            • Thermal performance optimization
-                          </p>
-                          <p className="text-base font-inter font-normal text-global-4">
-                            • Academic report in APA format
-                          </p>
-                          <p className="text-base font-inter font-normal text-global-4">
-                            • Raw simulation data and results
+                      <div className="grid grid-cols-2 gap-4 mt-4">
+                        <div>
+                          <span className="text-sm text-global-6">Created</span>
+                          <p className="text-global-1">
+                            {formatDate(project.createdAt)}
                           </p>
                         </div>
-                      </div>
-
-                      <div className="bg-global-4 rounded-lg p-3 mt-4">
-                        <p className="text-sm font-inter font-normal text-global-5 mb-2">
-                          Attachments:
-                        </p>
-                        <div className="flex items-center gap-2">
-                          <img
-                            src="/images/img_frame_gray_600.svg"
-                            alt="file"
-                            className="w-4 h-4"
-                          />
-                          <span className="text-sm font-inter font-normal text-global-1">
-                            project_specifications.pdf
+                        <div>
+                          <span className="text-sm text-global-6">
+                            Last Updated
                           </span>
-                          <Button className="cursor-pointer text-sm font-inter font-normal text-global-5 ml-auto">
-                            Download
-                          </Button>
+                          <p className="text-global-1">
+                            {formatDate(project.updatedAt)}
+                          </p>
                         </div>
                       </div>
                     </div>
                   )}
                 </div>
 
-                {/* Milestones */}
-                <div className="bg-global-5 border border-primary rounded-xl p-6">
-                  <h2 className="text-lg font-inter font-normal text-global-1 mb-4">
-                    Milestones
-                  </h2>
-                  <div className="border border-primary rounded-lg p-4">
-                    <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-                      <div className="flex-1">
-                        <h3 className="text-base font-inter font-normal text-global-1 mb-1">
-                          CFD Model & Initial Report
-                        </h3>
-                        <p className="text-sm font-inter font-normal text-global-6">
-                          Due: Jan 10, 2025
-                        </p>
-                      </div>
-                      <div className="flex items-center gap-4">
-                        <span className="text-lg font-inter font-normal text-global-1">
-                          $600
-                        </span>
-                        <Button
-                          variant="secondary"
-                          size="sm"
-                          className="cursor-pointer px-2 py-1 text-xs font-inter font-normal text-global-3 bg-global-3 rounded"
-                        >
-                          Pending Payment
-                        </Button>
-                        <Button
-                          size="sm"
-                          className="cursor-pointer px-4 py-2 text-sm font-inter font-normal text-global-8 bg-global-1 rounded-lg"
-                          onClick={handleCheckout}
-                        >
-                          Pay Now
-                        </Button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Meeting & Collaborate */}
-                <div className="bg-gradient-to-r from-global-4 to-global-3 border border-primary rounded-xl p-8">
-                  <div className="text-center">
-                    <h2 className="text-2xl font-inter font-normal text-global-1 mb-3">
-                      Meeting & Collaborate
-                    </h2>
-                    <p className="text-base font-inter font-normal text-global-5 mb-6 max-w-2xl mx-auto">
-                      Easily connect with your freelancer through a meeting to
-                      share ideas, align goals, and keep the project on track.
-                    </p>
-                    <Button className="cursor-pointer flex items-center justify-center gap-4 px-8 py-4 text-lg font-inter font-normal text-global-8 bg-global-1 rounded-xl shadow-lg mx-auto">
-                      <img
-                        src="/images/img_frame_white_a700.svg"
-                        alt="join"
-                        className="w-5 h-[18px]"
-                      />
-                      Join Meeting
-                    </Button>
-                    <div className="flex flex-col sm:flex-row justify-center items-center gap-8 mt-6">
-                      <Button className="cursor-pointer text-sm font-inter font-normal text-global-5 underline">
-                        Schedule new meeting
-                      </Button>
-                      <Button className="cursor-pointer text-sm font-inter font-normal text-global-5 underline">
-                        View past meetings & recordings
-                      </Button>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Chat Section */}
+                {/* Tabs Section */}
                 <div className="bg-global-5 border border-primary rounded-xl overflow-hidden">
-                  {/* Chat Header */}
-                  <div className="flex justify-between items-center p-4 border-b border-primary">
-                    <div className="flex items-center gap-3">
-                      <img
-                        src="/images/img_mask_group.svg"
-                        alt="avatar"
-                        className="w-10 h-10 rounded-full"
-                      />
-                      <div>
-                        <h3 className="text-base font-inter font-normal text-global-1">
-                          Dr. Amina Khalid
-                        </h3>
-                        <p className="text-sm font-inter font-normal text-global-5">
-                          Online
-                        </p>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <img
-                        src="/images/img_button_gray_600.svg"
-                        alt="action"
-                        className="w-[30px] h-8 cursor-pointer"
-                      />
-                      <img
-                        src="/images/img_button_gray_600_32x30.svg"
-                        alt="action"
-                        className="w-[30px] h-8 cursor-pointer"
-                      />
-                      <img
-                        src="/images/img_button_gray_600_32x28.svg"
-                        alt="action"
-                        className="w-7 h-8 cursor-pointer"
-                      />
-                    </div>
+                  {/* Tab Headers */}
+                  <div className="flex border-b border-primary">
+                    <button
+                      className={`flex-1 px-4 py-3 text-sm font-medium flex items-center justify-center gap-2 ${activeTab === "chat"
+                        ? "bg-global-3 text-global-1 border-b-2 border-primary"
+                        : "text-global-5 hover:bg-global-4"
+                        }`}
+                      onClick={() => setActiveTab("chat")}
+                    >
+                      <MessageSquare size={16} />
+                      Chat
+                    </button>
+                    <button
+                      className={`flex-1 px-4 py-3 text-sm font-medium flex items-center justify-center gap-2 ${activeTab === "files"
+                        ? "bg-global-3 text-global-1 border-b-2 border-primary"
+                        : "text-global-5 hover:bg-global-4"
+                        }`}
+                      onClick={() => setActiveTab("files")}
+                    >
+                      <FileIcon size={16} />
+                      Files ({files.length})
+                    </button>
+                    <button
+                      className={`flex-1 px-4 py-3 text-sm font-medium flex items-center justify-center gap-2 ${activeTab === "activity"
+                        ? "bg-global-3 text-global-1 border-b-2 border-primary"
+                        : "text-global-5 hover:bg-global-4"
+                        }`}
+                      onClick={() => setActiveTab("activity")}
+                    >
+                      <Activity size={16} />
+                      Activity
+                    </button>
                   </div>
 
-                  {/* Messages */}
-                  <div className="p-4 space-y-4 max-h-96 overflow-y-auto">
-                    {messages.map((message) => (
-                      <div
-                        key={message.id}
-                        className={`flex gap-3 ${message.isOwn ? "justify-end" : "justify-start"
-                          }`}
-                      >
-                        {!message.isOwn && (
-                          <img
-                            src={message.avatar}
-                            alt="avatar"
-                            className="w-8 h-8 rounded-full flex-shrink-0"
-                          />
-                        )}
-                        <div
-                          className={`flex flex-col gap-1 max-w-[70%] ${message.isOwn ? "items-end" : "items-start"
-                            }`}
-                        >
-                          <div
-                            className={`p-3 rounded-lg ${message.isOwn
-                                ? "bg-global-1 text-global-8"
-                                : "bg-global-3 text-global-1"
-                              }`}
-                          >
-                            <p className="text-sm font-inter font-normal leading-relaxed">
-                              {message.content}
-                            </p>
-                          </div>
-                          <span className="text-xs font-inter font-normal text-global-6">
-                            {message.timestamp}
-                          </span>
-                        </div>
-                        {message.isOwn && (
-                          <img
-                            src={message.avatar}
-                            alt="avatar"
-                            className="w-8 h-8 rounded-full flex-shrink-0"
-                          />
-                        )}
-                      </div>
-                    ))}
-                  </div>
-
-                  {/* Message Input */}
-                  <div className="p-4 border-t border-primary">
-                    <div className="flex items-center gap-3">
-                      <img
-                        src="/images/img_button_gray_600_32x30.svg"
-                        alt="attach"
-                        className="w-[30px] h-8 cursor-pointer"
-                      />
-                      <img
-                        src="/images/img_button_32x30.svg"
-                        alt="emoji"
-                        className="w-[30px] h-8 cursor-pointer"
-                      />
-                      <EditText
-                        placeholder="Type your message..."
-                        value={messageText}
-                        onChange={setMessageText}
-                        className="flex-1 px-3 py-3 text-base font-inter font-normal text-global-9 bg-global-5 border border-primary rounded-lg"
-                      />
-                      <Button
-                        onClick={handleSendMessage}
-                        className="cursor-pointer p-3 bg-global-1 rounded-lg"
-                      >
-                        <img
-                          src="/images/img_button_white_a700.svg"
-                          alt="send"
-                          className="w-4 h-4"
-                        />
-                      </Button>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Secure Deliverables */}
-                <div className="bg-global-5 border border-primary rounded-xl p-6">
-                  <div className="flex items-center gap-2 mb-6">
-                    <img
-                      src="/images/img_vector.svg"
-                      alt="secure"
-                      className="w-[14px] h-[18px]"
-                    />
-                    <h2 className="text-lg font-inter font-normal text-global-1">
-                      Secure Deliverables
-                    </h2>
-                  </div>
-
-                  <div className="space-y-4">
-                    {deliverables.map((deliverable) => (
-                      <div
-                        key={deliverable.id}
-                        className={`border border-primary rounded-lg p-4 ${deliverable.isLocked ? "bg-global-4" : "bg-global-5"
-                          }`}
-                      >
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-4">
-                            <img
-                              src={deliverable.icon}
-                              alt="file"
-                              className="w-12 h-12 rounded-lg"
-                            />
-                            <div>
-                              <h3 className="text-base font-inter font-normal text-global-1 mb-1">
-                                {deliverable.name}
-                              </h3>
-                              <p className="text-sm font-inter font-normal text-global-6 mb-1">
-                                {deliverable.size}
-                              </p>
-                              <span
-                                className={`text-xs font-inter font-normal px-2 py-1 rounded ${deliverable.isLocked
-                                    ? "text-global-3 bg-global-3"
-                                    : "text-global-3 bg-global-3"
-                                  }`}
-                              >
-                                {deliverable.isLocked
-                                  ? "Locked — Pay to access"
-                                  : "Unlocked"}
-                              </span>
+                  {/* Tab Content */}
+                  <div className="p-4">
+                    {/* Chat Tab */}
+                    {activeTab === "chat" && (
+                      <div className="flex flex-col h-[400px]">
+                        {/* Messages */}
+                        <div className="flex-1 overflow-y-auto space-y-4 mb-4">
+                          {messages.length === 0 ? (
+                            <div className="flex flex-col items-center justify-center h-full text-global-5">
+                              <MessageSquare className="w-12 h-12 mb-2" />
+                              <p>No messages yet</p>
+                              <p className="text-sm">Start the conversation!</p>
                             </div>
-                          </div>
-                          <div className="flex items-center gap-2">
-                            {deliverable.isLocked ? (
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                className="cursor-pointer px-3 py-2 text-sm font-inter font-normal text-global-2 border border-global-2 rounded-lg"
-                              >
-                                Pay & Unlock
-                              </Button>
+                          ) : (
+                            messages.map((message) => {
+                              const isOwn = message.senderId === user?.id;
+                              return (
+                                <div
+                                  key={message.id}
+                                  className={`flex gap-3 ${isOwn ? "flex-row-reverse" : ""
+                                    }`}
+                                >
+                                  <div
+                                    className={`max-w-[70%] ${isOwn ? "items-end" : "items-start"
+                                      }`}
+                                  >
+                                    <div
+                                      className={`p-3 rounded-lg ${isOwn
+                                        ? "bg-global-1 text-global-8"
+                                        : "bg-global-3 text-global-1"
+                                        }`}
+                                    >
+                                      <p className="text-sm">{message.content}</p>
+                                    </div>
+                                    <div className={`flex items-center gap-1 mt-1 ${isOwn ? 'justify-end' : ''}`}>
+                                      <span className="text-xs text-global-6">
+                                        {formatTime(message.createdAt)}
+                                      </span>
+                                      {isOwn && (
+                                        message.isRead ? (
+                                          <CheckCheck size={14} className="text-blue-500" />
+                                        ) : (
+                                          <Check size={14} className="text-global-6" />
+                                        )
+                                      )}
+                                    </div>
+                                  </div>
+                                </div>
+                              );
+                            })
+                          )}
+
+                          {/* Typing Indicator */}
+                          {typingUsers.length > 0 && (
+                            <div className="flex items-center gap-2 text-global-5 text-sm pl-2">
+                              <div className="flex gap-1">
+                                <span className="w-2 h-2 bg-global-5 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
+                                <span className="w-2 h-2 bg-global-5 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
+                                <span className="w-2 h-2 bg-global-5 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+                              </div>
+                              <span>typing...</span>
+                            </div>
+                          )}
+
+                          <div ref={messagesEndRef} />
+                        </div>
+
+                        {/* Message Input */}
+                        <div className="flex items-center gap-3 border-t border-primary pt-4">
+                          <Button variant="ghost" size="sm">
+                            <Paperclip size={20} />
+                          </Button>
+                          <input
+                            type="text"
+                            placeholder="Type your message..."
+                            value={messageText}
+                            onChange={(e) => {
+                              setMessageText(e.target.value);
+                              // Send typing indicator
+                              if (conversation?.id) {
+                                sendTypingIndicator(conversation.id, e.target.value.length > 0);
+                              }
+                            }}
+                            onKeyPress={(e) => {
+                              if (e.key === "Enter" && !e.shiftKey) {
+                                e.preventDefault();
+                                handleSendMessage();
+                                // Stop typing indicator
+                                if (conversation?.id) {
+                                  sendTypingIndicator(conversation.id, false);
+                                }
+                              }
+                            }}
+                            onBlur={() => {
+                              // Stop typing when leaving input
+                              if (conversation?.id) {
+                                sendTypingIndicator(conversation.id, false);
+                              }
+                            }}
+                            className="flex-1 px-3 py-2 text-base bg-global-5 border border-primary rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                            disabled={!conversation || sendingMessage}
+                          />
+                          <Button
+                            onClick={handleSendMessage}
+                            disabled={
+                              !messageText.trim() || !conversation || sendingMessage
+                            }
+                            className="bg-global-1"
+                          >
+                            {sendingMessage ? (
+                              <Loader2 size={16} className="animate-spin" />
                             ) : (
-                              <>
-                                <Button
-                                  size="sm"
-                                  className="flex items-center gap-2 px-4 py-2 text-sm font-inter font-normal text-global-8 bg-global-1 rounded-lg"
-                                >
-                                  <img
-                                    src="/images/img_i_white_a700.svg"
-                                    alt="download"
-                                    className="w-[14px] h-4"
-                                  />
-                                  Download
-                                </Button>
-                                <Button
-                                  variant="outline"
-                                  size="sm"
-                                  className="cursor-pointer px-4 py-2 text-sm font-inter font-normal text-global-1 border border-[#d4d4d4] rounded-lg"
-                                >
-                                  Accept
-                                </Button>
-                              </>
+                              <Send size={16} />
                             )}
-                          </div>
+                          </Button>
                         </div>
                       </div>
-                    ))}
+                    )}
+
+                    {/* Files Tab */}
+                    {activeTab === "files" && (
+                      <div className="space-y-3">
+                        {files.length === 0 ? (
+                          <div className="flex flex-col items-center justify-center py-8 text-global-5">
+                            <FileIcon className="w-12 h-12 mb-2" />
+                            <p>No files uploaded yet</p>
+                          </div>
+                        ) : (
+                          files.map((file) => (
+                            <div
+                              key={file.id}
+                              className="flex items-center justify-between p-3 border border-primary rounded-lg"
+                            >
+                              <div className="flex items-center gap-3">
+                                <FileIcon className="w-8 h-8 text-global-5" />
+                                <div>
+                                  <p className="text-sm font-medium text-global-1">
+                                    {file.filename}
+                                  </p>
+                                  <p className="text-xs text-global-5">
+                                    {formatFileSize(file.size)} • Uploaded by{" "}
+                                    {file.uploader?.name || "Unknown"}
+                                  </p>
+                                </div>
+                              </div>
+                              <div className="flex items-center gap-2">
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() =>
+                                    window.open(
+                                      `${import.meta.env.VITE_API_BASE_URL}/${file.path}`,
+                                      "_blank"
+                                    )
+                                  }
+                                >
+                                  <Download size={16} />
+                                </Button>
+                                {file.uploaderId === user?.id && (
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    className="text-red-500 hover:text-red-700"
+                                    onClick={() => handleDeleteFile(file.id)}
+                                  >
+                                    <Trash2 size={16} />
+                                  </Button>
+                                )}
+                              </div>
+                            </div>
+                          ))
+                        )}
+                      </div>
+                    )}
+
+                    {/* Activity Tab */}
+                    {activeTab === "activity" && (
+                      <div className="space-y-3">
+                        {activities.length === 0 ? (
+                          <div className="flex flex-col items-center justify-center py-8 text-global-5">
+                            <Activity className="w-12 h-12 mb-2" />
+                            <p>No activity yet</p>
+                          </div>
+                        ) : (
+                          activities.map((activity) => (
+                            <div
+                              key={activity.id}
+                              className="flex items-start gap-3 p-3 border-l-2 border-primary"
+                            >
+                              <Clock className="w-4 h-4 text-global-5 mt-1" />
+                              <div>
+                                <p className="text-sm text-global-1">
+                                  {activity.details}
+                                </p>
+                                <p className="text-xs text-global-5">
+                                  {formatDate(activity.createdAt)} at{" "}
+                                  {formatTime(activity.createdAt)} •{" "}
+                                  {activity.user?.name || "System"}
+                                </p>
+                              </div>
+                            </div>
+                          ))
+                        )}
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>
@@ -571,136 +799,107 @@ const ProjectDetails: React.FC = () => {
               <div className="w-full xl:w-80 flex flex-col gap-6">
                 {/* Participants */}
                 <div className="bg-global-5 border border-primary rounded-xl p-6">
-                  <h2 className="text-base font-inter font-normal text-global-1 mb-4">
+                  <h2 className="text-base font-inter font-medium text-global-1 mb-4">
                     Participants
                   </h2>
                   <div className="space-y-3">
-                    {participants.map((participant) => (
-                      <div
-                        key={participant.id}
-                        className="flex items-center justify-between"
-                      >
-                        <div className="flex items-center gap-3">
-                          <img
-                            src={participant.avatar}
-                            alt="avatar"
-                            className="w-10 h-10 rounded-full"
-                          />
-                          <div>
-                            <h3 className="text-base font-inter font-normal text-global-1">
-                              {participant.name}
-                            </h3>
-                            <p className="text-sm font-inter font-normal text-global-6">
-                              {participant.role}
-                            </p>
-                          </div>
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-full bg-global-3 flex items-center justify-center">
+                          <span className="text-sm font-medium">
+                            {project.client?.name?.[0] || "C"}
+                          </span>
                         </div>
-                        <img
-                          src="/images/img_button_gray_600_32x32.svg"
-                          alt="options"
-                          className="w-8 h-8 cursor-pointer"
-                        />
+                        <div>
+                          <h3 className="text-base font-inter font-normal text-global-1">
+                            {project.client?.name || "Client"}
+                          </h3>
+                          <p className="text-sm font-inter font-normal text-global-6">
+                            Client
+                          </p>
+                        </div>
                       </div>
-                    ))}
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-full bg-global-3 flex items-center justify-center">
+                          <span className="text-sm font-medium">
+                            {project.provider?.user?.name?.[0] || "P"}
+                          </span>
+                        </div>
+                        <div>
+                          <h3 className="text-base font-inter font-normal text-global-1">
+                            {project.provider?.user?.name || "Provider"}
+                          </h3>
+                          <p className="text-sm font-inter font-normal text-global-6">
+                            Provider
+                          </p>
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 </div>
 
-                {/* Milestone Payment */}
+                {/* Meetings */}
                 <div className="bg-global-5 border border-primary rounded-xl p-6">
-                  <h2 className="text-base font-inter font-normal text-global-1 mb-4">
-                    Milestone Payment
+                  <h2 className="text-base font-inter font-medium text-global-1 mb-4">
+                    Meetings
                   </h2>
-                  <div className="border border-primary rounded-lg p-3">
-                    <div className="flex justify-between items-center mb-2">
-                      <span className="text-base font-inter font-normal text-global-1">
-                        CFD Model & Report
-                      </span>
-                      <span className="text-base font-inter font-normal text-global-1">
-                        $600
-                      </span>
+                  {meetings.length === 0 ? (
+                    <p className="text-sm text-global-5">No meetings scheduled</p>
+                  ) : (
+                    <div className="space-y-3">
+                      {meetings.slice(0, 3).map((meeting) => (
+                        <div
+                          key={meeting.id}
+                          className="bg-global-4 rounded-lg p-3"
+                        >
+                          <div className="flex justify-between items-start mb-2">
+                            <MeetingStatusTag status={meeting.status} />
+                            <span className="text-xs text-global-6">
+                              {meeting.scheduledAt
+                                ? formatDate(meeting.scheduledAt)
+                                : "Instant"}
+                            </span>
+                          </div>
+                          {(meeting.status === "PENDING" ||
+                            meeting.status === "ACTIVE") && (
+                              <Button
+                                size="sm"
+                                className="w-full bg-global-1 text-global-8 flex items-center justify-center gap-1"
+                                onClick={() => handleJoinMeeting(meeting.id)}
+                              >
+                                <Video size={14} />
+                                Join Meeting
+                              </Button>
+                            )}
+                        </div>
+                      ))}
                     </div>
-                    <div className="flex justify-between items-center mb-3">
-                      <span className="text-sm font-inter font-normal text-global-6">
-                        Escrow Status
-                      </span>
-                      <Button
-                        variant="secondary"
-                        size="sm"
-                        className="cursor-pointer px-2 py-1 text-xs font-inter font-normal text-global-3 bg-global-3 rounded"
-                      >
-                        Pending
-                      </Button>
-                    </div>
-                    <Button
-                      variant="default"
-                      className="cursor-pointer w-full py-2 text-sm font-inter font-normal text-global-8 bg-global-1 rounded-lg"
-                    >
-                      Pay Now
-                    </Button>
-                  </div>
-                </div>
-
-                {/* Upcoming Meetings */}
-                <div className="bg-global-5 border border-primary rounded-xl p-6">
-                  <h2 className="text-base font-inter font-normal text-global-1 mb-4">
-                    Upcoming Meetings
-                  </h2>
-                  <div className="bg-global-4 rounded-lg p-4">
-                    <div className="flex justify-between items-start mb-2">
-                      <h3 className="text-base font-inter font-normal text-global-1">
-                        Project Review
-                      </h3>
-                      <span className="text-sm font-inter font-normal text-global-6">
-                        Tomorrow
-                      </span>
-                    </div>
-                    <p className="text-sm font-inter font-normal text-global-5 mb-2">
-                      14:00 - 15:00
-                    </p>
-                    <p className="text-xs font-inter font-normal text-global-6 mb-3">
-                      23h 45m remaining
-                    </p>
-                    <Button className="cursor-pointer w-full py-2 text-sm font-inter font-normal text-global-8 bg-global-1 rounded-lg">
-                      Join Meeting
-                    </Button>
-                  </div>
+                  )}
                 </div>
 
                 {/* Quick Actions */}
                 <div className="bg-global-5 border border-primary rounded-xl p-6">
-                  <h2 className="text-base font-inter font-normal text-global-1 mb-4">
+                  <h2 className="text-base font-inter font-medium text-global-1 mb-4">
                     Quick Actions
                   </h2>
                   <div className="space-y-2">
-                    <Button className="cursor-pointer flex items-center justify-start gap-3 w-full p-3 hover:bg-global-4 rounded-lg transition-colors">
-                      <img
-                        src="/images/img_vector_gray_600.svg"
-                        alt="open"
-                        className="w-4 h-4"
-                      />
-                      <span className="text-base font-inter font-normal text-global-1">
-                        Open Request in full page
-                      </span>
+                    <Button
+                      variant="ghost"
+                      className="w-full justify-start gap-3"
+                      onClick={handleScheduleMeeting}
+                    >
+                      <Calendar size={16} />
+                      Schedule Meeting
                     </Button>
-                    <Button className="cursor-pointer flex items-center justify-start gap-3 w-full p-3 hover:bg-global-4 rounded-lg transition-colors">
-                      <img
-                        src="/images/img_frame_gray_600_16x14.svg"
-                        alt="note"
-                        className="w-[14px] h-4"
-                      />
-                      <span className="text-base font-inter font-normal text-global-1">
-                        Add private note
-                      </span>
-                    </Button>
-                    <Button className="cursor-pointer flex items-center justify-start gap-3 w-full p-3 hover:bg-global-4 rounded-lg transition-colors">
-                      <img
-                        src="/images/img_vector_blue_gray_700.svg"
-                        alt="dispute"
-                        className="w-[14px] h-4"
-                      />
-                      <span className="text-base font-inter font-normal text-global-5">
-                        Raise dispute
-                      </span>
+                    <Button
+                      variant="ghost"
+                      className="w-full justify-start gap-3"
+                      onClick={() => fileInputRef.current?.click()}
+                    >
+                      <Upload size={16} />
+                      Upload File
                     </Button>
                   </div>
                 </div>
@@ -712,34 +911,9 @@ const ProjectDetails: React.FC = () => {
         <div className="max-w-[90rem] w-full mt-[2rem] h-px bg-gray-300 mx-auto"></div>
 
         <Footer />
-        {/* Footer */}
-        {/* <div className="bg-global-4 py-3 mt-12">
-          <div className="w-full max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-14 flex justify-between items-center">
-            <p className="text-sm font-inter font-normal text-global-6 text-center flex-1">
-              © 2025 Research Marketplace. All rights reserved.
-            </p>
-            <div className="flex items-center gap-3">
-              <button className="p-4 bg-global-5 border border-[#d4d4d4] rounded-full shadow-lg">
-                <img
-                  src="/images/img_vector_indigo_300.svg"
-                  alt="help"
-                  className="w-4 h-4"
-                />
-              </button>
-              <Button className="cursor-pointer flex items-center gap-2 px-6 py-3 text-base font-inter font-normal text-global-8 bg-global-1 rounded-3xl shadow-lg">
-                <img
-                  src="/images/img_i_white_a700_20x18.svg"
-                  alt="join"
-                  className="w-[18px] h-5"
-                />
-                Join Meeting
-              </Button>
-            </div>
-          </div>
-        </div> */}
       </div>
     </div>
   );
 };
 
-export default ProjectDetails;
+export default ProjectDetailPage;

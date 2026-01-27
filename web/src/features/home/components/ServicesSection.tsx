@@ -28,12 +28,12 @@ const ServicesSection = () => {
           {/* Service Card 1 */}
           <div className="min-h-[35rem] relative rounded-3xl overflow-hidden h-[420px] shadow-xl hover:shadow-2xl transition-all duration-300 ease-in-out bg-white">
             <img
-              src="https://api.builder.io/api/v1/image/assets/TEMP/899a8098ef0b007728c5b449fcfdd3d2d83f321a?width=886"
+              src="https://api.builder.io/api/image/assets/TEMP/899a8098ef0b007728c5b449fcfdd3d2d83f321a?width=886"
               alt="Marketing and Branding Service"
               className="w-full h-2/3 object-cover rounded-t-3xl"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div> {/* Subtle gradient overlay */}
-            
+
             <div className="p-8 absolute bottom-0 left-0 right-0">
               <div className="flex flex-wrap gap-3 mb-4">
                 <span className="px-5 py-2 bg-white/20 backdrop-blur-md border border-white/30 text-white text-sm font-medium rounded-full">
@@ -55,7 +55,7 @@ const ServicesSection = () => {
           {/* Service Card 2 */}
           <div className="min-h-[35rem] mt-[5rem]  relative rounded-3xl overflow-hidden h-[420px] shadow-xl hover:shadow-2xl transition-all duration-300 ease-in-out bg-white">
             <img
-              src="https://api.builder.io/api/v1/image/assets/TEMP/5ff4b9407fec16f5b6de714c11bb7fbe251dd509?width=890"
+              src="https://api.builder.io/api/image/assets/TEMP/5ff4b9407fec16f5b6de714c11bb7fbe251dd509?width=890"
               alt="Coming Soon Service"
               className="w-full h-2/3 object-cover rounded-t-3xl"
             />
@@ -77,7 +77,7 @@ const ServicesSection = () => {
           {/* Service Card 3 */}
           <div className="min-h-[35rem] mt-[10rem] relative rounded-3xl overflow-hidden h-[420px] shadow-xl hover:shadow-2xl transition-all duration-300 ease-in-out bg-white">
             <img
-              src="https://api.builder.io/api/v1/image/assets/TEMP/905ad43363db0403ca35642582c8e176f0952fbb?width=890"
+              src="https://api.builder.io/api/image/assets/TEMP/905ad43363db0403ca35642582c8e176f0952fbb?width=890"
               alt="Full Stack Service"
               className="w-full h-2/3 object-cover rounded-t-3xl"
             />

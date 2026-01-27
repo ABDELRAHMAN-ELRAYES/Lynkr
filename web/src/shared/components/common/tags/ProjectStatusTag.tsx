@@ -5,6 +5,7 @@ import { cn } from "@/shared/lib/utils";
 export type ProjectStatus =
     | "PENDING_PAYMENT"
     | "IN_PROGRESS"
+    | "AWAITING_REVIEW"
     | "COMPLETED"
     | "CONFIRMED"
     | "CANCELLED"
@@ -18,6 +19,7 @@ export interface ProjectStatusTagProps extends React.HTMLAttributes<HTMLSpanElem
 const statusConfig: Record<ProjectStatus, { label: string; colorScheme: ColorScheme }> = {
     PENDING_PAYMENT: { label: "Pending Payment", colorScheme: "orange" },
     IN_PROGRESS: { label: "In Progress", colorScheme: "sky" },
+    AWAITING_REVIEW: { label: "Awaiting Review", colorScheme: "warning" },
     COMPLETED: { label: "Completed", colorScheme: "emerald" },
     CONFIRMED: { label: "Confirmed", colorScheme: "teal" },
     CANCELLED: { label: "Cancelled", colorScheme: "rose" },

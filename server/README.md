@@ -135,17 +135,17 @@ server/
 - `GET /health` - Server health check
 
 ### Authentication (Coming Soon)
-- `POST /api/v1/auth/login`
-- `POST /api/v1/auth/register`
-- `POST /api/v1/auth/logout`
-- `GET /api/v1/auth/me`
+- `POST /api/auth/login`
+- `POST /api/auth/register`
+- `POST /api/auth/logout`
+- `GET /api/auth/me`
 
 ### Users (Coming Soon)
-- `GET /api/v1/users`
-- `POST /api/v1/users`
-- `GET /api/v1/users/:id`
-- `PUT /api/v1/users/:id`
-- `DELETE /api/v1/users/:id`
+- `GET /api/users`
+- `POST /api/users`
+- `GET /api/users/:id`
+- `PUT /api/users/:id`
+- `DELETE /api/users/:id`
 
 ## Architecture
 

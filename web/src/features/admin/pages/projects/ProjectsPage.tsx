@@ -29,7 +29,7 @@ import { StatusTag } from "@/shared/components/common/tags";
 
 type ProjectsSubTab = "all" | "active" | "completed" | "on_hold" | "cancelled";
 
-export default function ProjectsPage() {
+export default function DashboardProjectsPage() {
     const { handleExportData } = useAdminContext();
     const [projectsSubTab, setProjectsSubTab] = useState<ProjectsSubTab>("all");
     const [projectSearch, setProjectSearch] = useState("");

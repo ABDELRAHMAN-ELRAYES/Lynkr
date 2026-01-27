@@ -162,7 +162,7 @@ function RightSidebar() {
         <div className="space-y-4">
           <div className="flex space-x-3">
             <img
-              src="https://api.builder.io/api/v1/image/assets/TEMP/79cd7076f08da433438b02fcb4d37c2034b9f708?width=64"
+              src="https://api.builder.io/api/image/assets/TEMP/79cd7076f08da433438b02fcb4d37c2034b9f708?width=64"
               alt="Sarah Chen"
               className="w-8 h-8 rounded-full"
             />
@@ -176,7 +176,7 @@ function RightSidebar() {
           </div>
           <div className="flex space-x-3">
             <img
-              src="https://api.builder.io/api/v1/image/assets/TEMP/abc58ac8712073485444a6525a49784768cf2a01?width=64"
+              src="https://api.builder.io/api/image/assets/TEMP/abc58ac8712073485444a6525a49784768cf2a01?width=64"
               alt="Michael Rodriguez"
               className="w-8 h-8 rounded-full"
             />

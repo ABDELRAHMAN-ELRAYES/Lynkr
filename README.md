@@ -170,7 +170,7 @@ JWT_EXPIRES_IN="7d"
 # Google OAuth
 GOOGLE_CLIENT_ID="..."
 GOOGLE_CLIENT_SECRET="..."
-GOOGLE_CALLBACK_URL="http://localhost:8080/api/v1/auth/google/callback"
+GOOGLE_CALLBACK_URL="http://localhost:8080/api/auth/google/callback"
 
 # Stripe
 STRIPE_SECRET_KEY="..."
@@ -185,10 +185,10 @@ AGORA_APP_CERTIFICATE="..."
 
 The API follows RESTful principles. Key resources:
 
--   `/api/v1/auth` - Authentication
--   `/api/v1/users` - User management
--   `/api/v1/projects` - Project workspace
--   `/api/v1/provider-profiles` - Public profiles
+-   `/api/auth` - Authentication
+-   `/api/users` - User management
+-   `/api/projects` - Project workspace
+-   `/api/provider-profiles` - Public profiles
 
 ## License
 
