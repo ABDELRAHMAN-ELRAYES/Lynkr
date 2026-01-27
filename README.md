@@ -62,7 +62,7 @@ A comprehensive service marketplace platform connecting clients with skilled ser
 
 - **Stripe** - Payment processing and escrow.
 - **Agora** - Real-time video conferencing.
-- **SendGrid / Nodemailer** - Email service integration.
+- **Nodemailer** - Email service integration.
 - **Google OAuth 2.0** - Social authentication.
 - **Multer** - File upload handling (Local/S3).
 

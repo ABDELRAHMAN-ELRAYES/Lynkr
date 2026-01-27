@@ -52,6 +52,15 @@ import ProjectsPage from "@/features/projects/pages/PorjectsPage";
 // Meeting
 import MeetingRoomPage from "@/features/meeting/pages/MeetingRoomPage";
 
+// Teaching
+import {
+  AvailabilityPage,
+  InstructorSessionsPage,
+  MySessionsPage,
+  BookSessionPage,
+  SessionDetailPage,
+  VideoSessionPage,
+} from "@/features/teaching";
 
 // Request
 import { RequestsListPage } from "@/features/request/pages/RequestsListPage";
@@ -116,6 +125,55 @@ export const router = createBrowserRouter([
   {
     path: "/services",
     element: <ServicesPage />,
+  },
+  // Teaching Routes
+  {
+    path: "/teaching/availability",
+    element: (
+      <ProtectedRoute>
+        <AvailabilityPage />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "/teaching/instructor-sessions",
+    element: (
+      <ProtectedRoute>
+        <InstructorSessionsPage />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "/teaching/my-sessions",
+    element: (
+      <ProtectedRoute>
+        <MySessionsPage />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "/teaching/book/:id",
+    element: (
+      <ProtectedRoute>
+        <BookSessionPage />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "/teaching/sessions/:id",
+    element: (
+      <ProtectedRoute>
+        <SessionDetailPage />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "/teaching/video/:id",
+    element: (
+      <ProtectedRoute>
+        <VideoSessionPage />
+      </ProtectedRoute>
+    ),
   },
   {
     path: "/providers/:id",

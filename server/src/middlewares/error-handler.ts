@@ -40,7 +40,7 @@ export const notFoundHandler = (
   response: Response,
   _next: NextFunction
 ) => {
-  const url = `http://${request.host}${request.originalUrl}`;
+  const url = `http://${request.hostname}${request.originalUrl}`;
   response.status(404).json({
     status: 'fail',
     message: `This URL : ${url} is not found in this server`,
