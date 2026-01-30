@@ -1,4 +1,4 @@
-import bcrypt from 'bcrypt';
+import bcrypt from 'bcryptjs';
 
 // hash any text
 export const hash = (plainText: string) => bcrypt.hash(plainText, 10);

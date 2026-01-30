@@ -13,7 +13,7 @@ import {
 import { protect, checkPermissions } from "../auth/auth.controller";
 import { UserRole } from "../../enum/UserRole";
 
-const SubscriptionRouter = Router();
+const SubscriptionRouter:Router = Router();
 
 // Public: Get available plans
 SubscriptionRouter.get("/plans", getAllPlans);

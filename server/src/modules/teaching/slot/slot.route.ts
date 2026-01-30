@@ -3,7 +3,7 @@ import SlotController from "./slot.controller";
 import { AuthMiddleware } from "../../../middlewares/auth.middleware";
 import { UserRole } from "../../../enum/UserRole";
 
-const router = Router();
+const router:Router = Router();
 
 // All routes require authentication
 router.use(AuthMiddleware.protect);
