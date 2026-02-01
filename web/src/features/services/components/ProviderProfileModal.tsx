@@ -1,7 +1,8 @@
 "use client";
 
 import { FC, useEffect, useState } from "react";
-import { X, Star, MapPin, Briefcase, GraduationCap, Globe, User } from "lucide-react";
+import { X, Star, MapPin, Briefcase, GraduationCap, Globe, User, ExternalLink } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import Button from "@/shared/components/ui/Button";
 import { profileService } from "@/shared/services/profile.service";
 import type { ProviderProfile } from "@/shared/types/profile";
@@ -18,6 +19,7 @@ const ProviderProfileModal: FC<ProviderProfileModalProps> = ({
     isOpen,
     onClose,
 }) => {
+    const navigate = useNavigate();
     const [profile, setProfile] = useState<ProviderProfile | null>(null);
     const [loading, setLoading] = useState(false);
 
@@ -38,6 +40,13 @@ const ProviderProfileModal: FC<ProviderProfileModalProps> = ({
             onClose();
         } finally {
             setLoading(false);
+        }
+    };
+
+    const handleViewFullProfile = () => {
+        if (providerId) {
+            navigate(`/providers/${providerId}`);
+            onClose();
         }
     };
 
@@ -254,6 +263,13 @@ const ProviderProfileModal: FC<ProviderProfileModalProps> = ({
                 {/* Footer */}
                 {profile && (
                     <div className="border-t border-gray-200 px-6 py-4 flex-shrink-0 flex justify-end gap-3">
+                        <Button
+                            className="px-6 py-2 text-sm font-medium text-[#7682e8] border-2 border-[#7682e8] rounded-lg bg-white hover:bg-[#7682e8] hover:text-white transition-all flex items-center gap-2"
+                            onClick={handleViewFullProfile}
+                        >
+                            View Full Profile
+                            <ExternalLink size={16} />
+                        </Button>
                         <Button
                             className="px-6 py-2 text-sm font-medium text-gray-600 border-2 border-gray-300 rounded-lg bg-white hover:bg-gray-50 transition-all"
                             onClick={onClose}

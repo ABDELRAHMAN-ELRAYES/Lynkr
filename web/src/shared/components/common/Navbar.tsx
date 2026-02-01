@@ -21,8 +21,8 @@ const allLinks: NavLink[] = [
     path: "/",
   },
   {
-    name: "Operations",
-    path: "/operations",
+    name: "Projects",
+    path: "/projects",
     requiresAuth: true,
   },
   {
@@ -260,7 +260,7 @@ const Navbar = () => {
 
         {/* Mobile Menu */}
         {isMobileMenuOpen && (
-          <div className="[@media(min-width:1200px)]:hidden bg-white border-t border-gray-200 shadow-lg w-full absolute bottom-[-21rem]">
+          <div className="[@media(min-width:1200px)]:hidden bg-white border-t border-gray-200 shadow-lg w-full absolute bottom-[-24rem]">
             <div className="px-2 pt-2 pb-3 space-y-1">
               {visibleLinks.map(({ name, path, icon }) => (
                 <button

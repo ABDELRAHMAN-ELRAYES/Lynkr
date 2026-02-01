@@ -9,12 +9,15 @@ import { profileService } from "@/shared/services/profile.service";
 import type { ProviderProfile } from "@/shared/types/profile";
 import { toast } from "sonner";
 import OperationRequestForm from "@/shared/components/common/modals/request-modal";
+import Button from "@/shared/components/ui/Button";
+import { AvailabilityView } from "../components/AvailabilityView";
 
 const ProviderDetailPage: FC = () => {
     const { id } = useParams<{ id: string }>();
     const navigate = useNavigate();
     const [profile, setProfile] = useState<ProviderProfile | null>(null);
     const [loading, setLoading] = useState(true);
+    const [activeTab, setActiveTab] = useState<"profile" | "availability">("profile");
     const [isRequestModalOpen, setIsRequestModalOpen] = useState(false);
 
     useEffect(() => {
@@ -55,12 +58,12 @@ const ProviderDetailPage: FC = () => {
                 <Navbar />
                 <div className="text-center py-12">
                     <p className="text-gray-600">Provider profile not found</p>
-                    <button
+                    <Button
                         onClick={() => navigate("/services")}
                         className="mt-4 text-[#7682e8] hover:underline"
                     >
                         Back to search
-                    </button>
+                    </Button>
                 </div>
                 <Footer />
             </div>
@@ -68,7 +71,7 @@ const ProviderDetailPage: FC = () => {
     }
 
     const fullName = profile.user
-        ? `${profile.user.firstName} ${profile.user.lastName}`
+        ? `${profile.user.firstName} ${profile.user.lastName.charAt(0)}.`
         : "Provider";
     const rating = typeof profile.averageRating === 'number'
         ? profile.averageRating
@@ -83,18 +86,18 @@ const ProviderDetailPage: FC = () => {
 
     return (
         <>
-            <div className="min-h-screen bg-gray-50">
+            <div className="min-h-screen ">
                 <Navbar />
 
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pt-[10rem]">
                     {/* Back Button */}
-                    <button
+                    <Button
                         onClick={() => navigate("/services")}
-                        className="flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-6 transition-colors"
+                        className="flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-6 transition-colors border-none shadow-none"
                     >
                         <ArrowLeft className="w-4 h-4" />
                         <span>Back to search</span>
-                    </button>
+                    </Button>
 
                     {/* Profile Header */}
                     <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 md:p-8 mb-6">
@@ -147,30 +150,131 @@ const ProviderDetailPage: FC = () => {
                                         </span>
                                     </div>
                                 )}
+                                <div className="w-full flex justify-end">
+                                    <Button
+                                        onClick={() => setIsRequestModalOpen(true)}
+                                        className="px-6 py-3 text-[#7682e8] border border-[#7682e8] rounded-lg font-medium  transition-colors"
 
-                                <button
-                                    onClick={() => setIsRequestModalOpen(true)}
-                                    className="px-6 py-3 bg-[#7682e8] text-white rounded-lg font-medium hover:bg-[#5a67d8] transition-colors"
-                                >
-                                    Send Request
-                                </button>
+                                    >
+                                        Request Service
+                                    </Button>
+
+
+                                </div>
+
                             </div>
                         </div>
+                    </div>
+
+                    {/* Tabs Navigation */}
+                    <div className="flex items-center gap-6 border-b border-gray-200 mb-8">
+                        <button
+                            onClick={() => setActiveTab("profile")}
+                            className={`pb-4 text-sm font-medium transition-all relative ${activeTab === "profile"
+                                    ? "text-[#7682e8]"
+                                    : "text-gray-500 hover:text-gray-700"
+                                }`}
+                        >
+                            Profile
+                            {activeTab === "profile" && (
+                                <div className="absolute bottom-0 left-0 w-full h-0.5 bg-[#7682e8] rounded-t-full" />
+                            )}
+                        </button>
+                        <button
+                            onClick={() => setActiveTab("availability")}
+                            className={`pb-4 text-sm font-medium transition-all relative ${activeTab === "availability"
+                                    ? "text-[#7682e8]"
+                                    : "text-gray-500 hover:text-gray-700"
+                                }`}
+                        >
+                            Availability
+                            {activeTab === "availability" && (
+                                <div className="absolute bottom-0 left-0 w-full h-0.5 bg-[#7682e8] rounded-t-full" />
+                            )}
+                        </button>
                     </div>
 
                     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                         {/* Main Content */}
                         <div className="lg:col-span-2 space-y-6">
-                            {/* Bio */}
-                            {profile.bio && (
-                                <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-                                    <h2 className="text-xl font-semibold text-gray-900 mb-4">About</h2>
-                                    <p className="text-gray-700 leading-relaxed whitespace-pre-wrap">
-                                        {profile.bio}
-                                    </p>
-                                </div>
-                            )}
+                            {activeTab === "profile" ? (
+                                <>
+                                    {/* Bio */}
+                                    {profile.bio && (
+                                        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                                            <h2 className="text-xl font-semibold text-gray-900 mb-4">About</h2>
+                                            <p className="text-gray-700 leading-relaxed whitespace-pre-wrap">
+                                                {profile.bio}
+                                            </p>
+                                        </div>
+                                    )}
 
+                                    {/* Experience */}
+                                    {experiences.length > 0 && (
+                                        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                                            <h2 className="text-xl font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                                                <Briefcase className="w-5 h-5" />
+                                                Work Experience
+                                            </h2>
+                                            <div className="space-y-4">
+                                                {experiences.map((exp) => (
+                                                    <div key={exp.id} className="border-l-2 border-gray-200 pl-4">
+                                                        <h3 className="font-semibold text-gray-900">{exp.title}</h3>
+                                                        <p className="text-gray-600">{exp.company}</p>
+                                                        <p className="text-sm text-gray-500">
+                                                            {exp.location && `${exp.location}, `}
+                                                            {exp.country}
+                                                        </p>
+                                                        <p className="text-sm text-gray-500">
+                                                            {new Date(exp.startDate).toLocaleDateString()} -{" "}
+                                                            {exp.endDate
+                                                                ? new Date(exp.endDate).toLocaleDateString()
+                                                                : "Present"}
+                                                        </p>
+                                                        {exp.description && (
+                                                            <p className="text-gray-700 mt-2">{exp.description}</p>
+                                                        )}
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    {/* Education */}
+                                    {education.length > 0 && (
+                                        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                                            <h2 className="text-xl font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                                                <GraduationCap className="w-5 h-5" />
+                                                Education
+                                            </h2>
+                                            <div className="space-y-4">
+                                                {education.map((edu) => (
+                                                    <div key={edu.id} className="border-l-2 border-gray-200 pl-4">
+                                                        <h3 className="font-semibold text-gray-900">{edu.degree}</h3>
+                                                        <p className="text-gray-600">{edu.school}</p>
+                                                        <p className="text-sm text-gray-500">{edu.fieldOfStudy}</p>
+                                                        <p className="text-sm text-gray-500">
+                                                            {new Date(edu.startDate).toLocaleDateString()} -{" "}
+                                                            {edu.endDate
+                                                                ? new Date(edu.endDate).toLocaleDateString()
+                                                                : "Present"}
+                                                        </p>
+                                                        {edu.description && (
+                                                            <p className="text-gray-700 mt-2">{edu.description}</p>
+                                                        )}
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    )}
+                                </>
+                            ) : (
+                                <AvailabilityView providerId={profile.id} />
+                            )}
+                        </div>
+
+                        {/* Sidebar */}
+                        <div className="space-y-6">
                             {/* Skills */}
                             {skills.length > 0 && (
                                 <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
@@ -190,69 +294,6 @@ const ProviderDetailPage: FC = () => {
                                     </div>
                                 </div>
                             )}
-
-                            {/* Experience */}
-                            {experiences.length > 0 && (
-                                <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-                                    <h2 className="text-xl font-semibold text-gray-900 mb-4 flex items-center gap-2">
-                                        <Briefcase className="w-5 h-5" />
-                                        Work Experience
-                                    </h2>
-                                    <div className="space-y-4">
-                                        {experiences.map((exp) => (
-                                            <div key={exp.id} className="border-l-2 border-gray-200 pl-4">
-                                                <h3 className="font-semibold text-gray-900">{exp.title}</h3>
-                                                <p className="text-gray-600">{exp.company}</p>
-                                                <p className="text-sm text-gray-500">
-                                                    {exp.location && `${exp.location}, `}
-                                                    {exp.country}
-                                                </p>
-                                                <p className="text-sm text-gray-500">
-                                                    {new Date(exp.startDate).toLocaleDateString()} -{" "}
-                                                    {exp.endDate
-                                                        ? new Date(exp.endDate).toLocaleDateString()
-                                                        : "Present"}
-                                                </p>
-                                                {exp.description && (
-                                                    <p className="text-gray-700 mt-2">{exp.description}</p>
-                                                )}
-                                            </div>
-                                        ))}
-                                    </div>
-                                </div>
-                            )}
-
-                            {/* Education */}
-                            {education.length > 0 && (
-                                <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-                                    <h2 className="text-xl font-semibold text-gray-900 mb-4 flex items-center gap-2">
-                                        <GraduationCap className="w-5 h-5" />
-                                        Education
-                                    </h2>
-                                    <div className="space-y-4">
-                                        {education.map((edu) => (
-                                            <div key={edu.id} className="border-l-2 border-gray-200 pl-4">
-                                                <h3 className="font-semibold text-gray-900">{edu.degree}</h3>
-                                                <p className="text-gray-600">{edu.school}</p>
-                                                <p className="text-sm text-gray-500">{edu.fieldOfStudy}</p>
-                                                <p className="text-sm text-gray-500">
-                                                    {new Date(edu.startDate).toLocaleDateString()} -{" "}
-                                                    {edu.endDate
-                                                        ? new Date(edu.endDate).toLocaleDateString()
-                                                        : "Present"}
-                                                </p>
-                                                {edu.description && (
-                                                    <p className="text-gray-700 mt-2">{edu.description}</p>
-                                                )}
-                                            </div>
-                                        ))}
-                                    </div>
-                                </div>
-                            )}
-                        </div>
-
-                        {/* Sidebar */}
-                        <div className="space-y-6">
                             {/* Languages */}
                             {languages.length > 0 && (
                                 <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
@@ -273,24 +314,7 @@ const ProviderDetailPage: FC = () => {
                                 </div>
                             )}
 
-                            {/* Contact Info */}
-                            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-                                <h3 className="text-lg font-semibold text-gray-900 mb-4">
-                                    Contact Information
-                                </h3>
-                                <div className="space-y-2 text-sm text-gray-600">
-                                    {profile.user?.email && (
-                                        <p>
-                                            <span className="font-medium">Email:</span> {profile.user.email}
-                                        </p>
-                                    )}
-                                    {profile.user?.username && (
-                                        <p>
-                                            <span className="font-medium">Username:</span> {profile.user.username}
-                                        </p>
-                                    )}
-                                </div>
-                            </div>
+
                         </div>
                     </div>
                 </div>

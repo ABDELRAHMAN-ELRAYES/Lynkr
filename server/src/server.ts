@@ -9,7 +9,6 @@ import PrismaClientSingleton from "./data-server-clients/prisma-client";
 import SocketService from "./services/socket.service";
 import { startAutoPublishJob } from "./jobs/auto-publish-requests.job";
 import { startSubscriptionJob } from "./jobs/subscription.job";
-import { slotCleanupJob } from "./jobs/slot-cleanup.job";
 
 const prisma = PrismaClientSingleton.getPrismaClient();
 
@@ -29,7 +28,6 @@ server.listen(PORT, () => {
     // Start scheduled jobs
     startAutoPublishJob();
     startSubscriptionJob();
-    slotCleanupJob.start();
 });
 
 // Graceful shutdown

@@ -1,10 +1,10 @@
 generator client {
-    provider = "prisma-client-js"
+  provider = "prisma-client-js"
 }
 
 datasource db {
-    provider = "postgresql"
-    url      = env("DATABASE_URL")
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
 // ============================================
@@ -12,77 +12,79 @@ datasource db {
 // ============================================
 
 model User {
-    id                String    @id @default(uuid())
-    firstName         String    @map("first_name")
-    lastName          String    @map("last_name")
-    username          String?   @unique
-    email             String    @unique
-    phone             String?   @unique
-    password          String
-    role              String    @default("CLIENT")
-    active            Boolean   @default(true)
-    emailVerified     Boolean   @default(false) @map("email_verified")
-    passwordChangedAt DateTime? @map("password_changed_at")
-    createdAt         DateTime  @default(now()) @map("created_at")
-    updatedAt         DateTime  @updatedAt @map("updated_at")
+  id                String    @id @default(uuid())
+  firstName         String    @map("first_name")
+  lastName          String    @map("last_name")
+  username          String?   @unique
+  email             String    @unique
+  phone             String?   @unique
+  password          String
+  role              String    @default("CLIENT")
+  active            Boolean   @default(true)
+  emailVerified     Boolean   @default(false) @map("email_verified")
+  passwordChangedAt DateTime? @map("password_changed_at")
+  createdAt         DateTime  @default(now()) @map("created_at")
+  updatedAt         DateTime  @updatedAt @map("updated_at")
 
-    // Relations
-    // User -> AdminPrivilege (One -> Many)
-    privileges                AdminPrivilege[]
-    // User -> ProviderProfile (One -> One)
-    providerProfile           ProviderProfile?
-    // User -> Request (One -> Many)
-    clientRequests            Request[]             @relation("ClientRequests")
-    // User -> ProviderApplication (One -> Many)
-    providerApplications      ProviderApplication[]
-    // User -> ApplicationReview (One -> Many)
-    adminReviews              ApplicationReview[]   @relation("AdminReviews")
-    // User -> Project (One -> Many) - as client
-    clientProjects            Project[]             @relation("ClientProjects")
-    // User -> Payment (One -> Many) - as payer
-    clientPayments            Payment[]             @relation("ClientPayments")
-    // User -> ProjectFile (One -> Many) - as uploader
-    projectFiles              ProjectFile[]
-    // User -> ProjectActivity (One -> Many)
-    projectActivities         ProjectActivity[]
-    // User -> Conversation (One -> Many) - as participant1
-    participant1Conversations Conversation[]        @relation("Participant1Conversations")
-    // User -> Conversation (One -> Many) - as participant2
-    participant2Conversations Conversation[]        @relation("Participant2Conversations")
-    // User -> Message (One -> Many) - as sender
-    sentMessages              Message[]             @relation("SentMessages")
-    // User -> Meeting (One -> Many) - as host
-    hostedMeetings            Meeting[]             @relation("MeetingHost")
-    // User -> Meeting (One -> Many) - as guest
-    guestMeetings             Meeting[]             @relation("MeetingGuest")
-    // User -> Review (One -> Many) - reviews given
-    reviewsGiven              Review[]              @relation("ReviewsGiven")
-    // User -> Review (One -> Many) - reviews received
-    reviewsReceived           Review[]              @relation("ReviewsReceived")
-    // User -> Notification (One -> Many)
-    notifications             Notification[]
-    // User -> Report (One -> Many) - reports submitted
-    reportsSubmitted          Report[]              @relation("ReportsSubmitted")
-    // User -> Report (One -> Many) - reports received
-    reportsReceived           Report[]              @relation("ReportsReceived")
-    // User -> ReportAction (One -> Many) - admin actions taken
-    adminActions              ReportAction[]        @relation("AdminActions")
+  // Relations
+  // User -> AdminPrivilege (One -> Many)
+  privileges                AdminPrivilege[]
+  // User -> ProviderProfile (One -> One)
+  providerProfile           ProviderProfile?
+  // User -> Request (One -> Many)
+  clientRequests            Request[]             @relation("ClientRequests")
+  // User -> ProviderApplication (One -> Many)
+  providerApplications      ProviderApplication[]
+  // User -> ApplicationReview (One -> Many)
+  adminReviews              ApplicationReview[]   @relation("AdminReviews")
+  // User -> Project (One -> Many) - as client
+  clientProjects            Project[]             @relation("ClientProjects")
+  // User -> Payment (One -> Many) - as payer
+  clientPayments            Payment[]             @relation("ClientPayments")
+  // User -> ProjectFile (One -> Many) - as uploader
+  projectFiles              ProjectFile[]
+  // User -> ProjectActivity (One -> Many)
+  projectActivities         ProjectActivity[]
+  // User -> Conversation (One -> Many) - as participant1
+  participant1Conversations Conversation[]        @relation("Participant1Conversations")
+  // User -> Conversation (One -> Many) - as participant2
+  participant2Conversations Conversation[]        @relation("Participant2Conversations")
+  // User -> Message (One -> Many) - as sender
+  sentMessages              Message[]             @relation("SentMessages")
+  // User -> Meeting (One -> Many) - as host
+  hostedMeetings            Meeting[]             @relation("MeetingHost")
+  // User -> Meeting (One -> Many) - as guest
+  guestMeetings             Meeting[]             @relation("MeetingGuest")
+  // User -> Review (One -> Many) - reviews given
+  reviewsGiven              Review[]              @relation("ReviewsGiven")
+  // User -> Review (One -> Many) - reviews received
+  reviewsReceived           Review[]              @relation("ReviewsReceived")
+  // User -> Notification (One -> Many)
+  notifications             Notification[]
+  // User -> Report (One -> Many) - reports submitted
+  reportsSubmitted          Report[]              @relation("ReportsSubmitted")
+  // User -> Report (One -> Many) - reports received
+  reportsReceived           Report[]              @relation("ReportsReceived")
+  // User -> ReportAction (One -> Many) - admin actions taken
+  adminActions              ReportAction[]        @relation("AdminActions")
+  // User -> MeetingRequest (One -> Many)
+  meetingRequests           MeetingRequest[]      @relation("MeetingRequests")
 
-    @@map("users")
+  @@map("users")
 }
 
 model AdminPrivilege {
-    id        String   @id @default(uuid())
-    userId    String   @map("user_id")
-    name      String
-    createdAt DateTime @default(now()) @map("created_at")
+  id        String   @id @default(uuid())
+  userId    String   @map("user_id")
+  name      String
+  createdAt DateTime @default(now()) @map("created_at")
 
-    // Relations
-    // AdminPrivilege -> User (Many -> One)
-    user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  // Relations
+  // AdminPrivilege -> User (Many -> One)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-    @@unique([userId, name])
-    @@map("admin_privileges")
+  @@unique([userId, name])
+  @@map("admin_privileges")
 }
 
 // ============================================
@@ -90,46 +92,46 @@ model AdminPrivilege {
 // ============================================
 
 model ProviderProfile {
-    id               String   @id @default(uuid())
-    userId           String   @unique @map("user_id")
-    serviceId        String?  @map("service_id") // Single service the provider specializes in
-    title            String? // Professional title
-    bio              String?  @db.Text
-    hourlyRate       Decimal? @map("hourly_rate")
-    availableBalance Decimal  @default(0) @map("available_balance")
-    isApproved       Boolean  @default(false) @map("is_approved")
-    averageRating    Decimal? @map("average_rating")
-    totalReviews     Int      @default(0) @map("total_reviews")
-    createdAt        DateTime @default(now()) @map("created_at")
-    updatedAt        DateTime @updatedAt @map("updated_at")
+  id               String   @id @default(uuid())
+  userId           String   @unique @map("user_id")
+  serviceId        String?  @map("service_id") // Single service the provider specializes in
+  title            String? // Professional title
+  bio              String?  @db.Text
+  hourlyRate       Decimal? @map("hourly_rate")
+  availableBalance Decimal  @default(0) @map("available_balance")
+  isApproved       Boolean  @default(false) @map("is_approved")
+  averageRating    Decimal? @map("average_rating")
+  totalReviews     Int      @default(0) @map("total_reviews")
+  createdAt        DateTime @default(now()) @map("created_at")
+  updatedAt        DateTime @updatedAt @map("updated_at")
 
-    // Relations
-    // ProviderProfile -> User (One -> One)
-    user                 User                   @relation(fields: [userId], references: [id], onDelete: Cascade)
-    // ProviderProfile -> Service (Many -> One)
-    service              Service?               @relation(fields: [serviceId], references: [id])
-    // ProviderProfile -> ProviderSkill (One -> Many)
-    skills               ProviderSkill[]
-    // ProviderProfile -> ProviderExperience (One -> Many)
-    experiences          ProviderExperience[]
-    // ProviderProfile -> ProviderEducation (One -> Many)
-    education            ProviderEducation[]
-    // ProviderProfile -> ProviderLanguage (One -> Many)
-    languages            ProviderLanguage[]
-    // ProviderProfile -> Request (One -> Many)
-    targetRequests       Request[]              @relation("TargetProviderRequests")
-    // ProviderProfile -> Proposal (One -> Many)
-    proposals            Proposal[]
-    // ProviderProfile -> ProviderApplication (One -> Many)
-    providerApplications ProviderApplication[]
-    // ProviderProfile -> Project (One -> Many)
-    projects             Project[]
-    // ProviderProfile -> TeachingSlot (One -> Many)
-    teachingSlots        TeachingSlot[]
-    // ProviderProfile -> ProviderSubscription (One -> Many)
-    subscriptions        ProviderSubscription[]
+  // Relations
+  // ProviderProfile -> User (One -> One)
+  user                 User                   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  // ProviderProfile -> Service (Many -> One)
+  service              Service?               @relation(fields: [serviceId], references: [id])
+  // ProviderProfile -> ProviderSkill (One -> Many)
+  skills               ProviderSkill[]
+  // ProviderProfile -> ProviderExperience (One -> Many)
+  experiences          ProviderExperience[]
+  // ProviderProfile -> ProviderEducation (One -> Many)
+  education            ProviderEducation[]
+  // ProviderProfile -> ProviderLanguage (One -> Many)
+  languages            ProviderLanguage[]
+  // ProviderProfile -> Request (One -> Many)
+  targetRequests       Request[]              @relation("TargetProviderRequests")
+  // ProviderProfile -> Proposal (One -> Many)
+  proposals            Proposal[]
+  // ProviderProfile -> ProviderApplication (One -> Many)
+  providerApplications ProviderApplication[]
+  // ProviderProfile -> Project (One -> Many)
+  projects             Project[]
+  // ProviderProfile -> ProviderAvailability (One -> Many)
+  availabilities       ProviderAvailability[]
+  // ProviderProfile -> ProviderSubscription (One -> Many)
+  subscriptions        ProviderSubscription[]
 
-    @@map("provider_profiles")
+  @@map("provider_profiles")
 }
 
 // ============================================
@@ -137,131 +139,131 @@ model ProviderProfile {
 // ============================================
 
 model Service {
-    id          String   @id @default(uuid())
-    name        String   @unique
-    description String?
-    isActive    Boolean  @default(true) @map("is_active")
-    createdAt   DateTime @default(now()) @map("created_at")
-    updatedAt   DateTime @updatedAt @map("updated_at")
+  id          String   @id @default(uuid())
+  name        String   @unique
+  description String?
+  isActive    Boolean  @default(true) @map("is_active")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
 
-    // Relations
-    // Service -> Skill (One -> Many)
-    skills           Skill[]
-    // Service -> ProviderProfile (One -> Many)
-    providerProfiles ProviderProfile[]
+  // Relations
+  // Service -> Skill (One -> Many)
+  skills           Skill[]
+  // Service -> ProviderProfile (One -> Many)
+  providerProfiles ProviderProfile[]
 
-    @@map("services")
+  @@map("services")
 }
 
 model Skill {
-    id        String   @id @default(uuid())
-    name      String
-    serviceId String   @map("service_id")
-    isActive  Boolean  @default(true) @map("is_active")
-    createdAt DateTime @default(now()) @map("created_at")
+  id        String   @id @default(uuid())
+  name      String
+  serviceId String   @map("service_id")
+  isActive  Boolean  @default(true) @map("is_active")
+  createdAt DateTime @default(now()) @map("created_at")
 
-    // Relations
-    // Skill -> Service (Many -> One)
-    service Service @relation(fields: [serviceId], references: [id], onDelete: Cascade)
+  // Relations
+  // Skill -> Service (Many -> One)
+  service Service @relation(fields: [serviceId], references: [id], onDelete: Cascade)
 
-    @@map("skills")
+  @@map("skills")
 }
 
 model ProviderSkill {
-    id                String @id @default(uuid())
-    providerProfileId String @map("provider_profile_id")
-    skillName         String @map("skill_name")
+  id                String @id @default(uuid())
+  providerProfileId String @map("provider_profile_id")
+  skillName         String @map("skill_name")
 
-    // Relations
-    // ProviderSkill -> ProviderProfile (Many -> One)
-    providerProfile ProviderProfile @relation(fields: [providerProfileId], references: [id], onDelete: Cascade)
+  // Relations
+  // ProviderSkill -> ProviderProfile (Many -> One)
+  providerProfile ProviderProfile @relation(fields: [providerProfileId], references: [id], onDelete: Cascade)
 
-    @@map("provider_skills")
+  @@map("provider_skills")
 }
 
 model ProviderExperience {
-    id                String    @id @default(uuid())
-    providerProfileId String    @map("provider_profile_id")
-    title             String
-    company           String
-    location          String
-    country           String
-    description       String?   @db.Text
-    startDate         DateTime  @map("start_date") @db.Date
-    endDate           DateTime? @map("end_date") @db.Date
+  id                String    @id @default(uuid())
+  providerProfileId String    @map("provider_profile_id")
+  title             String
+  company           String
+  location          String
+  country           String
+  description       String?   @db.Text
+  startDate         DateTime  @map("start_date") @db.Date
+  endDate           DateTime? @map("end_date") @db.Date
 
-    // Relations
-    // ProviderExperience -> ProviderProfile (Many -> One)
-    providerProfile ProviderProfile @relation(fields: [providerProfileId], references: [id], onDelete: Cascade)
+  // Relations
+  // ProviderExperience -> ProviderProfile (Many -> One)
+  providerProfile ProviderProfile @relation(fields: [providerProfileId], references: [id], onDelete: Cascade)
 
-    @@map("provider_experiences")
+  @@map("provider_experiences")
 }
 
 model ProviderEducation {
-    id                String    @id @default(uuid())
-    providerProfileId String    @map("provider_profile_id")
-    school            String
-    degree            String
-    fieldOfStudy      String    @map("field_of_study")
-    description       String?   @db.Text
-    startDate         DateTime  @map("start_date") @db.Date
-    endDate           DateTime? @map("end_date") @db.Date
+  id                String    @id @default(uuid())
+  providerProfileId String    @map("provider_profile_id")
+  school            String
+  degree            String
+  fieldOfStudy      String    @map("field_of_study")
+  description       String?   @db.Text
+  startDate         DateTime  @map("start_date") @db.Date
+  endDate           DateTime? @map("end_date") @db.Date
 
-    // Relations
-    // ProviderEducation -> ProviderProfile (Many -> One)
-    providerProfile ProviderProfile @relation(fields: [providerProfileId], references: [id], onDelete: Cascade)
+  // Relations
+  // ProviderEducation -> ProviderProfile (Many -> One)
+  providerProfile ProviderProfile @relation(fields: [providerProfileId], references: [id], onDelete: Cascade)
 
-    @@map("provider_education")
+  @@map("provider_education")
 }
 
 model ProviderLanguage {
-    id                String @id @default(uuid())
-    providerProfileId String @map("provider_profile_id")
-    language          String
-    proficiency       String
+  id                String @id @default(uuid())
+  providerProfileId String @map("provider_profile_id")
+  language          String
+  proficiency       String
 
-    // Relations
-    // ProviderLanguage -> ProviderProfile (Many -> One)
-    providerProfile ProviderProfile @relation(fields: [providerProfileId], references: [id], onDelete: Cascade)
+  // Relations
+  // ProviderLanguage -> ProviderProfile (Many -> One)
+  providerProfile ProviderProfile @relation(fields: [providerProfileId], references: [id], onDelete: Cascade)
 
-    @@map("provider_languages")
+  @@map("provider_languages")
 }
 
 model ProviderApplication {
-    id                String    @id @default(uuid())
-    userId            String    @map("user_id")
-    providerProfileId String?   @map("provider_profile_id")
-    status            String    @default("PENDING") // PENDING, APPROVED, REJECTED
-    cooldownEndsAt    DateTime? @map("cooldown_ends_at")
-    createdAt         DateTime  @default(now()) @map("created_at")
-    updatedAt         DateTime  @updatedAt @map("updated_at")
+  id                String    @id @default(uuid())
+  userId            String    @map("user_id")
+  providerProfileId String?   @map("provider_profile_id")
+  status            String    @default("PENDING") // PENDING, APPROVED, REJECTED
+  cooldownEndsAt    DateTime? @map("cooldown_ends_at")
+  createdAt         DateTime  @default(now()) @map("created_at")
+  updatedAt         DateTime  @updatedAt @map("updated_at")
 
-    // Relations
-    // ProviderApplication -> User (Many -> One)
-    user            User               @relation(fields: [userId], references: [id], onDelete: Cascade)
-    // ProviderApplication -> ProviderProfile (Many -> One)
-    providerProfile ProviderProfile?   @relation(fields: [providerProfileId], references: [id])
-    // ProviderApplication -> ApplicationReview (One -> One)
-    review          ApplicationReview?
+  // Relations
+  // ProviderApplication -> User (Many -> One)
+  user            User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  // ProviderApplication -> ProviderProfile (Many -> One)
+  providerProfile ProviderProfile?   @relation(fields: [providerProfileId], references: [id])
+  // ProviderApplication -> ApplicationReview (One -> One)
+  review          ApplicationReview?
 
-    @@map("provider_applications")
+  @@map("provider_applications")
 }
 
 model ApplicationReview {
-    id            String   @id @default(uuid())
-    applicationId String   @unique @map("application_id")
-    adminId       String   @map("admin_id")
-    decision      String // APPROVED, REJECTED
-    reason        String?  @db.Text
-    reviewedAt    DateTime @default(now()) @map("reviewed_at")
+  id            String   @id @default(uuid())
+  applicationId String   @unique @map("application_id")
+  adminId       String   @map("admin_id")
+  decision      String // APPROVED, REJECTED
+  reason        String?  @db.Text
+  reviewedAt    DateTime @default(now()) @map("reviewed_at")
 
-    // Relations
-    // ApplicationReview -> ProviderApplication (One -> One)
-    application ProviderApplication @relation(fields: [applicationId], references: [id], onDelete: Cascade)
-    // ApplicationReview -> User (Many -> One)
-    admin       User                @relation("AdminReviews", fields: [adminId], references: [id])
+  // Relations
+  // ApplicationReview -> ProviderApplication (One -> One)
+  application ProviderApplication @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+  // ApplicationReview -> User (Many -> One)
+  admin       User                @relation("AdminReviews", fields: [adminId], references: [id])
 
-    @@map("application_reviews")
+  @@map("application_reviews")
 }
 
 // ============================================
@@ -269,62 +271,62 @@ model ApplicationReview {
 // ============================================
 
 model Request {
-    id                String    @id @default(uuid())
-    clientId          String    @map("client_id")
-    targetProviderId  String?   @map("target_provider_id")
-    title             String
-    description       String    @db.Text
-    category          String
-    budgetType        String    @map("budget_type")
-    budgetCurrency    String    @default("USD") @map("budget_currency")
-    fromBudget        Decimal?  @map("from_budget")
-    toBudget          Decimal?  @map("to_budget")
-    deadline          DateTime?
-    responseDeadline  DateTime  @map("response_deadline")
-    status            String    @default("PENDING")
-    isPublic          Boolean   @default(false) @map("is_public")
-    enableAutoPublish Boolean   @default(false) @map("enable_auto_publish")
-    ndaRequired       Boolean   @default(false) @map("nda_required")
-    createdAt         DateTime  @default(now()) @map("created_at")
-    updatedAt         DateTime  @updatedAt @map("updated_at")
+  id                String    @id @default(uuid())
+  clientId          String    @map("client_id")
+  targetProviderId  String?   @map("target_provider_id")
+  title             String
+  description       String    @db.Text
+  category          String
+  budgetType        String    @map("budget_type")
+  budgetCurrency    String    @default("USD") @map("budget_currency")
+  fromBudget        Decimal?  @map("from_budget")
+  toBudget          Decimal?  @map("to_budget")
+  deadline          DateTime?
+  responseDeadline  DateTime  @map("response_deadline")
+  status            String    @default("PENDING")
+  isPublic          Boolean   @default(false) @map("is_public")
+  enableAutoPublish Boolean   @default(false) @map("enable_auto_publish")
+  ndaRequired       Boolean   @default(false) @map("nda_required")
+  createdAt         DateTime  @default(now()) @map("created_at")
+  updatedAt         DateTime  @updatedAt @map("updated_at")
 
-    // Relations
-    // Request -> ProviderProfile (Many -> One)
-    targetProvider ProviderProfile? @relation("TargetProviderRequests", fields: [targetProviderId], references: [id])
-    // Request -> Proposal (One -> Many)
-    proposals      Proposal[]
-    // Request -> RequestFile (One -> Many)
-    attachments    RequestFile[]
-    // Request -> User (Many -> One)
-    client         User             @relation("ClientRequests", fields: [clientId], references: [id], onDelete: Cascade)
+  // Relations
+  // Request -> ProviderProfile (Many -> One)
+  targetProvider ProviderProfile? @relation("TargetProviderRequests", fields: [targetProviderId], references: [id])
+  // Request -> Proposal (One -> Many)
+  proposals      Proposal[]
+  // Request -> RequestFile (One -> Many)
+  attachments    RequestFile[]
+  // Request -> User (Many -> One)
+  client         User             @relation("ClientRequests", fields: [clientId], references: [id], onDelete: Cascade)
 
-    @@map("requests")
+  @@map("requests")
 }
 
 model Proposal {
-    id                String   @id @default(uuid())
-    requestId         String   @map("request_id")
-    providerProfileId String   @map("provider_profile_id")
-    price             Decimal
-    priceType         String   @map("price_type")
-    estimatedDays     Int      @map("estimated_days")
-    notes             String?  @db.Text
-    status            String   @default("PENDING")
-    createdAt         DateTime @default(now()) @map("created_at")
-    updatedAt         DateTime @updatedAt @map("updated_at")
+  id                String   @id @default(uuid())
+  requestId         String   @map("request_id")
+  providerProfileId String   @map("provider_profile_id")
+  price             Decimal
+  priceType         String   @map("price_type")
+  estimatedDays     Int      @map("estimated_days")
+  notes             String?  @db.Text
+  status            String   @default("PENDING")
+  createdAt         DateTime @default(now()) @map("created_at")
+  updatedAt         DateTime @updatedAt @map("updated_at")
 
-    // Relations
-    // Proposal -> Request (Many -> One)
-    request         Request         @relation(fields: [requestId], references: [id], onDelete: Cascade)
-    // Proposal -> ProviderProfile (Many -> One)
-    providerProfile ProviderProfile @relation(fields: [providerProfileId], references: [id])
-    // Proposal -> ProposalFile (One -> Many)
-    attachments     ProposalFile[]
-    // Proposal -> Project (One -> One)
-    project         Project?
+  // Relations
+  // Proposal -> Request (Many -> One)
+  request         Request         @relation(fields: [requestId], references: [id], onDelete: Cascade)
+  // Proposal -> ProviderProfile (Many -> One)
+  providerProfile ProviderProfile @relation(fields: [providerProfileId], references: [id])
+  // Proposal -> ProposalFile (One -> Many)
+  attachments     ProposalFile[]
+  // Proposal -> Project (One -> One)
+  project         Project?
 
-    @@unique([requestId, providerProfileId])
-    @@map("proposals")
+  @@unique([requestId, providerProfileId])
+  @@map("proposals")
 }
 
 // ============================================
@@ -332,58 +334,57 @@ model Proposal {
 // ============================================
 
 model File {
-    id        String   @id @default(uuid())
-    filename  String
-    path      String
-    mimetype  String
-    size      Int
-    createdAt DateTime @default(now()) @map("created_at")
+  id        String   @id @default(uuid())
+  filename  String
+  path      String
+  mimetype  String
+  size      Int
+  createdAt DateTime @default(now()) @map("created_at")
 
-    // Relations
-    // File -> RequestFile (One -> Many)
-    requestFiles  RequestFile[]
-    // File -> ProposalFile (One -> Many)
-    proposalFiles ProposalFile[]
-    // File -> ProjectFile (One -> Many)
-    projectFiles  ProjectFile[]
-    // File -> SessionFile (One -> Many)
-    sessionFiles  SessionFile[]
-    // File -> ReportFile (One -> Many)
-    reportFiles   ReportFile[]
+  // Relations
+  // File -> RequestFile (One -> Many)
+  requestFiles  RequestFile[]
+  // File -> ProposalFile (One -> Many)
+  proposalFiles ProposalFile[]
+  // File -> ProjectFile (One -> Many)
+  projectFiles  ProjectFile[]
 
-    @@map("files")
+  // File -> ReportFile (One -> Many)
+  reportFiles ReportFile[]
+
+  @@map("files")
 }
 
 // Request <-> File (Many -> Many)
 model RequestFile {
-    id        String   @id @default(uuid())
-    requestId String   @map("request_id")
-    fileId    String   @map("file_id")
-    createdAt DateTime @default(now()) @map("created_at")
+  id        String   @id @default(uuid())
+  requestId String   @map("request_id")
+  fileId    String   @map("file_id")
+  createdAt DateTime @default(now()) @map("created_at")
 
-    // Relations
-    // RequestFile -> Request (Many -> One)
-    request Request @relation(fields: [requestId], references: [id], onDelete: Cascade)
-    // RequestFile -> File (Many -> One)
-    file    File    @relation(fields: [fileId], references: [id], onDelete: Cascade)
+  // Relations
+  // RequestFile -> Request (Many -> One)
+  request Request @relation(fields: [requestId], references: [id], onDelete: Cascade)
+  // RequestFile -> File (Many -> One)
+  file    File    @relation(fields: [fileId], references: [id], onDelete: Cascade)
 
-    @@map("request_files")
+  @@map("request_files")
 }
 
 // Proposal <-> File (Many -> Many)
 model ProposalFile {
-    id         String   @id @default(uuid())
-    proposalId String   @map("proposal_id")
-    fileId     String   @map("file_id")
-    createdAt  DateTime @default(now()) @map("created_at")
+  id         String   @id @default(uuid())
+  proposalId String   @map("proposal_id")
+  fileId     String   @map("file_id")
+  createdAt  DateTime @default(now()) @map("created_at")
 
-    // Relations
-    // ProposalFile -> Proposal (Many -> One)
-    proposal Proposal @relation(fields: [proposalId], references: [id], onDelete: Cascade)
-    // ProposalFile -> File (Many -> One)
-    file     File     @relation(fields: [fileId], references: [id], onDelete: Cascade)
+  // Relations
+  // ProposalFile -> Proposal (Many -> One)
+  proposal Proposal @relation(fields: [proposalId], references: [id], onDelete: Cascade)
+  // ProposalFile -> File (Many -> One)
+  file     File     @relation(fields: [fileId], references: [id], onDelete: Cascade)
 
-    @@map("proposal_files")
+  @@map("proposal_files")
 }
 
 // ============================================
@@ -391,58 +392,56 @@ model ProposalFile {
 // ============================================
 
 model Payment {
-    id              String    @id @default(uuid())
-    payerId         String    @map("payer_id")
-    amount          Decimal
-    currency        String    @default("USD")
-    paymentType     String    @map("payment_type") // FULL, INITIAL, FINAL, SESSION
-    status          String    @default("PENDING") // PENDING, COMPLETED, REFUNDED, CANCELLED
-    stripePaymentId String?   @map("stripe_payment_id")
-    paidAt          DateTime? @map("paid_at")
-    createdAt       DateTime  @default(now()) @map("created_at")
-    updatedAt       DateTime  @updatedAt @map("updated_at")
+  id              String    @id @default(uuid())
+  payerId         String    @map("payer_id")
+  amount          Decimal
+  currency        String    @default("USD")
+  paymentType     String    @map("payment_type") // FULL, INITIAL, FINAL, SESSION
+  status          String    @default("PENDING") // PENDING, COMPLETED, REFUNDED, CANCELLED
+  stripePaymentId String?   @map("stripe_payment_id")
+  paidAt          DateTime? @map("paid_at")
+  createdAt       DateTime  @default(now()) @map("created_at")
+  updatedAt       DateTime  @updatedAt @map("updated_at")
 
-    // Relations
-    // Payment -> User (Many -> One)
-    payer          User            @relation("ClientPayments", fields: [payerId], references: [id])
-    // Payment -> ProjectPayment (One -> One)
-    projectPayment ProjectPayment?
-    // Payment -> SessionPayment (One -> One)
-    sessionPayment SessionPayment?
+  // Relations
+  // Payment -> User (Many -> One)
+  payer          User            @relation("ClientPayments", fields: [payerId], references: [id])
+  // Payment -> ProjectPayment (One -> One)
+  projectPayment ProjectPayment?
 
-    @@map("payments")
+  @@map("payments")
 }
 
 // Payment <-> Project
 model ProjectPayment {
-    id        String @id @default(uuid())
-    paymentId String @unique @map("payment_id")
-    projectId String @map("project_id")
+  id        String @id @default(uuid())
+  paymentId String @unique @map("payment_id")
+  projectId String @map("project_id")
 
-    // Relations
-    // ProjectPayment -> Payment (One -> One)
-    payment Payment @relation(fields: [paymentId], references: [id], onDelete: Cascade)
-    // ProjectPayment -> Project (Many -> One)
-    project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  // Relations
+  // ProjectPayment -> Payment (One -> One)
+  payment Payment @relation(fields: [paymentId], references: [id], onDelete: Cascade)
+  // ProjectPayment -> Project (Many -> One)
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
 
-    @@map("project_payments")
+  @@map("project_payments")
 }
 
 model Escrow {
-    id            String    @id @default(uuid())
-    projectId     String    @unique @map("project_id")
-    depositAmount Decimal   @map("deposit_amount")
-    balance       Decimal   @default(0)
-    status        String    @default("HOLDING") // HOLDING, RELEASED, REFUNDED
-    releasedAt    DateTime? @map("released_at")
-    createdAt     DateTime  @default(now()) @map("created_at")
-    updatedAt     DateTime  @updatedAt @map("updated_at")
+  id            String    @id @default(uuid())
+  projectId     String    @unique @map("project_id")
+  depositAmount Decimal   @map("deposit_amount")
+  balance       Decimal   @default(0)
+  status        String    @default("HOLDING") // HOLDING, RELEASED, REFUNDED
+  releasedAt    DateTime? @map("released_at")
+  createdAt     DateTime  @default(now()) @map("created_at")
+  updatedAt     DateTime  @updatedAt @map("updated_at")
 
-    // Relations
-    // Escrow -> Project (One -> One)
-    project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  // Relations
+  // Escrow -> Project (One -> One)
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
 
-    @@map("escrows")
+  @@map("escrows")
 }
 
 // ============================================
@@ -450,78 +449,80 @@ model Escrow {
 // ============================================
 
 model Project {
-    id                 String    @id @default(uuid())
-    clientId           String    @map("client_id")
-    providerProfileId  String    @map("provider_profile_id")
-    acceptedProposalId String    @unique @map("accepted_proposal_id")
-    status             String    @default("PENDING_PAYMENT") // PENDING_PAYMENT, IN_PROGRESS, COMPLETED, CANCELLED
-    totalPrice         Decimal   @map("total_price")
-    paidAmount         Decimal   @default(0) @map("paid_amount")
-    startedAt          DateTime? @map("started_at")
-    completedAt        DateTime? @map("completed_at")
-    createdAt          DateTime  @default(now()) @map("created_at")
-    updatedAt          DateTime  @updatedAt @map("updated_at")
+  id                 String    @id @default(uuid())
+  clientId           String    @map("client_id")
+  providerProfileId  String    @map("provider_profile_id")
+  acceptedProposalId String    @unique @map("accepted_proposal_id")
+  status             String    @default("PENDING_PAYMENT") // PENDING_PAYMENT, IN_PROGRESS, COMPLETED, CANCELLED
+  totalPrice         Decimal   @map("total_price")
+  paidAmount         Decimal   @default(0) @map("paid_amount")
+  startedAt          DateTime? @map("started_at")
+  completedAt        DateTime? @map("completed_at")
+  createdAt          DateTime  @default(now()) @map("created_at")
+  updatedAt          DateTime  @updatedAt @map("updated_at")
 
-    // Relations
-    // Project -> User (Many -> One)
-    client           User              @relation("ClientProjects", fields: [clientId], references: [id])
-    // Project -> ProviderProfile (Many -> One)
-    providerProfile  ProviderProfile   @relation(fields: [providerProfileId], references: [id])
-    // Project -> Proposal (One -> One)
-    acceptedProposal Proposal          @relation(fields: [acceptedProposalId], references: [id])
-    // Project -> Escrow (One -> One)
-    escrow           Escrow?
-    // Project -> ProjectPayment (One -> Many)
-    projectPayments  ProjectPayment[]
-    // Project -> ProjectFile (One -> Many)
-    files            ProjectFile[]
-    // Project -> ProjectActivity (One -> Many)
-    activities       ProjectActivity[]
-    // Project -> Conversation (One -> One)
-    conversation     Conversation?
-    // Project -> Meeting (One -> Many)
-    meetings         Meeting[]
-    // Project -> ProjectReview (One -> Many)
-    reviews          ProjectReview[]
+  // Relations
+  // Project -> User (Many -> One)
+  client           User              @relation("ClientProjects", fields: [clientId], references: [id])
+  // Project -> ProviderProfile (Many -> One)
+  providerProfile  ProviderProfile   @relation(fields: [providerProfileId], references: [id])
+  // Project -> Proposal (One -> One)
+  acceptedProposal Proposal          @relation(fields: [acceptedProposalId], references: [id])
+  // Project -> Escrow (One -> One)
+  escrow           Escrow?
+  // Project -> ProjectPayment (One -> Many)
+  projectPayments  ProjectPayment[]
+  // Project -> ProjectFile (One -> Many)
+  files            ProjectFile[]
+  // Project -> ProjectActivity (One -> Many)
+  activities       ProjectActivity[]
+  // Project -> Conversation (One -> One)
+  conversation     Conversation?
+  // Project -> Meeting (One -> Many)
+  meetings         Meeting[]
+  // Project -> ProjectReview (One -> Many)
+  reviews          ProjectReview[]
+  // Project -> MeetingRequest (One -> Many)
+  meetingRequests  MeetingRequest[]
 
-    @@map("projects")
+  @@map("projects")
 }
 
 // Project <-> File (Many -> Many)
 model ProjectFile {
-    id          String   @id @default(uuid())
-    projectId   String   @map("project_id")
-    fileId      String   @map("file_id")
-    uploaderId  String   @map("uploader_id")
-    description String?
-    createdAt   DateTime @default(now()) @map("created_at")
+  id          String   @id @default(uuid())
+  projectId   String   @map("project_id")
+  fileId      String   @map("file_id")
+  uploaderId  String   @map("uploader_id")
+  description String?
+  createdAt   DateTime @default(now()) @map("created_at")
 
-    // Relations
-    // ProjectFile -> Project (Many -> One)
-    project  Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
-    // ProjectFile -> File (Many -> One)
-    file     File    @relation(fields: [fileId], references: [id], onDelete: Cascade)
-    // ProjectFile -> User (Many -> One)
-    uploader User    @relation(fields: [uploaderId], references: [id])
+  // Relations
+  // ProjectFile -> Project (Many -> One)
+  project  Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  // ProjectFile -> File (Many -> One)
+  file     File    @relation(fields: [fileId], references: [id], onDelete: Cascade)
+  // ProjectFile -> User (Many -> One)
+  uploader User    @relation(fields: [uploaderId], references: [id])
 
-    @@map("project_files")
+  @@map("project_files")
 }
 
 model ProjectActivity {
-    id        String   @id @default(uuid())
-    projectId String   @map("project_id")
-    userId    String   @map("user_id")
-    action    String // FILE_UPLOADED, STATUS_CHANGED, COMPLETION_REQUESTED, COMPLETION_CONFIRMED, PROJECT_CANCELLED
-    details   String?  @db.Text
-    createdAt DateTime @default(now()) @map("created_at")
+  id        String   @id @default(uuid())
+  projectId String   @map("project_id")
+  userId    String   @map("user_id")
+  action    String // FILE_UPLOADED, STATUS_CHANGED, COMPLETION_REQUESTED, COMPLETION_CONFIRMED, PROJECT_CANCELLED
+  details   String?  @db.Text
+  createdAt DateTime @default(now()) @map("created_at")
 
-    // Relations
-    // ProjectActivity -> Project (Many -> One)
-    project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
-    // ProjectActivity -> User (Many -> One)
-    user    User    @relation(fields: [userId], references: [id])
+  // Relations
+  // ProjectActivity -> Project (Many -> One)
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  // ProjectActivity -> User (Many -> One)
+  user    User    @relation(fields: [userId], references: [id])
 
-    @@map("project_activities")
+  @@map("project_activities")
 }
 
 // ============================================
@@ -529,42 +530,42 @@ model ProjectActivity {
 // ============================================
 
 model Conversation {
-    id             String   @id @default(uuid())
-    projectId      String   @unique @map("project_id")
-    participant1Id String   @map("participant_1_id")
-    participant2Id String   @map("participant_2_id")
-    createdAt      DateTime @default(now()) @map("created_at")
-    updatedAt      DateTime @updatedAt @map("updated_at")
+  id             String   @id @default(uuid())
+  projectId      String   @unique @map("project_id")
+  participant1Id String   @map("participant_1_id")
+  participant2Id String   @map("participant_2_id")
+  createdAt      DateTime @default(now()) @map("created_at")
+  updatedAt      DateTime @updatedAt @map("updated_at")
 
-    // Relations
-    // Conversation -> Project (One -> One)
-    project      Project   @relation(fields: [projectId], references: [id], onDelete: Cascade)
-    // Conversation -> User (Many -> One) - participant1
-    participant1 User      @relation("Participant1Conversations", fields: [participant1Id], references: [id])
-    // Conversation -> User (Many -> One) - participant2
-    participant2 User      @relation("Participant2Conversations", fields: [participant2Id], references: [id])
-    // Conversation -> Message (One -> Many)
-    messages     Message[]
+  // Relations
+  // Conversation -> Project (One -> One)
+  project      Project   @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  // Conversation -> User (Many -> One) - participant1
+  participant1 User      @relation("Participant1Conversations", fields: [participant1Id], references: [id])
+  // Conversation -> User (Many -> One) - participant2
+  participant2 User      @relation("Participant2Conversations", fields: [participant2Id], references: [id])
+  // Conversation -> Message (One -> Many)
+  messages     Message[]
 
-    @@map("conversations")
+  @@map("conversations")
 }
 
 model Message {
-    id             String   @id @default(uuid())
-    conversationId String   @map("conversation_id")
-    senderId       String   @map("sender_id")
-    content        String   @db.Text
-    isRead         Boolean  @default(false) @map("is_read")
-    createdAt      DateTime @default(now()) @map("created_at")
-    updatedAt      DateTime @updatedAt @map("updated_at")
+  id             String   @id @default(uuid())
+  conversationId String   @map("conversation_id")
+  senderId       String   @map("sender_id")
+  content        String   @db.Text
+  isRead         Boolean  @default(false) @map("is_read")
+  createdAt      DateTime @default(now()) @map("created_at")
+  updatedAt      DateTime @updatedAt @map("updated_at")
 
-    // Relations
-    // Message -> Conversation (Many -> One)
-    conversation Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
-    // Message -> User (Many -> One) - sender
-    sender       User         @relation("SentMessages", fields: [senderId], references: [id])
+  // Relations
+  // Message -> Conversation (Many -> One)
+  conversation Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  // Message -> User (Many -> One) - sender
+  sender       User         @relation("SentMessages", fields: [senderId], references: [id])
 
-    @@map("messages")
+  @@map("messages")
 }
 
 // ============================================
@@ -572,174 +573,77 @@ model Message {
 // ============================================
 
 model Meeting {
-    id          String    @id @default(uuid())
-    projectId   String    @map("project_id")
-    hostId      String    @map("host_id")
-    guestId     String    @map("guest_id")
-    channelName String    @unique @map("channel_name")
-    status      String    @default("PENDING") // PENDING, ACTIVE, COMPLETED, CANCELLED
-    scheduledAt DateTime? @map("scheduled_at")
-    startedAt   DateTime? @map("started_at")
-    endedAt     DateTime? @map("ended_at")
-    duration    Int? // In seconds
-    createdAt   DateTime  @default(now()) @map("created_at")
-    updatedAt   DateTime  @updatedAt @map("updated_at")
+  id          String    @id @default(uuid())
+  projectId   String    @map("project_id")
+  hostId      String    @map("host_id")
+  guestId     String    @map("guest_id")
+  channelName String    @unique @map("channel_name")
+  status      String    @default("PENDING") // PENDING, ACTIVE, COMPLETED, CANCELLED
+  scheduledAt DateTime? @map("scheduled_at")
+  startedAt   DateTime? @map("started_at")
+  endedAt     DateTime? @map("ended_at")
+  duration    Int? // In seconds
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
 
-    // Relations
-    // Meeting -> Project (Many -> One)
-    project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
-    // Meeting -> User (Many -> One) - host
-    host    User    @relation("MeetingHost", fields: [hostId], references: [id])
-    // Meeting -> User (Many -> One) - guest
-    guest   User    @relation("MeetingGuest", fields: [guestId], references: [id])
+  // Relations
+  // Meeting -> Project (Many -> One)
+  project        Project         @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  // Meeting -> User (Many -> One) - host
+  host           User            @relation("MeetingHost", fields: [hostId], references: [id])
+  // Meeting -> User (Many -> One) - guest
+  guest          User            @relation("MeetingGuest", fields: [guestId], references: [id])
+  // Meeting -> MeetingRequest (One -> One) - the request that created this meeting
+  meetingRequest MeetingRequest?
 
-    @@map("meetings")
+  @@map("meetings")
 }
 
 // ============================================
-// Module 7: Teaching & Scheduling
+// Module 7: Provider Availability & Meeting Scheduling
 // ============================================
 
-model TeachingSlot {
-    id                String   @id @default(uuid())
-    providerProfileId String   @map("provider_profile_id")
-    slotDate          DateTime @map("slot_date") @db.Date
-    startTime         String   @map("start_time")
-    endTime           String   @map("end_time")
-    durationMinutes   Int      @map("duration_minutes")
-    sessionType       String   @map("session_type") // ONE_TO_ONE, GROUP
-    maxParticipants   Int      @default(1) @map("max_participants")
-    timezone          String   @default("UTC")
-    createdAt         DateTime @default(now()) @map("created_at")
-    updatedAt         DateTime @updatedAt @map("updated_at")
+model ProviderAvailability {
+  id                String   @id @default(uuid())
+  providerProfileId String   @map("provider_profile_id")
+  dayOfWeek         Int      @map("day_of_week") // 0=Sunday, 1=Monday, ..., 6=Saturday
+  startTime         String   @map("start_time") // HH:mm format
+  endTime           String   @map("end_time") // HH:mm format
+  timezone          String   @default("UTC")
+  createdAt         DateTime @default(now()) @map("created_at")
+  updatedAt         DateTime @updatedAt @map("updated_at")
 
-    // Relations
-    // TeachingSlot -> ProviderProfile (Many -> One)
-    providerProfile ProviderProfile  @relation(fields: [providerProfileId], references: [id], onDelete: Cascade)
-    // TeachingSlot -> TeachingSession (One -> One)
-    session         TeachingSession?
+  // Relations
+  // ProviderAvailability -> ProviderProfile (Many -> One)
+  providerProfile ProviderProfile @relation(fields: [providerProfileId], references: [id], onDelete: Cascade)
 
-    @@map("teaching_slots")
+  @@map("provider_availabilities")
 }
 
-model TeachingSession {
-    id           String    @id @default(uuid())
-    slotId       String    @unique @map("slot_id")
-    instructorId String    @map("instructor_id")
-    status       String    @default("SCHEDULED") // SCHEDULED, IN_PROGRESS, COMPLETED, CANCELLED, NO_SHOW
-    channelName  String?   @unique @map("channel_name")
-    startedAt    DateTime? @map("started_at")
-    completedAt  DateTime? @map("completed_at")
-    createdAt    DateTime  @default(now()) @map("created_at")
-    updatedAt    DateTime  @updatedAt @map("updated_at")
+model MeetingRequest {
+  id              String    @id @default(uuid())
+  projectId       String    @map("project_id")
+  requestedById   String    @map("requested_by_id")
+  proposedDate    DateTime  @map("proposed_date") @db.Date
+  proposedTime    String    @map("proposed_time") // HH:mm format
+  timezone        String    @default("UTC")
+  isCustomTime    Boolean   @default(false) @map("is_custom_time")
+  status          String    @default("PENDING") // PENDING, APPROVED, REJECTED, CANCELLED
+  rejectionReason String?   @map("rejection_reason") @db.Text
+  approvedAt      DateTime? @map("approved_at")
+  createdAt       DateTime  @default(now()) @map("created_at")
+  updatedAt       DateTime  @updatedAt @map("updated_at")
 
-    // Relations
-    // TeachingSession -> TeachingSlot (One -> One)
-    slot         TeachingSlot         @relation(fields: [slotId], references: [id])
-    // TeachingSession -> SessionParticipant (One -> Many)
-    participants SessionParticipant[]
-    // TeachingSession -> SessionAttendance (One -> Many)
-    attendances  SessionAttendance[]
-    // TeachingSession -> SessionFile (One -> Many)
-    files        SessionFile[]
-    // TeachingSession -> SessionConversation (One -> One)
-    conversation SessionConversation?
-    // TeachingSession -> SessionReview (One -> Many)
-    reviews      SessionReview[]
+  // Relations
+  // MeetingRequest -> Project (Many -> One)
+  project     Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  // MeetingRequest -> User (Many -> One)
+  requestedBy User     @relation("MeetingRequests", fields: [requestedById], references: [id])
+  // MeetingRequest -> Meeting (One -> One) - created after approval
+  meetingId   String?  @unique @map("meeting_id")
+  meeting     Meeting? @relation(fields: [meetingId], references: [id])
 
-    @@map("teaching_sessions")
-}
-
-model SessionParticipant {
-    id        String   @id @default(uuid())
-    sessionId String   @map("session_id")
-    userId    String   @map("user_id")
-    status    String   @default("BOOKED") // BOOKED, CANCELLED, REFUNDED
-    bookedAt  DateTime @default(now()) @map("booked_at")
-
-    // Relations
-    // SessionParticipant -> TeachingSession (Many -> One)
-    session        TeachingSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
-    // SessionParticipant -> SessionPayment (One -> One)
-    sessionPayment SessionPayment?
-
-    @@unique([sessionId, userId])
-    @@map("session_participants")
-}
-
-// Payment <-> SessionParticipant
-model SessionPayment {
-    id            String @id @default(uuid())
-    paymentId     String @unique @map("payment_id")
-    participantId String @unique @map("participant_id")
-
-    // Relations
-    // SessionPayment -> Payment (One -> One)
-    payment     Payment            @relation(fields: [paymentId], references: [id], onDelete: Cascade)
-    // SessionPayment -> SessionParticipant (One -> One)
-    participant SessionParticipant @relation(fields: [participantId], references: [id], onDelete: Cascade)
-
-    @@map("session_payments")
-}
-
-model SessionAttendance {
-    id        String    @id @default(uuid())
-    sessionId String    @map("session_id")
-    userId    String    @map("user_id")
-    joinedAt  DateTime  @default(now()) @map("joined_at")
-    leftAt    DateTime? @map("left_at")
-
-    // Relations
-    // SessionAttendance -> TeachingSession (Many -> One)
-    session TeachingSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
-
-    @@map("session_attendances")
-}
-
-// File <-> TeachingSession
-model SessionFile {
-    id         String   @id @default(uuid())
-    sessionId  String   @map("session_id")
-    fileId     String   @map("file_id")
-    uploaderId String   @map("uploader_id")
-    createdAt  DateTime @default(now()) @map("created_at")
-
-    // Relations
-    // SessionFile -> TeachingSession (Many -> One)
-    session TeachingSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
-    // SessionFile -> File (Many -> One)
-    file    File            @relation(fields: [fileId], references: [id], onDelete: Cascade)
-
-    @@map("session_files")
-}
-
-// Chat for 1-to-1 sessions only
-model SessionConversation {
-    id        String   @id @default(uuid())
-    sessionId String   @unique @map("session_id")
-    createdAt DateTime @default(now()) @map("created_at")
-
-    // Relations
-    // SessionConversation -> TeachingSession (One -> One)
-    session  TeachingSession  @relation(fields: [sessionId], references: [id], onDelete: Cascade)
-    // SessionConversation -> SessionMessage (One -> Many)
-    messages SessionMessage[]
-
-    @@map("session_conversations")
-}
-
-model SessionMessage {
-    id             String   @id @default(uuid())
-    conversationId String   @map("conversation_id")
-    senderId       String   @map("sender_id")
-    content        String   @db.Text
-    createdAt      DateTime @default(now()) @map("created_at")
-
-    // Relations
-    // SessionMessage -> SessionConversation (Many -> One)
-    conversation SessionConversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
-
-    @@map("session_messages")
+  @@map("meeting_requests")
 }
 
 // ============================================
@@ -748,59 +652,41 @@ model SessionMessage {
 
 // Base review model containing common fields
 model Review {
-    id           String   @id @default(uuid())
-    reviewerId   String   @map("reviewer_id")
-    targetUserId String   @map("target_user_id")
-    rating       Int // 1-5 stars
-    comment      String?  @db.Text
-    reviewType   String   @map("review_type") // CLIENT_TO_PROVIDER, PROVIDER_TO_CLIENT
-    status       String   @default("SUBMITTED") // SUBMITTED, EXPIRED
-    createdAt    DateTime @default(now()) @map("created_at")
-    updatedAt    DateTime @updatedAt @map("updated_at")
+  id           String   @id @default(uuid())
+  reviewerId   String   @map("reviewer_id")
+  targetUserId String   @map("target_user_id")
+  rating       Int // 1-5 stars
+  comment      String?  @db.Text
+  reviewType   String   @map("review_type") // CLIENT_TO_PROVIDER, PROVIDER_TO_CLIENT
+  status       String   @default("SUBMITTED") // SUBMITTED, EXPIRED
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
 
-    // Relations
-    // Review -> User (Many -> One) - reviewer
-    reviewer      User           @relation("ReviewsGiven", fields: [reviewerId], references: [id])
-    // Review -> User (Many -> One) - target
-    targetUser    User           @relation("ReviewsReceived", fields: [targetUserId], references: [id])
-    // Review -> ProjectReview (One -> One)
-    projectReview ProjectReview?
-    // Review -> SessionReview (One -> One)
-    sessionReview SessionReview?
+  // Relations
+  // Review -> User (Many -> One) - reviewer
+  reviewer      User           @relation("ReviewsGiven", fields: [reviewerId], references: [id])
+  // Review -> User (Many -> One) - target
+  targetUser    User           @relation("ReviewsReceived", fields: [targetUserId], references: [id])
+  // Review -> ProjectReview (One -> One)
+  projectReview ProjectReview?
 
-    @@map("reviews")
+  @@map("reviews")
 }
 
 // Review <-> Project
 model ProjectReview {
-    id        String @id @default(uuid())
-    reviewId  String @unique @map("review_id")
-    projectId String @map("project_id")
+  id        String @id @default(uuid())
+  reviewId  String @unique @map("review_id")
+  projectId String @map("project_id")
 
-    // Relations
-    // ProjectReview -> Review (One -> One)
-    review  Review  @relation(fields: [reviewId], references: [id], onDelete: Cascade)
-    // ProjectReview -> Project (Many -> One)
-    project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  // Relations
+  // ProjectReview -> Review (One -> One)
+  review  Review  @relation(fields: [reviewId], references: [id], onDelete: Cascade)
+  // ProjectReview -> Project (Many -> One)
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
 
-    @@unique([reviewId, projectId])
-    @@map("project_reviews")
-}
-
-// Review <-> TeachingSession
-model SessionReview {
-    id        String @id @default(uuid())
-    reviewId  String @unique @map("review_id")
-    sessionId String @map("session_id")
-
-    // Relations
-    // SessionReview -> Review (One -> One)
-    review  Review          @relation(fields: [reviewId], references: [id], onDelete: Cascade)
-    // SessionReview -> TeachingSession (Many -> One)
-    session TeachingSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
-
-    @@unique([reviewId, sessionId])
-    @@map("session_reviews")
+  @@unique([reviewId, projectId])
+  @@map("project_reviews")
 }
 
 // ============================================
@@ -808,24 +694,24 @@ model SessionReview {
 // ============================================
 
 model Notification {
-    id         String   @id @default(uuid())
-    userId     String   @map("user_id")
-    title      String
-    message    String   @db.Text
-    type       String // MESSAGE, PROPOSAL, PROJECT, PAYMENT, REVIEW, SESSION, SYSTEM
-    category   String // COMMUNICATION, REQUESTS_PROPOSALS, PAYMENTS, PROJECT_SESSION, REVIEWS, SYSTEM
-    entityId   String?  @map("entity_id")
-    entityType String?  @map("entity_type")
-    isRead     Boolean  @default(false) @map("is_read")
-    createdAt  DateTime @default(now()) @map("created_at")
-    updatedAt  DateTime @updatedAt @map("updated_at")
+  id         String   @id @default(uuid())
+  userId     String   @map("user_id")
+  title      String
+  message    String   @db.Text
+  type       String // MESSAGE, PROPOSAL, PROJECT, PAYMENT, REVIEW, SESSION, SYSTEM
+  category   String // COMMUNICATION, REQUESTS_PROPOSALS, PAYMENTS, PROJECT_SESSION, REVIEWS, SYSTEM
+  entityId   String?  @map("entity_id")
+  entityType String?  @map("entity_type")
+  isRead     Boolean  @default(false) @map("is_read")
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
 
-    // Relations
-    // Notification -> User (Many -> One)
-    user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  // Relations
+  // Notification -> User (Many -> One)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-    @@index([userId, isRead])
-    @@map("notifications")
+  @@index([userId, isRead])
+  @@map("notifications")
 }
 
 // ============================================
@@ -833,61 +719,61 @@ model Notification {
 // ============================================
 
 model Report {
-    id           String   @id @default(uuid())
-    reporterId   String   @map("reporter_id")
-    targetUserId String?  @map("target_user_id")
-    targetType   String   @map("target_type") // USER, PROJECT, SESSION, REQUEST
-    targetId     String   @map("target_id")
-    category     String // FRAUD, ABUSE, SERVICE_FAILURE, POLICY_VIOLATION, TECHNICAL
-    description  String   @db.Text
-    status       String   @default("SUBMITTED") // SUBMITTED, UNDER_REVIEW, RESOLVED, DISMISSED
-    createdAt    DateTime @default(now()) @map("created_at")
-    updatedAt    DateTime @updatedAt @map("updated_at")
+  id           String   @id @default(uuid())
+  reporterId   String   @map("reporter_id")
+  targetUserId String?  @map("target_user_id")
+  targetType   String   @map("target_type") // USER, PROJECT, SESSION, REQUEST
+  targetId     String   @map("target_id")
+  category     String // FRAUD, ABUSE, SERVICE_FAILURE, POLICY_VIOLATION, TECHNICAL
+  description  String   @db.Text
+  status       String   @default("SUBMITTED") // SUBMITTED, UNDER_REVIEW, RESOLVED, DISMISSED
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
 
-    // Relations
-    // Report -> User (Many -> One) - reporter
-    reporter   User           @relation("ReportsSubmitted", fields: [reporterId], references: [id])
-    // Report -> User (Many -> One) - target user
-    targetUser User?          @relation("ReportsReceived", fields: [targetUserId], references: [id])
-    // Report -> ReportFile (One -> Many)
-    files      ReportFile[]
-    // Report -> ReportAction (One -> Many)
-    actions    ReportAction[]
+  // Relations
+  // Report -> User (Many -> One) - reporter
+  reporter   User           @relation("ReportsSubmitted", fields: [reporterId], references: [id])
+  // Report -> User (Many -> One) - target user
+  targetUser User?          @relation("ReportsReceived", fields: [targetUserId], references: [id])
+  // Report -> ReportFile (One -> Many)
+  files      ReportFile[]
+  // Report -> ReportAction (One -> Many)
+  actions    ReportAction[]
 
-    @@map("reports")
+  @@map("reports")
 }
 
 // Report <-> File
 model ReportFile {
-    id        String   @id @default(uuid())
-    reportId  String   @map("report_id")
-    fileId    String   @map("file_id")
-    createdAt DateTime @default(now()) @map("created_at")
+  id        String   @id @default(uuid())
+  reportId  String   @map("report_id")
+  fileId    String   @map("file_id")
+  createdAt DateTime @default(now()) @map("created_at")
 
-    // Relations
-    // ReportFile -> Report (Many -> One)
-    report Report @relation(fields: [reportId], references: [id], onDelete: Cascade)
-    // ReportFile -> File (Many -> One)
-    file   File   @relation(fields: [fileId], references: [id], onDelete: Cascade)
+  // Relations
+  // ReportFile -> Report (Many -> One)
+  report Report @relation(fields: [reportId], references: [id], onDelete: Cascade)
+  // ReportFile -> File (Many -> One)
+  file   File   @relation(fields: [fileId], references: [id], onDelete: Cascade)
 
-    @@map("report_files")
+  @@map("report_files")
 }
 
 model ReportAction {
-    id         String   @id @default(uuid())
-    reportId   String   @map("report_id")
-    adminId    String   @map("admin_id")
-    actionType String   @map("action_type") // STATUS_CHANGE, WARNING, SUSPEND, BAN
-    details    String?  @db.Text
-    createdAt  DateTime @default(now()) @map("created_at")
+  id         String   @id @default(uuid())
+  reportId   String   @map("report_id")
+  adminId    String   @map("admin_id")
+  actionType String   @map("action_type") // STATUS_CHANGE, WARNING, SUSPEND, BAN
+  details    String?  @db.Text
+  createdAt  DateTime @default(now()) @map("created_at")
 
-    // Relations
-    // ReportAction -> Report (Many -> One)
-    report Report @relation(fields: [reportId], references: [id], onDelete: Cascade)
-    // ReportAction -> User (Many -> One) - admin
-    admin  User   @relation("AdminActions", fields: [adminId], references: [id])
+  // Relations
+  // ReportAction -> Report (Many -> One)
+  report Report @relation(fields: [reportId], references: [id], onDelete: Cascade)
+  // ReportAction -> User (Many -> One) - admin
+  admin  User   @relation("AdminActions", fields: [adminId], references: [id])
 
-    @@map("report_actions")
+  @@map("report_actions")
 }
 
 // ============================================
@@ -895,39 +781,39 @@ model ReportAction {
 // ============================================
 
 model SubscriptionPlan {
-    id              String   @id @default(uuid())
-    name            String
-    description     String?  @db.Text
-    price           Decimal  @db.Decimal(10, 2)
-    durationDays    Int      @map("duration_days")
-    visibilityBoost Int      @default(1) @map("visibility_boost") // 1=normal, 2=high, 3=featured
-    isActive        Boolean  @default(true) @map("is_active")
-    createdAt       DateTime @default(now()) @map("created_at")
-    updatedAt       DateTime @updatedAt @map("updated_at")
+  id              String   @id @default(uuid())
+  name            String
+  description     String?  @db.Text
+  price           Decimal  @db.Decimal(10, 2)
+  durationDays    Int      @map("duration_days")
+  visibilityBoost Int      @default(1) @map("visibility_boost") // 1=normal, 2=high, 3=featured
+  isActive        Boolean  @default(true) @map("is_active")
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
 
-    // Relations
-    // SubscriptionPlan -> ProviderSubscription (One -> Many)
-    subscriptions ProviderSubscription[]
+  // Relations
+  // SubscriptionPlan -> ProviderSubscription (One -> Many)
+  subscriptions ProviderSubscription[]
 
-    @@map("subscription_plans")
+  @@map("subscription_plans")
 }
 
 model ProviderSubscription {
-    id                String    @id @default(uuid())
-    providerProfileId String    @map("provider_profile_id")
-    planId            String    @map("plan_id")
-    status            String    @default("PENDING") // PENDING, ACTIVE, EXPIRED, CANCELLED
-    paymentStatus     String    @default("PENDING") @map("payment_status") // PENDING, PAID, FAILED
-    startDate         DateTime? @map("start_date")
-    endDate           DateTime? @map("end_date")
-    createdAt         DateTime  @default(now()) @map("created_at")
-    updatedAt         DateTime  @updatedAt @map("updated_at")
+  id                String    @id @default(uuid())
+  providerProfileId String    @map("provider_profile_id")
+  planId            String    @map("plan_id")
+  status            String    @default("PENDING") // PENDING, ACTIVE, EXPIRED, CANCELLED
+  paymentStatus     String    @default("PENDING") @map("payment_status") // PENDING, PAID, FAILED
+  startDate         DateTime? @map("start_date")
+  endDate           DateTime? @map("end_date")
+  createdAt         DateTime  @default(now()) @map("created_at")
+  updatedAt         DateTime  @updatedAt @map("updated_at")
 
-    // Relations
-    // ProviderSubscription -> ProviderProfile (Many -> One)
-    providerProfile ProviderProfile  @relation(fields: [providerProfileId], references: [id])
-    // ProviderSubscription -> SubscriptionPlan (Many -> One)
-    plan            SubscriptionPlan @relation(fields: [planId], references: [id])
+  // Relations
+  // ProviderSubscription -> ProviderProfile (Many -> One)
+  providerProfile ProviderProfile  @relation(fields: [providerProfileId], references: [id])
+  // ProviderSubscription -> SubscriptionPlan (Many -> One)
+  plan            SubscriptionPlan @relation(fields: [planId], references: [id])
 
-    @@map("provider_subscriptions")
+  @@map("provider_subscriptions")
 }

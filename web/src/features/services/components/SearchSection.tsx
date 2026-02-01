@@ -24,7 +24,7 @@ const SearchSection: FC<SearchSectionProps> = ({ searchQuery, setSearchQuery, on
   };
 
   return (
-    <section className="min-h-[40rem] flex items-center bg-white py-8 sm:py-12 mt-[6rem]">
+    <section className="min-h-[30rem] flex items-center bg-white py-8 sm:py-12 mt-[6rem]">
       <div className="max-w-[90rem] mx-auto text-center">
         <h2 className="max-w-[90rem] px-4 mb-4 bg-gradient-to-r from-slate-900 to-slate-600 bg-clip-text text-4xl font-extrabold leading-tight tracking-tighter text-transparent text-[4rem]">
           Find the perfect talent for your project

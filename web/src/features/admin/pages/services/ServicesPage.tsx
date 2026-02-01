@@ -204,9 +204,9 @@ export default function ServicesPage() {
                     <h1 className="text-2xl font-bold text-slate-800">Services & Skills</h1>
                     <p className="text-sm text-slate-500">Manage platform service categories and their skills</p>
                 </div>
-                <Button className="rounded-2xl bg-[#7682e8] text-white hover:bg-[#7682e8]/80" onClick={openCreateServiceModal}>
+                {/* <Button className="rounded-2xl bg-[#7682e8] text-white hover:bg-[#7682e8]/80" onClick={openCreateServiceModal}>
                     <Plus className="mr-2 h-4 w-4" /> Add Service
-                </Button>
+                </Button> */}
             </div>
 
             {/* Filters */}

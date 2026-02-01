@@ -2,6 +2,7 @@
 
 import { FC, useState } from "react";
 import { Star, User, ArrowUpDown } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import OperationRequestForm from "@/shared/components/common/modals/request-modal";
 import ProviderProfileModal from "@/features/services/components/ProviderProfileModal";
 import type { SearchResult } from "@/shared/types/search";
@@ -22,6 +23,7 @@ const ResultsSection: FC<ResultsSectionProps> = ({
   sortOrder,
   onSortChange,
 }) => {
+  const navigate = useNavigate();
   const [isRequestModalOpen, setIsRequestModalOpen] = useState(false);
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
   const [selectedProviderId, setSelectedProviderId] = useState<string | null>(null);
@@ -29,6 +31,10 @@ const ResultsSection: FC<ResultsSectionProps> = ({
   const handleViewProfile = (providerId: string) => {
     setSelectedProviderId(providerId);
     setIsProfileModalOpen(true);
+  };
+
+  const handleViewProfilePage = (providerId: string) => {
+    navigate(`/providers/${providerId}`);
   };
 
   const handleRequest = (providerId: string) => {
@@ -187,7 +193,7 @@ const ResultsSection: FC<ResultsSectionProps> = ({
                       <div className="mb-2 sm:mb-0">
                         <h4
                           className="cursor-pointer text-lg font-semibold text-gray-900 hover:text-[#7682e8] transition-colors"
-                          onClick={() => handleViewProfile(provider.id)}
+                          onClick={() => handleViewProfilePage(provider.id)}
                         >
                           {displayName}
                         </h4>

@@ -50,7 +50,7 @@ export default function Button({
   return (
     <Comp
       data-slot="button"
-      className={cn(buttonVariants({ variant, size, className }),'border border-gray-100 cursor-pointer')}
+      className={cn('border border-gray-100 cursor-pointer',buttonVariants({ variant, size, className }))}
       {...props}
     />
   );

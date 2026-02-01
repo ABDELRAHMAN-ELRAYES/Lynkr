@@ -29,8 +29,7 @@ import ProviderApplicationRouter from "./modules/provider/provider-application/p
 import ProjectRouter from "./modules/process/project/project.route";
 import ConversationRouter from "./modules/messaging/conversation/conversation.route";
 import MessageRouter from "./modules/messaging/message/message.route";
-import SlotRouter from "./modules/teaching/slot/slot.route";
-import SessionRouter from "./modules/teaching/session/session.route";
+import AvailabilityRouter from "./modules/availability/availability.route";
 import ReportRouter from "./modules/report/report.route";
 import { bodyParser, cookieParserMiddleware, corsMiddleware, formParser } from "./middlewares/middlewares";
 
@@ -119,8 +118,7 @@ app.use("/api/provider-applications", ProviderApplicationRouter);
 app.use("/api/projects", ProjectRouter);
 app.use("/api/conversations", ConversationRouter);
 app.use("/api/messages", MessageRouter);
-app.use("/api/teaching/slots", SlotRouter);
-app.use("/api/teaching/sessions", SessionRouter);
+app.use("/api/availability", AvailabilityRouter);
 app.use("/api/reports", ReportRouter);
 
 // 404 handler

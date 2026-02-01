@@ -16,8 +16,6 @@ import {
   Plus,
   ClipboardList,
 } from "lucide-react";
-import Profile from "@/features/profile/components/Profile";
-import { ClientProfile } from "@/features/profile/components/ClientProfile";
 import Navbar from "@/shared/components/common/Navbar";
 import Footer from "@/shared/components/common/Footer";
 import Button from "@/shared/components/ui/Button";

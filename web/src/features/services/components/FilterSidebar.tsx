@@ -41,7 +41,7 @@ const FilterSidebar: FC<FilterSidebarProps> = ({
     { id: "standard", label: "$15 - $35/hr", min: 15, max: 35 },
     { id: "premium", label: "$35 - $60/hr", min: 35, max: 60 },
     { id: "enterprise", label: "$60+/hr", min: 60, max: undefined },
-    { id: "custom", label: "Custom Range", min: undefined, max: undefined },
+    // { id: "custom", label: "Custom Range", min: undefined, max: undefined },
   ];
 
   const handleFilterChange = (

@@ -1,142 +1,73 @@
 // ============================================
-// Teaching Types - Aligned with Backend
+// Provider Availability Types - Aligned with Backend
 // ============================================
 
-export type SessionType = "ONE_TO_ONE" | "GROUP";
-export type SessionStatus = "SCHEDULED" | "IN_PROGRESS" | "COMPLETED" | "CANCELLED" | "NO_SHOW";
-export type ParticipantStatus = "BOOKED" | "CANCELLED" | "REFUNDED";
-
-// ============================================
-// Core Entity Types
-// ============================================
-
-export interface TeachingSlot {
+export interface ProviderAvailability {
     id: string;
     providerProfileId: string;
-    slotDate: string;
-    startTime: string;
-    endTime: string;
-    durationMinutes: number;
-    sessionType: SessionType;
-    maxParticipants: number;
+    dayOfWeek: number; // 0=Sunday, 1=Monday, ..., 6=Saturday
+    startTime: string; // HH:mm format
+    endTime: string;   // HH:mm format
     timezone: string;
     createdAt: string;
     updatedAt: string;
-    session?: SessionSummary | null;
-    providerProfile?: SlotProvider;
 }
 
-export interface SessionSummary {
-    id: string;
-    status: SessionStatus;
-    participantCount: number;
-}
+// ============================================
+// Meeting Request Types
+// ============================================
 
-export interface SlotProvider {
-    id: string;
-    title: string | null;
-    hourlyRate: number | null;
-    user: {
-        id: string;
-        firstName: string;
-        lastName: string;
-        avatarUrl?: string;
-    };
-}
+export type MeetingRequestStatus = "PENDING" | "APPROVED" | "REJECTED" | "CANCELLED";
 
-export interface TeachingSession {
+export interface MeetingRequest {
     id: string;
-    slotId: string;
-    instructorId: string;
-    status: SessionStatus;
-    channelName: string | null;
-    startedAt: string | null;
-    completedAt: string | null;
+    projectId: string;
+    requestedById: string;
+    proposedDate: string;
+    proposedTime: string; // HH:mm format
+    timezone: string;
+    isCustomTime: boolean;
+    status: MeetingRequestStatus;
+    rejectionReason?: string;
+    approvedAt?: string;
+    meetingId?: string;
     createdAt: string;
     updatedAt: string;
-    slot: SlotWithProvider;
-    participants: SessionParticipant[];
-}
-
-export interface SlotWithProvider {
-    id: string;
-    slotDate: string;
-    startTime: string;
-    endTime: string;
-    durationMinutes: number;
-    sessionType: SessionType;
-    maxParticipants: number;
-    timezone: string;
-    providerProfile: {
-        id: string;
-        title: string | null;
-        hourlyRate: number | null;
-        user: {
-            id: string;
-            firstName: string;
-            lastName: string;
-            avatarUrl?: string;
-        };
-    };
-}
-
-export interface SessionParticipant {
-    id: string;
-    sessionId: string;
-    userId: string;
-    status: ParticipantStatus;
-    bookedAt: string;
-    user?: {
-        id: string;
-        firstName: string;
-        lastName: string;
-        avatarUrl?: string;
-    };
 }
 
 // ============================================
 // API Payload Types
 // ============================================
 
-export interface CreateSlotPayload {
-    slotDate: string;
+export interface CreateAvailabilityPayload {
+    dayOfWeek: number;
     startTime: string;
     endTime: string;
-    durationMinutes: number;
-    sessionType: SessionType;
-    maxParticipants?: number;
     timezone?: string;
 }
 
-export interface UpdateSlotPayload {
-    startTime?: string;
-    endTime?: string;
-    durationMinutes?: number;
-    sessionType?: SessionType;
-    maxParticipants?: number;
+export interface SaveAvailabilityPayload {
+    availabilities: CreateAvailabilityPayload[];
 }
 
-export interface BookSessionPayload {
-    slotId: string;
-}
-
-export interface ConfirmBookingPayload {
-    slotId: string;
-    paymentId: string;
+export interface RequestMeetingPayload {
+    projectId: string;
+    proposedDate: string;
+    proposedTime: string;
+    timezone?: string;
+    isCustomTime?: boolean;
 }
 
 // ============================================
 // API Response Types
 // ============================================
 
-export interface BookSessionResponse {
-    clientSecret: string;
-    paymentIntentId: string;
-    amount: number;
+export interface AvailabilityResponse {
+    status: string;
+    data: ProviderAvailability[];
 }
 
-export interface SessionVideoInfo {
-    channelName: string;
-    token: string;
-    uid: number;
+export interface MeetingRequestResponse {
+    status: string;
+    data: MeetingRequest;
 }
