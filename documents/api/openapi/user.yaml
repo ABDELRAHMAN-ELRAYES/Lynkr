@@ -1,0 +1,333 @@
+Users:
+  post:
+    tags:
+      - User
+    summary: Create a new user
+    security:
+      - bearerAuth: []
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - firstName
+              - lastName
+              - email
+              - password
+              - role
+            properties:
+              firstName:
+                type: string
+              lastName:
+                type: string
+              email:
+                type: string
+                format: email
+              password:
+                type: string
+              phone:
+                type: string
+              role:
+                type: string
+                enum: [ADMIN, PROVIDER, CLIENT, USER]
+              privileges:
+                type: array
+                items:
+                  type: object
+    responses:
+      201:
+        description: User created
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                status:
+                  type: string
+                  example: success
+                data:
+                  type: object
+  get:
+    tags:
+      - User
+    summary: Get all users
+    security:
+      - bearerAuth: []
+    parameters:
+      - in: query
+        name: role
+        schema:
+          type: string
+    responses:
+      200:
+        description: List of users
+        content:
+          application/json:
+            schema:
+              type: object
+
+UsersBatch:
+  post:
+    tags:
+      - User
+    summary: Create multiple users
+    security:
+      - bearerAuth: []
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - users
+            properties:
+              users:
+                type: array
+                items:
+                  type: object
+    responses:
+      200:
+        description: Users created
+  get:
+    tags:
+      - User
+    summary: Get users with pagination
+    security:
+      - bearerAuth: []
+    parameters:
+      - in: query
+        name: page
+        schema:
+          type: integer
+          default: 1
+      - in: query
+        name: limit
+        schema:
+          type: integer
+          default: 10
+      - in: query
+        name: search
+        schema:
+          type: string
+      - in: query
+        name: role
+        schema:
+          type: string
+      - in: query
+        name: status
+        schema:
+          type: string
+          enum: [active, inactive]
+    responses:
+      200:
+        description: Paginated users
+
+UsersMinBatch:
+  get:
+    tags:
+      - User
+    summary: Get minimal user info list
+    security:
+      - bearerAuth: []
+    parameters:
+      - in: query
+        name: role
+        schema:
+          type: string
+          default: USER
+    responses:
+      200:
+        description: List of users
+
+UsersStatistics:
+  get:
+    tags:
+      - User
+    summary: Get user statistics
+    security:
+      - bearerAuth: []
+    responses:
+      200:
+        description: Statistics data
+
+UsersId:
+  get:
+    tags:
+      - User
+    summary: Get a user by ID
+    security:
+      - bearerAuth: []
+    parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: string
+    responses:
+      200:
+        description: User data
+        content:
+          application/json:
+            schema:
+              type: object
+  put:
+    tags:
+      - User
+    summary: Update a user
+    security:
+      - bearerAuth: []
+    parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: string
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              data:
+                type: object
+    responses:
+      200:
+        description: User updated
+  delete:
+    tags:
+      - User
+    summary: Delete a user
+    security:
+      - bearerAuth: []
+    parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: string
+    responses:
+      200:
+        description: User deleted
+  patch:
+    tags:
+      - User
+    summary: Update user status
+    security:
+      - bearerAuth: []
+    parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: string
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - active
+            properties:
+              active:
+                type: boolean
+    responses:
+      200:
+        description: Status updated
+
+UsersIdProfile:
+  put:
+    tags:
+      - User
+    summary: Update user profile
+    security:
+      - bearerAuth: []
+    parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: string
+    requestBody:
+      content:
+        multipart/form-data:
+          schema:
+            type: object
+            properties:
+              avatar:
+                type: string
+                format: binary
+              firstName:
+                type: string
+              lastName:
+                type: string
+              phone:
+                type: string
+              hasNewAvatar:
+                type: string
+    responses:
+      200:
+        description: Profile updated
+
+UsersIdPassword:
+  patch:
+    tags:
+      - User
+    summary: Update user password (Admin)
+    security:
+      - bearerAuth: []
+    parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: string
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - password
+            properties:
+              password:
+                type: string
+    responses:
+      200:
+        description: Password updated
+
+UsersIdProfilePassword:
+  patch:
+    tags:
+      - User
+    summary: Update own password
+    security:
+      - bearerAuth: []
+    parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: string
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - currentPassword
+              - newPassword
+            properties:
+              currentPassword:
+                type: string
+              newPassword:
+                type: string
+    responses:
+      200:
+        description: Password updated

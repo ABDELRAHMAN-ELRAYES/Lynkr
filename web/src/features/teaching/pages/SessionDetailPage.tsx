@@ -3,8 +3,8 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Calendar, Clock, Users, Video, X, MessageSquare } from 'lucide-react';
 import { toast } from 'sonner';
 import { SessionStatusTag, SessionTypeTag } from '@/shared/components/common/tags';
-import { teachingService } from '@/shared/services/teaching.service';
-import type { TeachingSession } from '@/shared/types/teaching';
+import { teachingService } from '@/shared/services/availability.service';
+import type { TeachingSession } from '@/shared/types/availability';
 import { useAuth } from '@/shared/hooks/use-auth';
 import Button from '@/shared/components/ui/Button';
 

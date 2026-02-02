@@ -1,7 +1,7 @@
 import { FC } from 'react';
 import { Clock, Users, Calendar, Trash2, Edit2 } from 'lucide-react';
 import { SessionStatusTag, SessionTypeTag } from '@/shared/components/common/tags';
-import type { TeachingSlot } from '@/shared/types/teaching';
+import type { TeachingSlot } from '@/shared/types/availability';
 import Button from '@/shared/components/ui/Button';
 
 interface SlotCardProps {

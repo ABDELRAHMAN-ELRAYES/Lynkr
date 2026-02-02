@@ -1,0 +1,151 @@
+Proposals:
+  post:
+    tags:
+      - Proposal
+    summary: Create a new proposal
+    security:
+      - bearerAuth: []
+    requestBody:
+      content:
+        multipart/form-data:
+          schema:
+            type: object
+            required:
+              - requestId
+              - price
+              - estimatedDays
+            properties:
+              requestId:
+                type: string
+              price:
+                type: number
+              priceType:
+                type: string
+                enum: [fixed, hourly]
+              estimatedDays:
+                type: integer
+              notes:
+                type: string
+              files:
+                type: array
+                items:
+                  type: string
+                  format: binary
+    responses:
+      201:
+        description: Proposal created
+
+ProposalsRequest:
+  get:
+    tags:
+      - Proposal
+    summary: Get proposals for a request
+    security:
+      - bearerAuth: []
+    parameters:
+      - in: path
+        name: requestId
+        required: true
+        schema:
+          type: string
+    responses:
+      200:
+        description: List of proposals
+
+ProposalsId:
+  get:
+    tags:
+      - Proposal
+    summary: Get proposal by ID
+    security:
+      - bearerAuth: []
+    parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: string
+    responses:
+      200:
+        description: Proposal details
+  put:
+    tags:
+      - Proposal
+    summary: Update proposal
+    security:
+      - bearerAuth: []
+    parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: string
+    requestBody:
+      content:
+        multipart/form-data:
+          schema:
+            type: object
+            properties:
+              price:
+                type: number
+              estimatedDays:
+                type: integer
+              notes:
+                type: string
+              files:
+                type: array
+                items:
+                  type: string
+                  format: binary
+    responses:
+      200:
+        description: Proposal updated
+  delete:
+    tags:
+      - Proposal
+    summary: Delete proposal
+    security:
+      - bearerAuth: []
+    parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: string
+    responses:
+      204:
+        description: Proposal deleted
+
+ProposalsIdAccept:
+  patch:
+    tags:
+      - Proposal
+    summary: Accept proposal
+    security:
+      - bearerAuth: []
+    parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: string
+    responses:
+      200:
+        description: Proposal accepted
+
+ProposalsIdReject:
+  patch:
+    tags:
+      - Proposal
+    summary: Reject proposal
+    security:
+      - bearerAuth: []
+    parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: string
+    responses:
+      200:
+        description: Proposal rejected

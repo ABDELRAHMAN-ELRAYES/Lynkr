@@ -1,0 +1,70 @@
+PaymentsIntent:
+  post:
+    tags:
+      - Payment
+    summary: Create payment intent (Stripe)
+    security:
+      - bearerAuth: []
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - projectId
+              - amount
+              - paymentType
+            properties:
+              projectId:
+                type: string
+              amount:
+                type: number
+              paymentType:
+                type: string
+                enum: [PROJECT_MILESTONE, FULL_PROJECT, SUBSCRIPTION]
+    responses:
+      200:
+        description: Payment intent created
+
+PaymentsProject:
+  get:
+    tags:
+      - Payment
+    summary: Get project payments
+    security:
+      - bearerAuth: []
+    parameters:
+      - in: path
+        name: projectId
+        required: true
+        schema:
+          type: string
+    responses:
+      200:
+        description: List of payments
+
+PaymentsMe:
+  get:
+    tags:
+      - Payment
+    summary: Get my payments
+    security:
+      - bearerAuth: []
+    responses:
+      200:
+        description: List of payments
+
+PaymentsWebhook:
+  post:
+    tags:
+      - Payment
+    summary: Stripe Webhook
+    requestBody:
+      content:
+        application/json:
+          schema:
+            type: object
+    responses:
+      200:
+        description: Webhook received

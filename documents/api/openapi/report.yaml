@@ -1,0 +1,165 @@
+Reports:
+  post:
+    tags:
+      - Report
+    summary: Submit a report
+    security:
+      - bearerAuth: []
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - targetType
+              - targetId
+              - category
+              - description
+            properties:
+              targetType:
+                type: string
+              targetId:
+                type: string
+              targetUserId:
+                type: string
+              category:
+                type: string
+              description:
+                type: string
+    responses:
+      201:
+        description: Report submitted
+
+ReportsMy:
+  get:
+    tags:
+      - Report
+    summary: Get my reports
+    security:
+      - bearerAuth: []
+    parameters:
+      - in: query
+        name: page
+        schema:
+          type: integer
+      - in: query
+        name: limit
+        schema:
+          type: integer
+      - in: query
+        name: status
+        schema:
+          type: string
+      - in: query
+        name: category
+        schema:
+          type: string
+    responses:
+      200:
+        description: List of reports
+
+ReportsAdminAll:
+  get:
+    tags:
+      - Report
+    summary: Get all reports (Admin)
+    security:
+      - bearerAuth: []
+    parameters:
+      - in: query
+        name: page
+        schema:
+          type: integer
+      - in: query
+        name: limit
+        schema:
+          type: integer
+      - in: query
+        name: status
+        schema:
+          type: string
+      - in: query
+        name: category
+        schema:
+          type: string
+    responses:
+      200:
+        description: List of reports
+
+ReportsId:
+  get:
+    tags:
+      - Report
+    summary: Get report by ID
+    security:
+      - bearerAuth: []
+    parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: string
+    responses:
+      200:
+        description: Report details
+
+ReportsIdStatus:
+  patch:
+    tags:
+      - Report
+    summary: Update report status (Admin)
+    security:
+      - bearerAuth: []
+    parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: string
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - status
+            properties:
+              status:
+                type: string
+              details:
+                type: string
+    responses:
+      200:
+        description: Status updated
+
+ReportsIdAction:
+  post:
+    tags:
+      - Report
+    summary: Take action on report (Admin)
+    security:
+      - bearerAuth: []
+    parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: string
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - actionType
+            properties:
+              actionType:
+                type: string
+              details:
+                type: string
+    responses:
+      201:
+        description: Action taken

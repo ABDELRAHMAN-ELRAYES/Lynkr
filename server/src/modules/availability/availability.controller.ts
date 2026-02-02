@@ -1,113 +1,93 @@
 import { Request, Response, NextFunction } from "express";
 import AvailabilityService from "./availability.service";
 import AppError from "../../utils/app-error";
+import { catchAsync } from "@/utils/catch-async";
 
-class AvailabilityController {
-    private availabilityService: AvailabilityService;
-    static instance: AvailabilityController;
 
-    private constructor() {
-        this.availabilityService = AvailabilityService.getInstance();
+export const saveAvailabilities = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
+    const { providerProfileId } = req.user as { providerProfileId?: string };
+
+    if (!providerProfileId) {
+        return next(new AppError(403, "Only providers can set availability"));
     }
 
-    static getInstance(): AvailabilityController {
-        if (!AvailabilityController.instance) {
-            AvailabilityController.instance = new AvailabilityController();
-        }
-        return AvailabilityController.instance;
+    const { availabilities } = req.body;
+
+    if (!Array.isArray(availabilities)) {
+        return next(new AppError(400, "availabilities must be an array"));
     }
 
-    /**
-     * Save all availabilities for the authenticated provider (bulk replace)
-     * POST /api/availability
-     */
-    saveAvailabilities = async (req: Request, res: Response, next: NextFunction) => {
-        const { providerProfileId } = req.user as { providerProfileId?: string };
+    const result = await AvailabilityService.saveAvailabilities(
+        providerProfileId,
+        { availabilities },
+        next
+    );
 
-        if (!providerProfileId) {
-            return next(new AppError(403, "Only providers can set availability"));
-        }
+    if (!result) return;
 
-        const { availabilities } = req.body;
+    res.status(200).json({
+        status: "success",
+        message: "Availability saved successfully",
+        data: result
+    });
+});
 
-        if (!Array.isArray(availabilities)) {
-            return next(new AppError(400, "availabilities must be an array"));
-        }
+/**
+ * Get authenticated provider's own availabilities
+ * GET /api/availability/my
+ */
+export const getMyAvailabilities = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
+    const { providerProfileId } = req.user as { providerProfileId?: string };
 
-        const result = await this.availabilityService.saveAvailabilities(
-            providerProfileId,
-            { availabilities },
-            next
-        );
+    if (!providerProfileId) {
+        return next(new AppError(403, "Only providers can access this"));
+    }
 
-        if (!result) return;
+    const availabilities = await AvailabilityService.getProviderAvailabilities(providerProfileId);
 
-        res.status(200).json({
-            status: "success",
-            message: "Availability saved successfully",
-            data: result
-        });
-    };
+    res.status(200).json({
+        status: "success",
+        data: availabilities
+    });
+});
 
-    /**
-     * Get authenticated provider's own availabilities
-     * GET /api/availability/my
-     */
-    getMyAvailabilities = async (req: Request, res: Response, next: NextFunction) => {
-        const { providerProfileId } = req.user as { providerProfileId?: string };
+/**
+ * Get a provider's public availabilities
+ * GET /api/availability/provider/:providerId
+ */
+export const getProviderAvailabilities = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
+    const providerId = Array.isArray(req.params.providerId) ? req.params.providerId[0] : req.params.providerId;
 
-        if (!providerProfileId) {
-            return next(new AppError(403, "Only providers can access this"));
-        }
+    if (!providerId) {
+        return next(new AppError(400, "Provider ID is required"));
+    }
 
-        const availabilities = await this.availabilityService.getProviderAvailabilities(providerProfileId);
+    const availabilities = await AvailabilityService.getProviderAvailabilities(providerId);
 
-        res.status(200).json({
-            status: "success",
-            data: availabilities
-        });
-    };
+    res.status(200).json({
+        status: "success",
+        data: availabilities
+    });
+});
 
-    /**
-     * Get a provider's public availabilities
-     * GET /api/availability/provider/:providerId
-     */
-    getProviderAvailabilities = async (req: Request, res: Response, next: NextFunction) => {
-        const providerId = Array.isArray(req.params.prroviderId) ? req.params.prroviderId[0] : req.params.prroviderId;
+/**
+ * Delete a specific availability
+ * DELETE /api/availability/:id
+ */
+export const deleteAvailability = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
+    const id = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
+    const { providerProfileId } = req.user as { providerProfileId?: string };
 
-        if (!providerId) {
-            return next(new AppError(400, "Provider ID is required"));
-        }
+    if (!providerProfileId) {
+        return next(new AppError(403, "Only providers can delete availability"));
+    }
 
-        const availabilities = await this.availabilityService.getProviderAvailabilities(providerId);
+    const result = await AvailabilityService.deleteAvailability(id, providerProfileId, next);
 
-        res.status(200).json({
-            status: "success",
-            data: availabilities
-        });
-    };
+    if (!result) return;
 
-    /**
-     * Delete a specific availability
-     * DELETE /api/availability/:id
-     */
-    deleteAvailability = async (req: Request, res: Response, next: NextFunction) => {
-        const id = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
-        const { providerProfileId } = req.user as { providerProfileId?: string };
-
-        if (!providerProfileId) {
-            return next(new AppError(403, "Only providers can delete availability"));
-        }
-
-        const result = await this.availabilityService.deleteAvailability(id, providerProfileId, next);
-
-        if (!result) return;
-
-        res.status(200).json({
-            status: "success",
-            message: "Availability deleted successfully"
-        });
-    };
-}
-
-export default AvailabilityController;
+    res.status(200).json({
+        status: "success",
+        message: "Availability deleted successfully"
+    });
+});

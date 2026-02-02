@@ -32,6 +32,8 @@ import MessageRouter from "./modules/messaging/message/message.route";
 import AvailabilityRouter from "./modules/availability/availability.route";
 import ReportRouter from "./modules/report/report.route";
 import { bodyParser, cookieParserMiddleware, corsMiddleware, formParser } from "./middlewares/middlewares";
+import { setupSwagger } from "./config/swagger";
+
 
 // Seed default admin user
 (async () => {
@@ -68,6 +70,10 @@ export const ROOT_DIR: string = process.cwd();
 
 const app: Express = express();
 
+// Setup Swagger
+setupSwagger(app)
+
+
 // Security middleware
 app.use(helmet({
     contentSecurityPolicy: {
@@ -96,7 +102,6 @@ app.use(
     "/api/uploads",
     express.static(path.join(process.cwd(), "uploads"))
 );
-
 
 
 // API Routes

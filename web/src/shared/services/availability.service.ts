@@ -3,13 +3,13 @@ import type {
     ProviderAvailability,
     SaveAvailabilityPayload,
     AvailabilityResponse,
-} from '@/shared/types/teaching';
+} from '@/shared/types/availability';
 
 // ============================================
 // Availability Service - API Integration Layer
 // ============================================
 
-export const teachingService = {
+export const availabilityService = {
     // ==========================================
     // Availability Management
     // ==========================================

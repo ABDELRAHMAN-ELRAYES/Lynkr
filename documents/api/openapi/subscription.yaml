@@ -1,0 +1,159 @@
+SubscriptionsPlans:
+  get:
+    tags:
+      - Subscription
+    summary: Get all plans
+    parameters:
+      - in: query
+        name: includeInactive
+        schema:
+          type: boolean
+    responses:
+      200:
+        description: List of plans
+  post:
+    tags:
+      - Subscription
+    summary: Create plan (Admin)
+    security:
+      - bearerAuth: []
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - name
+              - price
+            properties:
+              name:
+                type: string
+              price:
+                type: number
+              description:
+                type: string
+    responses:
+      201:
+        description: Plan created
+
+SubscriptionsPlansId:
+  get:
+    tags:
+      - Subscription
+    summary: Get plan by ID
+    parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: string
+    responses:
+      200:
+        description: Plan details
+  patch:
+    tags:
+      - Subscription
+    summary: Update plan (Admin)
+    security:
+      - bearerAuth: []
+    parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: string
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+    responses:
+      200:
+        description: Plan updated
+
+SubscriptionsPurchase:
+  post:
+    tags:
+      - Subscription
+    summary: Purchase subscription
+    security:
+      - bearerAuth: []
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - planId
+            properties:
+              planId:
+                type: string
+    responses:
+      201:
+        description: Subscription activated
+
+SubscriptionsMy:
+  get:
+    tags:
+      - Subscription
+    summary: Get my active subscription
+    security:
+      - bearerAuth: []
+    responses:
+      200:
+        description: Active subscription
+
+SubscriptionsMyHistory:
+  get:
+    tags:
+      - Subscription
+    summary: Get my subscription history
+    security:
+      - bearerAuth: []
+    responses:
+      200:
+        description: Subscription history
+
+SubscriptionsIdCancel:
+  patch:
+    tags:
+      - Subscription
+    summary: Cancel subscription
+    security:
+      - bearerAuth: []
+    parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: string
+    responses:
+      200:
+        description: Subscription cancelled
+
+SubscriptionsAdminAll:
+  get:
+    tags:
+      - Subscription
+    summary: Get all subscriptions (Admin)
+    security:
+      - bearerAuth: []
+    parameters:
+      - in: query
+        name: page
+        schema:
+          type: integer
+      - in: query
+        name: limit
+        schema:
+          type: integer
+      - in: query
+        name: status
+        schema:
+          type: string
+    responses:
+      200:
+        description: List of subscriptions

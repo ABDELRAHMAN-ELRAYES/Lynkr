@@ -1,8 +1,8 @@
 import { FC, useEffect, useState } from "react";
 import { Clock, Calendar as CalendarIcon, Globe, AlertCircle } from "lucide-react";
-import { teachingService } from "@/shared/services/teaching.service";
+import { availabilityService } from "@/shared/services/availability.service";
 import { toast } from "sonner";
-import { ProviderAvailability } from "@/shared/types/teaching";
+import { ProviderAvailability } from "@/shared/types/availability";
 
 interface AvailabilityViewProps {
     providerId: string;
@@ -27,7 +27,7 @@ export const AvailabilityView: FC<AvailabilityViewProps> = ({ providerId }) => {
         const loadAvailability = async () => {
             try {
                 setLoading(true);
-                const availabilities = await teachingService.getProviderAvailabilities(providerId);
+                const availabilities = await availabilityService.getProviderAvailabilities(providerId);
 
                 // Group by day
                 const grouped = WEEKDAYS.map((day, index) => {

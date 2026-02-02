@@ -3,8 +3,8 @@ import { Plus, ChevronLeft, ChevronRight, Calendar } from 'lucide-react';
 import { toast } from 'sonner';
 import { SlotCard } from '../components/SlotCard';
 import { CreateSlotModal } from '../components/CreateSlotModal';
-import { teachingService } from '@/shared/services/teaching.service';
-import type { TeachingSlot } from '@/shared/types/teaching';
+import { teachingService } from '@/shared/services/availability.service';
+import type { TeachingSlot } from '@/shared/types/availability';
 import Button from '@/shared/components/ui/Button';
 
 interface WeekData {
@@ -169,8 +169,8 @@ export const AvailabilityPage: FC = () => {
                             onClick={() => setSelectedWeek(Math.max(0, selectedWeek - 1))}
                             disabled={selectedWeek === 0}
                             className={`p-2 rounded-lg transition-colors ${selectedWeek === 0
-                                    ? 'text-gray-300 cursor-not-allowed'
-                                    : 'text-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700'
+                                ? 'text-gray-300 cursor-not-allowed'
+                                : 'text-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700'
                                 }`}
                         >
                             <ChevronLeft className="h-5 w-5" />
@@ -187,8 +187,8 @@ export const AvailabilityPage: FC = () => {
                             onClick={() => setSelectedWeek(Math.min(3, selectedWeek + 1))}
                             disabled={selectedWeek === 3}
                             className={`p-2 rounded-lg transition-colors ${selectedWeek === 3
-                                    ? 'text-gray-300 cursor-not-allowed'
-                                    : 'text-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700'
+                                ? 'text-gray-300 cursor-not-allowed'
+                                : 'text-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700'
                                 }`}
                         >
                             <ChevronRight className="h-5 w-5" />
@@ -202,8 +202,8 @@ export const AvailabilityPage: FC = () => {
                                 key={week}
                                 onClick={() => setSelectedWeek(week)}
                                 className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${selectedWeek === week
-                                        ? 'bg-[#7682e8] text-white'
-                                        : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+                                    ? 'bg-[#7682e8] text-white'
+                                    : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
                                     }`}
                             >
                                 Week {week + 1}
@@ -224,8 +224,8 @@ export const AvailabilityPage: FC = () => {
                             <div
                                 key={dateKey}
                                 className={`bg-white dark:bg-gray-800 border rounded-lg p-4 ${isToday
-                                        ? 'border-[#7682e8] ring-2 ring-[#7682e8]/20'
-                                        : 'border-gray-200 dark:border-gray-700'
+                                    ? 'border-[#7682e8] ring-2 ring-[#7682e8]/20'
+                                    : 'border-gray-200 dark:border-gray-700'
                                     } ${isPast ? 'opacity-50' : ''}`}
                             >
                                 <div className="text-center mb-3 pb-3 border-b border-gray-100 dark:border-gray-700">
@@ -248,8 +248,8 @@ export const AvailabilityPage: FC = () => {
                                             <div
                                                 key={slot.id}
                                                 className={`text-xs p-2 rounded ${slot.session
-                                                        ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-200'
-                                                        : 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-200'
+                                                    ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-200'
+                                                    : 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-200'
                                                     }`}
                                             >
                                                 <p className="font-medium">

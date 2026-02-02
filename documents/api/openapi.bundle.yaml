@@ -1,0 +1,2705 @@
+openapi: 3.0.0
+info:
+  title: Lynkr API
+  version: 1.0.0
+  description: API documentation for Lynkr platform
+servers:
+  - url: 'http://localhost:3000/api'
+    description: Local Development Server
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+security:
+  - bearerAuth: []
+paths:
+  /auth/login:
+    post:
+      tags:
+        - Auth
+      summary: Login user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - usernameOrEmail
+                - password
+              properties:
+                usernameOrEmail:
+                  type: string
+                password:
+                  type: string
+      responses:
+        '200':
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: success
+                  data:
+                    type: object
+                    properties:
+                      token:
+                        type: string
+                      user:
+                        type: object
+  /auth/register:
+    post:
+      tags:
+        - Auth
+      summary: Initiate registration (send OTP)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+              properties:
+                email:
+                  type: string
+                  format: email
+      responses:
+        '200':
+          description: OTP sent successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: success
+                  data:
+                    type: object
+                    properties:
+                      email:
+                        type: string
+                      otp:
+                        type: object
+  /auth/register-verification:
+    post:
+      tags:
+        - Auth
+      summary: Complete registration with OTP
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - otp
+                - user
+              properties:
+                otp:
+                  type: object
+                  properties:
+                    hashedOtp:
+                      type: string
+                    expiresIn:
+                      type: string
+                    enteredOtp:
+                      type: string
+                user:
+                  type: object
+                  properties:
+                    firstName:
+                      type: string
+                    lastName:
+                      type: string
+                    email:
+                      type: string
+                    password:
+                      type: string
+                    phone:
+                      type: string
+                    role:
+                      type: string
+                      enum:
+                        - ADMIN
+                        - PROVIDER
+                        - CLIENT
+                        - USER
+      responses:
+        '200':
+          description: Registration successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: success
+                  data:
+                    type: object
+                    properties:
+                      token:
+                        type: string
+                      user:
+                        type: object
+  /auth/verify-otp:
+    post:
+      tags:
+        - Auth
+      summary: Verify OTP standalone
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - hashedOtp
+                - enteredOtp
+                - expiresIn
+              properties:
+                hashedOtp:
+                  type: string
+                enteredOtp:
+                  type: string
+                expiresIn:
+                  type: string
+      responses:
+        '200':
+          description: OTP verified
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: success
+  /auth/forget-password:
+    post:
+      tags:
+        - Auth
+      summary: Request password reset
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+              properties:
+                email:
+                  type: string
+      responses:
+        '200':
+          description: Reset email sent
+  /auth/reset-password:
+    post:
+      tags:
+        - Auth
+      summary: Reset password with token
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - token
+                - password
+              properties:
+                token:
+                  type: string
+                password:
+                  type: string
+      responses:
+        '200':
+          description: Password reset successful
+  /auth/logout:
+    post:
+      tags:
+        - Auth
+      summary: Logout user
+      responses:
+        '200':
+          description: Logout successful
+  /auth/me:
+    get:
+      tags:
+        - Auth
+      summary: Get current logged in user
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: User data
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: success
+                  data:
+                    type: object
+                    properties:
+                      user:
+                        type: object
+  /auth/google:
+    get:
+      tags:
+        - Auth
+      summary: Initiate Google OAuth
+      responses:
+        '302':
+          description: Redirects to Google
+  /availability:
+    post:
+      tags:
+        - Availability
+      summary: Save all availabilities (bulk replace)
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - availabilities
+              properties:
+                availabilities:
+                  type: array
+                  items:
+                    type: object
+                    required:
+                      - dayOfWeek
+                      - startTime
+                      - endTime
+                    properties:
+                      dayOfWeek:
+                        type: integer
+                        minimum: 0
+                        maximum: 6
+                        description: '0=Sunday, 6=Saturday'
+                      startTime:
+                        type: string
+                        pattern: '^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$'
+                        example: '09:00'
+                      endTime:
+                        type: string
+                        pattern: '^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$'
+                        example: '17:00'
+                      timezone:
+                        type: string
+      responses:
+        '200':
+          description: Availabilities saved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: success
+                  data:
+                    type: array
+                    items:
+                      type: object
+  /availability/my:
+    get:
+      tags:
+        - Availability
+      summary: Get authenticated provider's own availabilities
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: List of availabilities
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: success
+                  data:
+                    type: array
+                    items:
+                      type: object
+  '/availability/provider/{providerId}':
+    get:
+      tags:
+        - Availability
+      summary: Get a specific provider's public availabilities
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: providerId
+          schema:
+            type: string
+          required: true
+          description: ID of the provider
+      responses:
+        '200':
+          description: List of availabilities
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: success
+                  data:
+                    type: array
+                    items:
+                      type: object
+  '/availability/{id}':
+    delete:
+      tags:
+        - Availability
+      summary: Delete a specific availability
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+          description: ID of the availability slot to delete
+      responses:
+        '200':
+          description: Availability deleted
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: success
+                  message:
+                    type: string
+  /users:
+    post:
+      tags:
+        - User
+      summary: Create a new user
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - firstName
+                - lastName
+                - email
+                - password
+                - role
+              properties:
+                firstName:
+                  type: string
+                lastName:
+                  type: string
+                email:
+                  type: string
+                  format: email
+                password:
+                  type: string
+                phone:
+                  type: string
+                role:
+                  type: string
+                  enum:
+                    - ADMIN
+                    - PROVIDER
+                    - CLIENT
+                    - USER
+                privileges:
+                  type: array
+                  items:
+                    type: object
+      responses:
+        '201':
+          description: User created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: success
+                  data:
+                    type: object
+    get:
+      tags:
+        - User
+      summary: Get all users
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: query
+          name: role
+          schema:
+            type: string
+      responses:
+        '200':
+          description: List of users
+          content:
+            application/json:
+              schema:
+                type: object
+  /users/batch:
+    post:
+      tags:
+        - User
+      summary: Create multiple users
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - users
+              properties:
+                users:
+                  type: array
+                  items:
+                    type: object
+      responses:
+        '200':
+          description: Users created
+    get:
+      tags:
+        - User
+      summary: Get users with pagination
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: query
+          name: page
+          schema:
+            type: integer
+            default: 1
+        - in: query
+          name: limit
+          schema:
+            type: integer
+            default: 10
+        - in: query
+          name: search
+          schema:
+            type: string
+        - in: query
+          name: role
+          schema:
+            type: string
+        - in: query
+          name: status
+          schema:
+            type: string
+            enum:
+              - active
+              - inactive
+      responses:
+        '200':
+          description: Paginated users
+  /users/min-batch:
+    get:
+      tags:
+        - User
+      summary: Get minimal user info list
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: query
+          name: role
+          schema:
+            type: string
+            default: USER
+      responses:
+        '200':
+          description: List of users
+  /users/statistics:
+    get:
+      tags:
+        - User
+      summary: Get user statistics
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Statistics data
+  '/users/{id}':
+    get:
+      tags:
+        - User
+      summary: Get a user by ID
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: User data
+          content:
+            application/json:
+              schema:
+                type: object
+    put:
+      tags:
+        - User
+      summary: Update a user
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                data:
+                  type: object
+      responses:
+        '200':
+          description: User updated
+    delete:
+      tags:
+        - User
+      summary: Delete a user
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: User deleted
+    patch:
+      tags:
+        - User
+      summary: Update user status
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - active
+              properties:
+                active:
+                  type: boolean
+      responses:
+        '200':
+          description: Status updated
+  '/users/{id}/profile':
+    put:
+      tags:
+        - User
+      summary: Update user profile
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                avatar:
+                  type: string
+                  format: binary
+                firstName:
+                  type: string
+                lastName:
+                  type: string
+                phone:
+                  type: string
+                hasNewAvatar:
+                  type: string
+      responses:
+        '200':
+          description: Profile updated
+  '/users/{id}/password':
+    patch:
+      tags:
+        - User
+      summary: Update user password (Admin)
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - password
+              properties:
+                password:
+                  type: string
+      responses:
+        '200':
+          description: Password updated
+  '/users/{id}/profile/password':
+    patch:
+      tags:
+        - User
+      summary: Update own password
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - currentPassword
+                - newPassword
+              properties:
+                currentPassword:
+                  type: string
+                newPassword:
+                  type: string
+      responses:
+        '200':
+          description: Password updated
+  /meetings:
+    post:
+      tags:
+        - Meeting
+      summary: Create a new meeting
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - projectId
+                - guestId
+                - scheduledAt
+              properties:
+                projectId:
+                  type: string
+                guestId:
+                  type: string
+                scheduledAt:
+                  type: string
+                  format: date-time
+      responses:
+        '201':
+          description: Meeting created
+  /meetings/me:
+    get:
+      tags:
+        - Meeting
+      summary: Get current user's meetings
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: List of meetings
+  '/meetings/project/{projectId}':
+    get:
+      tags:
+        - Meeting
+      summary: Get meetings for a project
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: projectId
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: List of meetings
+  '/meetings/{id}':
+    get:
+      tags:
+        - Meeting
+      summary: Get meeting by ID
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Meeting details
+    delete:
+      tags:
+        - Meeting
+      summary: Cancel meeting
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Meeting cancelled
+  '/meetings/{id}/token':
+    get:
+      tags:
+        - Meeting
+      summary: Get join token
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Join token
+  '/meetings/{id}/start':
+    patch:
+      tags:
+        - Meeting
+      summary: Start meeting
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Meeting started
+  '/meetings/{id}/end':
+    patch:
+      tags:
+        - Meeting
+      summary: End meeting
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Meeting ended
+  '/meetings/{id}/accept':
+    patch:
+      tags:
+        - Meeting
+      summary: Accept meeting
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Meeting accepted
+  '/meetings/{id}/decline':
+    patch:
+      tags:
+        - Meeting
+      summary: Decline meeting
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Meeting declined
+  /settings:
+    get:
+      tags:
+        - Settings
+      summary: Get all settings
+      responses:
+        '200':
+          description: List of settings
+  '/settings/{id}':
+    get:
+      tags:
+        - Settings
+      summary: Get setting by ID
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Setting details
+    put:
+      tags:
+        - Settings
+      summary: Update setting
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        '200':
+          description: Setting updated
+  /notifications:
+    get:
+      tags:
+        - Notification
+      summary: Get user notifications
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: query
+          name: page
+          schema:
+            type: integer
+            default: 1
+        - in: query
+          name: limit
+          schema:
+            type: integer
+            default: 20
+        - in: query
+          name: isRead
+          schema:
+            type: boolean
+        - in: query
+          name: type
+          schema:
+            type: string
+        - in: query
+          name: category
+          schema:
+            type: string
+      responses:
+        '200':
+          description: List of notifications
+  /notifications/unread-count:
+    get:
+      tags:
+        - Notification
+      summary: Get unread notification count
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Unread count
+  /notifications/read-all:
+    patch:
+      tags:
+        - Notification
+      summary: Mark all notifications as read
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: All marked as read
+  '/notifications/{id}/read':
+    patch:
+      tags:
+        - Notification
+      summary: Mark notification as read
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Marked as read
+  '/notifications/{id}':
+    delete:
+      tags:
+        - Notification
+      summary: Delete notification
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Notification deleted
+  /conversations:
+    get:
+      tags:
+        - Messaging
+      summary: Get user conversations
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: List of conversations
+    post:
+      tags:
+        - Messaging
+      summary: Create conversation
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - projectId
+                - participant1Id
+                - participant2Id
+              properties:
+                projectId:
+                  type: string
+                participant1Id:
+                  type: string
+                participant2Id:
+                  type: string
+      responses:
+        '201':
+          description: Conversation created
+  '/conversations/project/{projectId}':
+    get:
+      tags:
+        - Messaging
+      summary: Get conversation by project
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: projectId
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Conversation details
+  '/conversations/{id}':
+    get:
+      tags:
+        - Messaging
+      summary: Get conversation by ID
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Conversation details
+  /messages:
+    post:
+      tags:
+        - Messaging
+      summary: Send a message
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - conversationId
+                - content
+              properties:
+                conversationId:
+                  type: string
+                content:
+                  type: string
+      responses:
+        '201':
+          description: Message sent
+  '/messages/conversation/{conversationId}':
+    get:
+      tags:
+        - Messaging
+      summary: Get messages for conversation
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: conversationId
+          required: true
+          schema:
+            type: string
+        - in: query
+          name: page
+          schema:
+            type: integer
+            default: 1
+        - in: query
+          name: limit
+          schema:
+            type: integer
+            default: 50
+      responses:
+        '200':
+          description: List of messages
+  '/messages/{id}/read':
+    patch:
+      tags:
+        - Messaging
+      summary: Mark message as read
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Message marked as read
+  '/messages/conversation/{conversationId}/read':
+    patch:
+      tags:
+        - Messaging
+      summary: Mark all messages in conversation as read
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: conversationId
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Messages marked as read
+  /proposals:
+    post:
+      tags:
+        - Proposal
+      summary: Create a new proposal
+      security:
+        - bearerAuth: []
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+                - requestId
+                - price
+                - estimatedDays
+              properties:
+                requestId:
+                  type: string
+                price:
+                  type: number
+                priceType:
+                  type: string
+                  enum:
+                    - fixed
+                    - hourly
+                estimatedDays:
+                  type: integer
+                notes:
+                  type: string
+                files:
+                  type: array
+                  items:
+                    type: string
+                    format: binary
+      responses:
+        '201':
+          description: Proposal created
+  '/proposals/request/{requestId}':
+    get:
+      tags:
+        - Proposal
+      summary: Get proposals for a request
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: requestId
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: List of proposals
+  '/proposals/{id}':
+    get:
+      tags:
+        - Proposal
+      summary: Get proposal by ID
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Proposal details
+    put:
+      tags:
+        - Proposal
+      summary: Update proposal
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                price:
+                  type: number
+                estimatedDays:
+                  type: integer
+                notes:
+                  type: string
+                files:
+                  type: array
+                  items:
+                    type: string
+                    format: binary
+      responses:
+        '200':
+          description: Proposal updated
+    delete:
+      tags:
+        - Proposal
+      summary: Delete proposal
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Proposal deleted
+  '/proposals/{id}/accept':
+    patch:
+      tags:
+        - Proposal
+      summary: Accept proposal
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Proposal accepted
+  '/proposals/{id}/reject':
+    patch:
+      tags:
+        - Proposal
+      summary: Reject proposal
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Proposal rejected
+  /reports:
+    post:
+      tags:
+        - Report
+      summary: Submit a report
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - targetType
+                - targetId
+                - category
+                - description
+              properties:
+                targetType:
+                  type: string
+                targetId:
+                  type: string
+                targetUserId:
+                  type: string
+                category:
+                  type: string
+                description:
+                  type: string
+      responses:
+        '201':
+          description: Report submitted
+  /reports/my:
+    get:
+      tags:
+        - Report
+      summary: Get my reports
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: query
+          name: page
+          schema:
+            type: integer
+        - in: query
+          name: limit
+          schema:
+            type: integer
+        - in: query
+          name: status
+          schema:
+            type: string
+        - in: query
+          name: category
+          schema:
+            type: string
+      responses:
+        '200':
+          description: List of reports
+  /reports/admin/all:
+    get:
+      tags:
+        - Report
+      summary: Get all reports (Admin)
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: query
+          name: page
+          schema:
+            type: integer
+        - in: query
+          name: limit
+          schema:
+            type: integer
+        - in: query
+          name: status
+          schema:
+            type: string
+        - in: query
+          name: category
+          schema:
+            type: string
+      responses:
+        '200':
+          description: List of reports
+  '/reports/{id}':
+    get:
+      tags:
+        - Report
+      summary: Get report by ID
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Report details
+  '/reports/{id}/status':
+    patch:
+      tags:
+        - Report
+      summary: Update report status (Admin)
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - status
+              properties:
+                status:
+                  type: string
+                details:
+                  type: string
+      responses:
+        '200':
+          description: Status updated
+  '/reports/{id}/action':
+    post:
+      tags:
+        - Report
+      summary: Take action on report (Admin)
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - actionType
+              properties:
+                actionType:
+                  type: string
+                details:
+                  type: string
+      responses:
+        '201':
+          description: Action taken
+  /services:
+    get:
+      tags:
+        - Service
+      summary: Get all services
+      parameters:
+        - in: query
+          name: includeInactive
+          schema:
+            type: boolean
+      responses:
+        '200':
+          description: List of services
+    post:
+      tags:
+        - Service
+      summary: Create new service (Admin)
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - name
+              properties:
+                name:
+                  type: string
+                description:
+                  type: string
+      responses:
+        '201':
+          description: Service created
+  '/services/{id}':
+    get:
+      tags:
+        - Service
+      summary: Get service by ID
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Service details
+    patch:
+      tags:
+        - Service
+      summary: Update service (Admin)
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                description:
+                  type: string
+                active:
+                  type: boolean
+      responses:
+        '200':
+          description: Service updated
+    delete:
+      tags:
+        - Service
+      summary: Delete (deactivate) service (Admin)
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Service deleted
+  '/services/{id}/skills':
+    get:
+      tags:
+        - Service
+      summary: Get skills for a service
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: List of skills
+    post:
+      tags:
+        - Service
+      summary: Add skill to service (Admin)
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - name
+              properties:
+                name:
+                  type: string
+                description:
+                  type: string
+      responses:
+        '201':
+          description: Skill created
+  '/services/{id}/skills/{skillId}':
+    delete:
+      tags:
+        - Service
+      summary: Delete skill (Admin)
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: skillId
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Skill deleted
+  /subscriptions/plans:
+    get:
+      tags:
+        - Subscription
+      summary: Get all plans
+      parameters:
+        - in: query
+          name: includeInactive
+          schema:
+            type: boolean
+      responses:
+        '200':
+          description: List of plans
+    post:
+      tags:
+        - Subscription
+      summary: Create plan (Admin)
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - name
+                - price
+              properties:
+                name:
+                  type: string
+                price:
+                  type: number
+                description:
+                  type: string
+      responses:
+        '201':
+          description: Plan created
+  '/subscriptions/plans/{id}':
+    get:
+      tags:
+        - Subscription
+      summary: Get plan by ID
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Plan details
+    patch:
+      tags:
+        - Subscription
+      summary: Update plan (Admin)
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        '200':
+          description: Plan updated
+  /subscriptions/purchase:
+    post:
+      tags:
+        - Subscription
+      summary: Purchase subscription
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - planId
+              properties:
+                planId:
+                  type: string
+      responses:
+        '201':
+          description: Subscription activated
+  /subscriptions/my:
+    get:
+      tags:
+        - Subscription
+      summary: Get my active subscription
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Active subscription
+  /subscriptions/my/history:
+    get:
+      tags:
+        - Subscription
+      summary: Get my subscription history
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Subscription history
+  '/subscriptions/{id}/cancel':
+    patch:
+      tags:
+        - Subscription
+      summary: Cancel subscription
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Subscription cancelled
+  /subscriptions/admin/all:
+    get:
+      tags:
+        - Subscription
+      summary: Get all subscriptions (Admin)
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: query
+          name: page
+          schema:
+            type: integer
+        - in: query
+          name: limit
+          schema:
+            type: integer
+        - in: query
+          name: status
+          schema:
+            type: string
+      responses:
+        '200':
+          description: List of subscriptions
+  /providers:
+    get:
+      tags:
+        - Provider
+      summary: Get all provider profiles
+      parameters:
+        - in: query
+          name: approved
+          schema:
+            type: boolean
+      responses:
+        '200':
+          description: List of profiles
+    post:
+      tags:
+        - Provider
+      summary: Create provider profile
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              description: Supports flat fields or nested 'profile' object with sub-objects
+      responses:
+        '201':
+          description: Profile created
+  /providers/full:
+    post:
+      tags:
+        - Provider
+      summary: Create provider profile (alias)
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        '201':
+          description: Profile created
+  /providers/search:
+    get:
+      tags:
+        - Provider
+      summary: Search providers
+      parameters:
+        - in: query
+          name: q
+          schema:
+            type: string
+        - in: query
+          name: serviceId
+          schema:
+            type: string
+        - in: query
+          name: minPrice
+          schema:
+            type: number
+        - in: query
+          name: maxPrice
+          schema:
+            type: number
+        - in: query
+          name: minRating
+          schema:
+            type: number
+        - in: query
+          name: language
+          schema:
+            type: string
+        - in: query
+          name: sortBy
+          schema:
+            type: string
+        - in: query
+          name: sortOrder
+          schema:
+            type: string
+        - in: query
+          name: page
+          schema:
+            type: integer
+        - in: query
+          name: limit
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Search results
+  /providers/requests/pending:
+    get:
+      tags:
+        - Provider
+      summary: Get pending profiles (Admin)
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: List of pending profiles
+  '/providers/requests/{id}/evaluate':
+    post:
+      tags:
+        - Provider
+      summary: Evaluate profile request (Admin)
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - decision
+              properties:
+                decision:
+                  type: string
+                  enum:
+                    - APPROVED
+                    - REJECTED
+                adminNotes:
+                  type: string
+      responses:
+        '200':
+          description: Request evaluated
+  '/providers/{id}':
+    get:
+      tags:
+        - Provider
+      summary: Get profile by ID
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Profile details
+    put:
+      tags:
+        - Provider
+      summary: Update profile
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        '200':
+          description: Profile updated
+    delete:
+      tags:
+        - Provider
+      summary: Delete profile (Admin)
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Profile deleted
+  '/providers/user/{userId}':
+    get:
+      tags:
+        - Provider
+      summary: Get profile by User ID
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: userId
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Profile details
+  '/providers/{id}/approve':
+    post:
+      tags:
+        - Provider
+      summary: Approve profile (Admin)
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Profile approved
+  '/providers/{id}/reject':
+    post:
+      tags:
+        - Provider
+      summary: Reject profile (Admin)
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Profile rejected
+  /provider-applications:
+    post:
+      tags:
+        - Provider Application
+      summary: Submit application
+      security:
+        - bearerAuth: []
+      responses:
+        '201':
+          description: Application submitted
+    get:
+      tags:
+        - Provider Application
+      summary: Get pending applications (Admin)
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: List of applications
+  /provider-applications/me:
+    get:
+      tags:
+        - Provider Application
+      summary: Get my applications
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Application history
+  '/provider-applications/{id}':
+    get:
+      tags:
+        - Provider Application
+      summary: Get application by ID (Admin)
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Application details
+  '/provider-applications/{id}/approve':
+    patch:
+      tags:
+        - Provider Application
+      summary: Approve application (Admin)
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Application approved
+  '/provider-applications/{id}/reject':
+    patch:
+      tags:
+        - Provider Application
+      summary: Reject application (Admin)
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                reason:
+                  type: string
+      responses:
+        '200':
+          description: Application rejected
+  /projects:
+    post:
+      tags:
+        - Project
+      summary: Create project from proposal
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - proposalId
+                - providerProfileId
+                - totalPrice
+              properties:
+                proposalId:
+                  type: string
+                providerProfileId:
+                  type: string
+                totalPrice:
+                  type: number
+      responses:
+        '201':
+          description: Project created
+  /projects/me:
+    get:
+      tags:
+        - Project
+      summary: Get my projects
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: List of projects
+  '/projects/{id}':
+    get:
+      tags:
+        - Project
+      summary: Get project by ID
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Project details
+  '/projects/{id}/complete':
+    patch:
+      tags:
+        - Project
+      summary: Mark project as complete (Provider)
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Project marked complete
+  '/projects/{id}/confirm':
+    patch:
+      tags:
+        - Project
+      summary: Confirm completion (Client)
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Completion confirmed
+  '/projects/{id}/cancel':
+    patch:
+      tags:
+        - Project
+      summary: Cancel project (Client)
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Project cancelled
+  '/projects/{id}/files':
+    get:
+      tags:
+        - Project
+      summary: Get project files
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: List of files
+    post:
+      tags:
+        - Project
+      summary: Upload project file
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+                - file
+              properties:
+                file:
+                  type: string
+                  format: binary
+                description:
+                  type: string
+      responses:
+        '201':
+          description: File upload
+  '/projects/{id}/files/{fileId}':
+    delete:
+      tags:
+        - Project
+      summary: Delete project file
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: fileId
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: File deleted
+  '/projects/{id}/activities':
+    get:
+      tags:
+        - Project
+      summary: Get project activities
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: List of activities
+  /requests:
+    post:
+      tags:
+        - Request
+      summary: Create a request
+      security:
+        - bearerAuth: []
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+                - operation
+              properties:
+                operation:
+                  type: object
+                  description: JSON string with request details
+                files:
+                  type: array
+                  items:
+                    type: string
+                    format: binary
+      responses:
+        '201':
+          description: Request created
+    get:
+      tags:
+        - Request
+      summary: Get requests
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: List of requests
+  /requests/public:
+    get:
+      tags:
+        - Request
+      summary: Get public requests (Provider)
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: query
+          name: page
+          schema:
+            type: integer
+        - in: query
+          name: limit
+          schema:
+            type: integer
+        - in: query
+          name: search
+          schema:
+            type: string
+        - in: query
+          name: category
+          schema:
+            type: string
+      responses:
+        '200':
+          description: List of public requests
+  '/requests/{id}':
+    get:
+      tags:
+        - Request
+      summary: Get request by ID
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Request details
+    put:
+      tags:
+        - Request
+      summary: Update request
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                files:
+                  type: array
+                  items:
+                    type: string
+                    format: binary
+      responses:
+        '200':
+          description: Request updated
+  '/requests/{id}/cancel':
+    post:
+      tags:
+        - Request
+      summary: Cancel request
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Request cancelled
+  '/requests/{id}/accept':
+    post:
+      tags:
+        - Request
+      summary: Accept request
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Request accepted
+  '/requests/{id}/reject':
+    post:
+      tags:
+        - Request
+      summary: Reject request
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Request rejected
+  /reviews/given:
+    get:
+      tags:
+        - Review
+      summary: Get reviews given by me
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: List of reviews
+  /reviews/received:
+    get:
+      tags:
+        - Review
+      summary: Get reviews received by me
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: List of reviews
+  '/reviews/provider/{providerUserId}':
+    get:
+      tags:
+        - Review
+      summary: Get provider reviews
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: providerUserId
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: List of reviews
+  '/reviews/{id}':
+    get:
+      tags:
+        - Review
+      summary: Get review by ID
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Review details
+  '/reviews/projects/{projectId}':
+    post:
+      tags:
+        - Review
+      summary: Submit project review
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: projectId
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - rating
+              properties:
+                rating:
+                  type: integer
+                  minimum: 1
+                  maximum: 5
+                comment:
+                  type: string
+      responses:
+        '201':
+          description: Review submitted
+  '/reviews/projects/{projectId}/eligibility':
+    get:
+      tags:
+        - Review
+      summary: Check project review eligibility
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: projectId
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Eligibility status
+  '/reviews/sessions/{sessionId}':
+    post:
+      tags:
+        - Review
+      summary: Submit session review
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: sessionId
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - rating
+              properties:
+                rating:
+                  type: integer
+                  minimum: 1
+                  maximum: 5
+                comment:
+                  type: string
+      responses:
+        '201':
+          description: Review submitted
+  '/reviews/sessions/{sessionId}/eligibility':
+    get:
+      tags:
+        - Review
+      summary: Check session review eligibility
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: sessionId
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Eligibility status
+  '/escrow/project/{projectId}':
+    get:
+      tags:
+        - Escrow
+      summary: Get escrow for project
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: projectId
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Escrow details
+  /escrow/balance:
+    get:
+      tags:
+        - Escrow
+      summary: Get provider balance
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Balance amount
+  /escrow/withdraw:
+    post:
+      tags:
+        - Escrow
+      summary: Request withdrawal
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - amount
+              properties:
+                amount:
+                  type: number
+      responses:
+        '200':
+          description: Withdrawal requested
+  /payments/intent:
+    post:
+      tags:
+        - Payment
+      summary: Create payment intent (Stripe)
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - projectId
+                - amount
+                - paymentType
+              properties:
+                projectId:
+                  type: string
+                amount:
+                  type: number
+                paymentType:
+                  type: string
+                  enum:
+                    - PROJECT_MILESTONE
+                    - FULL_PROJECT
+                    - SUBSCRIPTION
+      responses:
+        '200':
+          description: Payment intent created
+  '/payments/project/{projectId}':
+    get:
+      tags:
+        - Payment
+      summary: Get project payments
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: projectId
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: List of payments
+  /payments/me:
+    get:
+      tags:
+        - Payment
+      summary: Get my payments
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: List of payments
+  /payments/webhook:
+    post:
+      tags:
+        - Payment
+      summary: Stripe Webhook
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        '200':
+          description: Webhook received

@@ -1,0 +1,158 @@
+Services:
+  get:
+    tags:
+      - Service
+    summary: Get all services
+    parameters:
+      - in: query
+        name: includeInactive
+        schema:
+          type: boolean
+    responses:
+      200:
+        description: List of services
+  post:
+    tags:
+      - Service
+    summary: Create new service (Admin)
+    security:
+      - bearerAuth: []
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - name
+            properties:
+              name:
+                type: string
+              description:
+                type: string
+    responses:
+      201:
+        description: Service created
+
+ServicesId:
+  get:
+    tags:
+      - Service
+    summary: Get service by ID
+    parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: string
+    responses:
+      200:
+        description: Service details
+  patch:
+    tags:
+      - Service
+    summary: Update service (Admin)
+    security:
+      - bearerAuth: []
+    parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: string
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              name:
+                type: string
+              description:
+                type: string
+              active:
+                type: boolean
+    responses:
+      200:
+        description: Service updated
+  delete:
+    tags:
+      - Service
+    summary: Delete (deactivate) service (Admin)
+    security:
+      - bearerAuth: []
+    parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: string
+    responses:
+      200:
+        description: Service deleted
+
+ServicesIdSkills:
+  get:
+    tags:
+      - Service
+    summary: Get skills for a service
+    parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: string
+    responses:
+      200:
+        description: List of skills
+  post:
+    tags:
+      - Service
+    summary: Add skill to service (Admin)
+    security:
+      - bearerAuth: []
+    parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: string
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - name
+            properties:
+              name:
+                type: string
+              description:
+                type: string
+    responses:
+      201:
+        description: Skill created
+
+ServicesIdSkillsKw:
+  delete:
+    tags:
+      - Service
+    summary: Delete skill (Admin)
+    security:
+      - bearerAuth: []
+    parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: skillId
+        required: true
+        schema:
+          type: string
+    responses:
+      200:
+        description: Skill deleted

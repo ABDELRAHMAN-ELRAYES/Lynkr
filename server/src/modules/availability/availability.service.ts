@@ -2,13 +2,14 @@ import AvailabilityRepository from "./availability.repository";
 import AppError from "../../utils/app-error";
 import { NextFunction } from "express";
 import { ICreateAvailabilityData, ISaveAvailabilityPayload } from "./types/IAvailability";
+import { isStartBeforeEnd, validateDayOfWeek, validateTimeFormat } from "@/utils/date-time-helpers";
 
 class AvailabilityService {
-    private availabilityRepository: AvailabilityRepository;
+    private static availabilityRepository: AvailabilityRepository = AvailabilityRepository.getInstance();
     static instance: AvailabilityService;
 
     private constructor() {
-        this.availabilityRepository = AvailabilityRepository.getInstance();
+        if (!AvailabilityService.availabilityRepository) AvailabilityService.availabilityRepository = AvailabilityRepository.getInstance();
     }
 
     static getInstance(): AvailabilityService {
@@ -18,48 +19,28 @@ class AvailabilityService {
         return AvailabilityService.instance;
     }
 
-    /**
-     * Validate time format (HH:mm)
-     */
-    private validateTimeFormat(time: string): boolean {
-        const timeRegex = /^([01]\d|2[0-3]):([0-5]\d)$/;
-        return timeRegex.test(time);
-    }
 
-    /**
-     * Validate day of week (0-6)
-     */
-    private validateDayOfWeek(day: number): boolean {
-        return Number.isInteger(day) && day >= 0 && day <= 6;
-    }
-
-    /**
-     * Compare times to ensure start is before end
-     */
-    private isStartBeforeEnd(startTime: string, endTime: string): boolean {
-        return startTime < endTime;
-    }
 
     /**
      * Create a single availability entry
      */
-    async createAvailability(
+    static async createAvailability(
         providerProfileId: string,
         data: ICreateAvailabilityData,
         next: NextFunction
     ) {
         // Validate day of week
-        if (!this.validateDayOfWeek(data.dayOfWeek)) {
+        if (!validateDayOfWeek(data.dayOfWeek)) {
             return next(new AppError(400, "Invalid day of week. Must be 0-6 (Sunday-Saturday)"));
         }
 
         // Validate time formats
-        if (!this.validateTimeFormat(data.startTime) || !this.validateTimeFormat(data.endTime)) {
+        if (!validateTimeFormat(data.startTime) || !validateTimeFormat(data.endTime)) {
             return next(new AppError(400, "Invalid time format. Use HH:mm (e.g., 09:00)"));
         }
 
         // Validate start time is before end time
-        if (!this.isStartBeforeEnd(data.startTime, data.endTime)) {
+        if (!isStartBeforeEnd(data.startTime, data.endTime)) {
             return next(new AppError(400, "Start time must be before end time"));
         }
 
@@ -81,14 +62,14 @@ class AvailabilityService {
     /**
      * Get all availabilities for a provider
      */
-    async getProviderAvailabilities(providerProfileId: string) {
+    static async getProviderAvailabilities(providerProfileId: string) {
         return await this.availabilityRepository.getAvailabilitiesByProviderId(providerProfileId);
     }
 
     /**
      * Get availability by ID
      */
-    async getAvailabilityById(id: string) {
+    static async getAvailabilityById(id: string) {
         return await this.availabilityRepository.getAvailabilityById(id);
     }
 
@@ -96,7 +77,7 @@ class AvailabilityService {
      * Save all availabilities for a provider (bulk replace)
      * This deletes existing availabilities and creates new ones
      */
-    async saveAvailabilities(
+    static async saveAvailabilities(
         providerProfileId: string,
         payload: ISaveAvailabilityPayload,
         next: NextFunction
@@ -105,13 +86,13 @@ class AvailabilityService {
 
         // Validate all entries
         for (const entry of availabilities) {
-            if (!this.validateDayOfWeek(entry.dayOfWeek)) {
+            if (!validateDayOfWeek(entry.dayOfWeek)) {
                 return next(new AppError(400, `Invalid day of week: ${entry.dayOfWeek}`));
             }
-            if (!this.validateTimeFormat(entry.startTime) || !this.validateTimeFormat(entry.endTime)) {
+            if (!validateTimeFormat(entry.startTime) || !validateTimeFormat(entry.endTime)) {
                 return next(new AppError(400, `Invalid time format in entry for day ${entry.dayOfWeek}`));
             }
-            if (!this.isStartBeforeEnd(entry.startTime, entry.endTime)) {
+            if (!isStartBeforeEnd(entry.startTime, entry.endTime)) {
                 return next(new AppError(400, `Start time must be before end time for day ${entry.dayOfWeek}`));
             }
         }
@@ -156,7 +137,7 @@ class AvailabilityService {
     /**
      * Delete a specific availability
      */
-    async deleteAvailability(id: string, providerProfileId: string, next: NextFunction) {
+    static async deleteAvailability(id: string, providerProfileId: string, next: NextFunction) {
         const availability = await this.availabilityRepository.getAvailabilityById(id);
 
         if (!availability) {

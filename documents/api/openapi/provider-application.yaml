@@ -1,0 +1,89 @@
+Applications:
+  post:
+    tags:
+      - Provider Application
+    summary: Submit application
+    security:
+      - bearerAuth: []
+    responses:
+      201:
+        description: Application submitted
+  get:
+    tags:
+      - Provider Application
+    summary: Get pending applications (Admin)
+    security:
+      - bearerAuth: []
+    responses:
+      200:
+        description: List of applications
+
+ApplicationsMe:
+  get:
+    tags:
+      - Provider Application
+    summary: Get my applications
+    security:
+      - bearerAuth: []
+    responses:
+      200:
+        description: Application history
+
+ApplicationsId:
+  get:
+    tags:
+      - Provider Application
+    summary: Get application by ID (Admin)
+    security:
+      - bearerAuth: []
+    parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: string
+    responses:
+      200:
+        description: Application details
+
+ApplicationsIdApprove:
+  patch:
+    tags:
+      - Provider Application
+    summary: Approve application (Admin)
+    security:
+      - bearerAuth: []
+    parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: string
+    responses:
+      200:
+        description: Application approved
+
+ApplicationsIdReject:
+  patch:
+    tags:
+      - Provider Application
+    summary: Reject application (Admin)
+    security:
+      - bearerAuth: []
+    parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: string
+    requestBody:
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              reason:
+                type: string
+    responses:
+      200:
+        description: Application rejected

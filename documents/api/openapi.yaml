@@ -1,0 +1,237 @@
+openapi: 3.0.0
+info:
+  title: Lynkr API
+  version: 1.0.0
+  description: API documentation for Lynkr platform
+servers:
+  - url: http://localhost:3000/api
+    description: Local Development Server
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+security:
+  - bearerAuth: []
+paths:
+  /auth/login:
+    $ref: './openapi/auth.yaml#/Login'
+  /auth/register:
+    $ref: './openapi/auth.yaml#/Register'
+  /auth/register-verification:
+    $ref: './openapi/auth.yaml#/RegisterVerification'
+  /auth/verify-otp:
+    $ref: './openapi/auth.yaml#/VerifyOtp'
+  /auth/forget-password:
+    $ref: './openapi/auth.yaml#/ForgetPassword'
+  /auth/reset-password:
+    $ref: './openapi/auth.yaml#/ResetPassword'
+  /auth/logout:
+    $ref: './openapi/auth.yaml#/Logout'
+  /auth/me:
+    $ref: './openapi/auth.yaml#/Me'
+  /auth/google:
+    $ref: './openapi/auth.yaml#/GoogleAuth'
+  /availability:
+    $ref: './openapi/availability.yaml#/SaveAvailabilities'
+  /availability/my:
+    $ref: './openapi/availability.yaml#/GetMyAvailabilities'
+  /availability/provider/{providerId}:
+    $ref: './openapi/availability.yaml#/GetProviderAvailabilities'
+  /availability/{id}:
+    $ref: './openapi/availability.yaml#/DeleteAvailability'
+  /users:
+    $ref: './openapi/user.yaml#/Users'
+  /users/batch:
+    $ref: './openapi/user.yaml#/UsersBatch'
+  /users/min-batch:
+    $ref: './openapi/user.yaml#/UsersMinBatch'
+  /users/statistics:
+    $ref: './openapi/user.yaml#/UsersStatistics'
+  /users/{id}:
+    $ref: './openapi/user.yaml#/UsersId'
+  /users/{id}/profile:
+    $ref: './openapi/user.yaml#/UsersIdProfile'
+  /users/{id}/password:
+    $ref: './openapi/user.yaml#/UsersIdPassword'
+  /users/{id}/profile/password:
+    $ref: './openapi/user.yaml#/UsersIdProfilePassword'
+  /meetings:
+    $ref: './openapi/meeting.yaml#/Meetings'
+  /meetings/me:
+    $ref: './openapi/meeting.yaml#/MeetingsMe'
+  /meetings/project/{projectId}:
+    $ref: './openapi/meeting.yaml#/MeetingsProject'
+  /meetings/{id}:
+    $ref: './openapi/meeting.yaml#/MeetingsId'
+  /meetings/{id}/token:
+    $ref: './openapi/meeting.yaml#/MeetingsIdToken'
+  /meetings/{id}/start:
+    $ref: './openapi/meeting.yaml#/MeetingsIdStart'
+  /meetings/{id}/end:
+    $ref: './openapi/meeting.yaml#/MeetingsIdEnd'
+  /meetings/{id}/accept:
+    $ref: './openapi/meeting.yaml#/MeetingsIdAccept'
+  /meetings/{id}/decline:
+    $ref: './openapi/meeting.yaml#/MeetingsIdDecline'
+  /settings:
+    $ref: './openapi/settings.yaml#/Settings'
+  /settings/{id}:
+    $ref: './openapi/settings.yaml#/SettingsId'
+  /notifications:
+    $ref: './openapi/notification.yaml#/Notifications'
+  /notifications/unread-count:
+    $ref: './openapi/notification.yaml#/NotificationsUnreadCount'
+  /notifications/read-all:
+    $ref: './openapi/notification.yaml#/NotificationsReadAll'
+  /notifications/{id}/read:
+    $ref: './openapi/notification.yaml#/NotificationsIdRead'
+  /notifications/{id}:
+    $ref: './openapi/notification.yaml#/NotificationsId'
+  /conversations:
+    $ref: './openapi/messaging.yaml#/Conversations'
+  /conversations/project/{projectId}:
+    $ref: './openapi/messaging.yaml#/ConversationsProject'
+  /conversations/{id}:
+    $ref: './openapi/messaging.yaml#/ConversationsId'
+  /messages:
+    $ref: './openapi/messaging.yaml#/Messages'
+  /messages/conversation/{conversationId}:
+    $ref: './openapi/messaging.yaml#/MessagesConversation'
+  /messages/{id}/read:
+    $ref: './openapi/messaging.yaml#/MessagesIdRead'
+  /messages/conversation/{conversationId}/read:
+    $ref: './openapi/messaging.yaml#/MessagesConversationRead'
+  /proposals:
+    $ref: './openapi/proposal.yaml#/Proposals'
+  /proposals/request/{requestId}:
+    $ref: './openapi/proposal.yaml#/ProposalsRequest'
+  /proposals/{id}:
+    $ref: './openapi/proposal.yaml#/ProposalsId'
+  /proposals/{id}/accept:
+    $ref: './openapi/proposal.yaml#/ProposalsIdAccept'
+  /proposals/{id}/reject:
+    $ref: './openapi/proposal.yaml#/ProposalsIdReject'
+  /reports:
+    $ref: './openapi/report.yaml#/Reports'
+  /reports/my:
+    $ref: './openapi/report.yaml#/ReportsMy'
+  /reports/admin/all:
+    $ref: './openapi/report.yaml#/ReportsAdminAll'
+  /reports/{id}:
+    $ref: './openapi/report.yaml#/ReportsId'
+  /reports/{id}/status:
+    $ref: './openapi/report.yaml#/ReportsIdStatus'
+  /reports/{id}/action:
+    $ref: './openapi/report.yaml#/ReportsIdAction'
+  /services:
+    $ref: './openapi/service.yaml#/Services'
+  /services/{id}:
+    $ref: './openapi/service.yaml#/ServicesId'
+  /services/{id}/skills:
+    $ref: './openapi/service.yaml#/ServicesIdSkills'
+  /services/{id}/skills/{skillId}:
+    $ref: './openapi/service.yaml#/ServicesIdSkillsKw'
+  /subscriptions/plans:
+    $ref: './openapi/subscription.yaml#/SubscriptionsPlans'
+  /subscriptions/plans/{id}:
+    $ref: './openapi/subscription.yaml#/SubscriptionsPlansId'
+  /subscriptions/purchase:
+    $ref: './openapi/subscription.yaml#/SubscriptionsPurchase'
+  /subscriptions/my:
+    $ref: './openapi/subscription.yaml#/SubscriptionsMy'
+  /subscriptions/my/history:
+    $ref: './openapi/subscription.yaml#/SubscriptionsMyHistory'
+  /subscriptions/{id}/cancel:
+    $ref: './openapi/subscription.yaml#/SubscriptionsIdCancel'
+  /subscriptions/admin/all:
+    $ref: './openapi/subscription.yaml#/SubscriptionsAdminAll'
+  /providers:
+    $ref: './openapi/provider.yaml#/Providers'
+  /providers/full:
+    $ref: './openapi/provider.yaml#/ProvidersFull'
+  /providers/search:
+    $ref: './openapi/provider.yaml#/ProvidersSearch'
+  /providers/requests/pending:
+    $ref: './openapi/provider.yaml#/ProvidersRequestsPending'
+  /providers/requests/{id}/evaluate:
+    $ref: './openapi/provider.yaml#/ProvidersRequestsEvaluate'
+  /providers/{id}:
+    $ref: './openapi/provider.yaml#/ProvidersId'
+  /providers/user/{userId}:
+    $ref: './openapi/provider.yaml#/ProvidersUser'
+  /providers/{id}/approve:
+    $ref: './openapi/provider.yaml#/ProvidersIdApprove'
+  /providers/{id}/reject:
+    $ref: './openapi/provider.yaml#/ProvidersIdReject'
+  /provider-applications:
+    $ref: './openapi/provider-application.yaml#/Applications'
+  /provider-applications/me:
+    $ref: './openapi/provider-application.yaml#/ApplicationsMe'
+  /provider-applications/{id}:
+    $ref: './openapi/provider-application.yaml#/ApplicationsId'
+  /provider-applications/{id}/approve:
+    $ref: './openapi/provider-application.yaml#/ApplicationsIdApprove'
+  /provider-applications/{id}/reject:
+    $ref: './openapi/provider-application.yaml#/ApplicationsIdReject'
+  /projects:
+    $ref: './openapi/project.yaml#/Projects'
+  /projects/me:
+    $ref: './openapi/project.yaml#/ProjectsMe'
+  /projects/{id}:
+    $ref: './openapi/project.yaml#/ProjectsId'
+  /projects/{id}/complete:
+    $ref: './openapi/project.yaml#/ProjectsIdComplete'
+  /projects/{id}/confirm:
+    $ref: './openapi/project.yaml#/ProjectsIdConfirm'
+  /projects/{id}/cancel:
+    $ref: './openapi/project.yaml#/ProjectsIdCancel'
+  /projects/{id}/files:
+    $ref: './openapi/project.yaml#/ProjectsFiles'
+  /projects/{id}/files/{fileId}:
+    $ref: './openapi/project.yaml#/ProjectsFilesDelete'
+  /projects/{id}/activities:
+    $ref: './openapi/project.yaml#/ProjectsActivities'
+  /requests:
+    $ref: './openapi/request.yaml#/Requests'
+  /requests/public:
+    $ref: './openapi/request.yaml#/RequestsPublic'
+  /requests/{id}:
+    $ref: './openapi/request.yaml#/RequestsId'
+  /requests/{id}/cancel:
+    $ref: './openapi/request.yaml#/RequestsIdCancel'
+  /requests/{id}/accept:
+    $ref: './openapi/request.yaml#/RequestsIdAccept'
+  /requests/{id}/reject:
+    $ref: './openapi/request.yaml#/RequestsIdReject'
+  /reviews/given:
+    $ref: './openapi/review.yaml#/ReviewsGiven'
+  /reviews/received:
+    $ref: './openapi/review.yaml#/ReviewsReceived'
+  /reviews/provider/{providerUserId}:
+    $ref: './openapi/review.yaml#/ReviewsProvider'
+  /reviews/{id}:
+    $ref: './openapi/review.yaml#/ReviewsId'
+  /reviews/projects/{projectId}:
+    $ref: './openapi/review.yaml#/ReviewsProject'
+  /reviews/projects/{projectId}/eligibility:
+    $ref: './openapi/review.yaml#/ReviewsProjectEligibility'
+  /reviews/sessions/{sessionId}:
+    $ref: './openapi/review.yaml#/ReviewsSession'
+  /reviews/sessions/{sessionId}/eligibility:
+    $ref: './openapi/review.yaml#/ReviewsSessionEligibility'
+  /escrow/project/{projectId}:
+    $ref: './openapi/escrow.yaml#/EscrowsProject'
+  /escrow/balance:
+    $ref: './openapi/escrow.yaml#/EscrowsBalance'
+  /escrow/withdraw:
+    $ref: './openapi/escrow.yaml#/EscrowsWithdraw'
+  /payments/intent:
+    $ref: './openapi/payment.yaml#/PaymentsIntent'
+  /payments/project/{projectId}:
+    $ref: './openapi/payment.yaml#/PaymentsProject'
+  /payments/me:
+    $ref: './openapi/payment.yaml#/PaymentsMe'
+  /payments/webhook:
+    $ref: './openapi/payment.yaml#/PaymentsWebhook'

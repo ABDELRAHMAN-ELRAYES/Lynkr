@@ -1,0 +1,49 @@
+EscrowsProject:
+  get:
+    tags:
+      - Escrow
+    summary: Get escrow for project
+    security:
+      - bearerAuth: []
+    parameters:
+      - in: path
+        name: projectId
+        required: true
+        schema:
+          type: string
+    responses:
+      200:
+        description: Escrow details
+
+EscrowsBalance:
+  get:
+    tags:
+      - Escrow
+    summary: Get provider balance
+    security:
+      - bearerAuth: []
+    responses:
+      200:
+        description: Balance amount
+
+EscrowsWithdraw:
+  post:
+    tags:
+      - Escrow
+    summary: Request withdrawal
+    security:
+      - bearerAuth: []
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - amount
+            properties:
+              amount:
+                type: number
+    responses:
+      200:
+        description: Withdrawal requested

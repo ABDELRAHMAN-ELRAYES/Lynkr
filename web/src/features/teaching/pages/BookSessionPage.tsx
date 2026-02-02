@@ -3,8 +3,8 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Calendar, Clock, Users, DollarSign } from 'lucide-react';
 import { toast } from 'sonner';
 import { SlotCard } from '../components/SlotCard';
-import { teachingService } from '@/shared/services/teaching.service';
-import type { TeachingSlot } from '@/shared/types/teaching';
+import { teachingService } from '@/shared/services/availability.service';
+import type { TeachingSlot } from '@/shared/types/availability';
 import Button from '@/shared/components/ui/Button';
 
 interface ProviderInfo {

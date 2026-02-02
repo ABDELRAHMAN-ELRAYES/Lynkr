@@ -1,0 +1,153 @@
+ReviewsGiven:
+  get:
+    tags:
+      - Review
+    summary: Get reviews given by me
+    security:
+      - bearerAuth: []
+    responses:
+      200:
+        description: List of reviews
+
+ReviewsReceived:
+  get:
+    tags:
+      - Review
+    summary: Get reviews received by me
+    security:
+      - bearerAuth: []
+    responses:
+      200:
+        description: List of reviews
+
+ReviewsProvider:
+  get:
+    tags:
+      - Review
+    summary: Get provider reviews
+    security:
+      - bearerAuth: []
+    parameters:
+      - in: path
+        name: providerUserId
+        required: true
+        schema:
+          type: string
+    responses:
+      200:
+        description: List of reviews
+
+ReviewsId:
+  get:
+    tags:
+      - Review
+    summary: Get review by ID
+    security:
+      - bearerAuth: []
+    parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: string
+    responses:
+      200:
+        description: Review details
+
+ReviewsProject:
+  post:
+    tags:
+      - Review
+    summary: Submit project review
+    security:
+      - bearerAuth: []
+    parameters:
+      - in: path
+        name: projectId
+        required: true
+        schema:
+          type: string
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - rating
+            properties:
+              rating:
+                type: integer
+                minimum: 1
+                maximum: 5
+              comment:
+                type: string
+    responses:
+      201:
+        description: Review submitted
+
+ReviewsProjectEligibility:
+  get:
+    tags:
+      - Review
+    summary: Check project review eligibility
+    security:
+      - bearerAuth: []
+    parameters:
+      - in: path
+        name: projectId
+        required: true
+        schema:
+          type: string
+    responses:
+      200:
+        description: Eligibility status
+
+ReviewsSession:
+  post:
+    tags:
+      - Review
+    summary: Submit session review
+    security:
+      - bearerAuth: []
+    parameters:
+      - in: path
+        name: sessionId
+        required: true
+        schema:
+          type: string
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - rating
+            properties:
+              rating:
+                type: integer
+                minimum: 1
+                maximum: 5
+              comment:
+                type: string
+    responses:
+      201:
+        description: Review submitted
+
+ReviewsSessionEligibility:
+  get:
+    tags:
+      - Review
+    summary: Check session review eligibility
+    security:
+      - bearerAuth: []
+    parameters:
+      - in: path
+        name: sessionId
+        required: true
+        schema:
+          type: string
+    responses:
+      200:
+        description: Eligibility status

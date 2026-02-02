@@ -1,0 +1,44 @@
+Settings:
+  get:
+    tags:
+      - Settings
+    summary: Get all settings
+    responses:
+      200:
+        description: List of settings
+
+SettingsId:
+  get:
+    tags:
+      - Settings
+    summary: Get setting by ID
+    parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: string
+    responses:
+      200:
+        description: Setting details
+  put:
+    tags:
+      - Settings
+    summary: Update setting
+    security:
+      - bearerAuth: []
+    parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: string
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+    responses:
+      200:
+        description: Setting updated

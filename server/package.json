@@ -46,7 +46,9 @@
     "sharp": "^0.34.5",
     "socket.io": "^4.8.3",
     "stripe": "^17.5.0",
-    "winston": "^3.19.0"
+    "swagger-ui-express": "^5.0.1",
+    "winston": "^3.19.0",
+    "yamljs": "^0.3.0"
   },
   "devDependencies": {
     "@types/bcryptjs": "^3.0.0",
@@ -60,8 +62,11 @@
     "@types/nodemailer": "^6.4.17",
     "@types/passport": "^1.0.17",
     "@types/passport-google-oauth20": "^2.0.17",
+    "@types/swagger-ui-express": "^4.1.8",
+    "@types/yamljs": "^0.2.34",
     "nodemon": "^3.1.9",
     "prisma": "^5.22.0",
+    "swagger-cli": "^4.0.4",
     "ts-node": "^10.9.2",
     "tsx": "^4.21.0",
     "typescript": "^5.7.2"

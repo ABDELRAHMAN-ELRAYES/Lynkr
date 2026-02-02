@@ -2,8 +2,8 @@ import { useState, useEffect } from "react";
 import { Plus, Clock, Calendar as CalendarIcon, Save, Copy, Trash2, Globe, AlertCircle } from "lucide-react";
 import Button from "@/shared/components/ui/Button";
 import { toast } from "sonner";
-import { teachingService } from "@/shared/services/teaching.service";
-import { SaveAvailabilityPayload, CreateAvailabilityPayload } from '@/shared/types/teaching';
+import { availabilityService } from "@/shared/services/availability.service";
+import { SaveAvailabilityPayload, CreateAvailabilityPayload } from '@/shared/types/availability';
 
 // Initial state for days of the week
 const WEEKDAYS = [
@@ -48,7 +48,7 @@ export default function Availability() {
     const loadAvailability = async () => {
       try {
         setFetching(true);
-        const availabilities = await teachingService.getMyAvailabilities();
+        const availabilities = await availabilityService.getMyAvailabilities();
 
         if (availabilities.length > 0) {
           // Reset schedule to empty first
@@ -180,7 +180,7 @@ export default function Availability() {
       }
 
       const payload: SaveAvailabilityPayload = { availabilities };
-      await teachingService.saveAvailabilities(payload);
+      await availabilityService.saveAvailabilities(payload);
 
       toast.success("Availability updated successfully!");
     } catch (error: any) {

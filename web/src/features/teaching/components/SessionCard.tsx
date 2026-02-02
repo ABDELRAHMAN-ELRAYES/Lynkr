@@ -2,7 +2,7 @@ import { FC } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Clock, Calendar, Users, Play, Square, Video, X } from 'lucide-react';
 import { SessionStatusTag, SessionTypeTag } from '@/shared/components/common/tags';
-import type { TeachingSession } from '@/shared/types/teaching';
+import type { TeachingSession } from '@/shared/types/availability';
 import Button from '@/shared/components/ui/Button';
 
 interface SessionCardProps {
