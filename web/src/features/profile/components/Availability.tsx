@@ -286,7 +286,7 @@ export default function Availability() {
                 </div>
 
                 {/* Slots Area */}
-                <div className="flex-1 space-y-3 min-h-[44px]">
+                <div className="flex-1 space-y-3 min-h-[44px] flex items-center justify-end">
                   {!day.isEnabled ? (
                     <div className="text-sm text-gray-400 italic pt-2">Unavailable</div>
                   ) : (

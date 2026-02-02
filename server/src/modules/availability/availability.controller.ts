@@ -34,7 +34,7 @@ export const saveAvailabilities = catchAsync(async (req: Request, res: Response,
  */
 export const getMyAvailabilities = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
     const user = req.user as IUser;
-    const availabilities = await AvailabilityService.getProviderAvailabilities(user.id);
+    const availabilities = await AvailabilityService.getProviderAvailabilitiesByProviderId(user.id);
 
     res.status(200).json({
         status: "success",

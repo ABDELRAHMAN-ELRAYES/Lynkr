@@ -61,6 +61,25 @@ class AvailabilityRepository {
             throw new AppError(500, "Failed to get provider availabilities");
         }
     }
+    async getAvailabilitiesByProviderId(providerId: string) {
+        try {
+            return await this.prisma.providerAvailability.findMany({
+                where: {
+                    providerProfile: {
+                        user: {
+                            id: providerId
+                        }
+                    }
+                },
+                orderBy: [
+                    { dayOfWeek: "asc" },
+                    { startTime: "asc" }
+                ]
+            });
+        } catch (error) {
+            throw new AppError(500, "Failed to get provider availabilities");
+        }
+    }
 
     async getOverlappingAvailabilities(
         providerProfileId: string,

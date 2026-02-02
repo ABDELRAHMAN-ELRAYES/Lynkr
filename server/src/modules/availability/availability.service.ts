@@ -78,8 +78,12 @@ class AvailabilityService {
     /**
      * Get all availabilities for a provider
      */
-    static async getProviderAvailabilities(providerId: string) {
-        return await this.availabilityRepository.getAvailabilitiesByProviderProfileId(providerId);
+     static async getProviderAvailabilitiesByProviderId(providerId: string) {
+        return await this.availabilityRepository.getAvailabilitiesByProviderId(providerId);
+    }
+
+    static async getProviderAvailabilities(providerProfileId: string) {
+        return await this.availabilityRepository.getAvailabilitiesByProviderProfileId(providerProfileId);
     }
 
     /**
