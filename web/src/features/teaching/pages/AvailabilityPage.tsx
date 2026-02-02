@@ -3,8 +3,8 @@ import { Plus, ChevronLeft, ChevronRight, Calendar } from 'lucide-react';
 import { toast } from 'sonner';
 import { SlotCard } from '../components/SlotCard';
 import { CreateSlotModal } from '../components/CreateSlotModal';
-import { teachingService } from '@/shared/services/availability.service';
-import type { TeachingSlot } from '@/shared/types/availability';
+import { teachingService } from '@/shared/services/teaching.service';
+import type { TeachingSlot } from '@/shared/types/teaching';
 import Button from '@/shared/components/ui/Button';
 
 interface WeekData {

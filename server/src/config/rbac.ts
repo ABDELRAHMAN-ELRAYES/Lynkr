@@ -13,10 +13,10 @@ const ROLE_PRIVILEGES: Record<UserRole, string[]> = {
         AdminPrivilege.REPORTS,
     ],
     [UserRole.ADMIN]: [], // Admins have privileges defined per-user in DB
-    [UserRole.PROVIDER_APPROVED]: [],
-    [UserRole.PROVIDER_PENDING]: [],
-    [UserRole.PROVIDER_REJECTED]: [],
-    [UserRole.PROVIDER_SUSPENDED]: [],
+    [UserRole.PROVIDER]: [],
+    [UserRole.PENDING_PROVIDER]: [],
+    [UserRole.REJECTED_PROVIDER]: [],
+    [UserRole.SUSPENDED_PROVIDER]: [],
     [UserRole.CLIENT]: [],
 
 };
@@ -34,10 +34,10 @@ const ROLE_TABS: Record<UserRole, string[]> = {
         "reports",
     ],
     [UserRole.ADMIN]: [], // Tabs defined by user privileges in database
-    [UserRole.PROVIDER_APPROVED]: ["profile", "operations", "proposals", "services"],
-    [UserRole.PROVIDER_PENDING]: ["profile"],
-    [UserRole.PROVIDER_REJECTED]: ["profile"],
-    [UserRole.PROVIDER_SUSPENDED]: ["profile"],
+    [UserRole.PROVIDER]: ["profile", "operations", "proposals", "services"],
+    [UserRole.PENDING_PROVIDER]: ["profile"],
+    [UserRole.REJECTED_PROVIDER]: ["profile"],
+    [UserRole.SUSPENDED_PROVIDER]: ["profile"],
     [UserRole.CLIENT]: ["operations", "services", "profile"],
 
 };

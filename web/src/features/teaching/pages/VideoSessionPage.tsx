@@ -17,9 +17,9 @@ import {
     MonitorOff,
 } from 'lucide-react';
 import { toast } from 'sonner';
-import { teachingService } from '@/shared/services/availability.service';
+import { teachingService } from '@/shared/services/teaching.service';
 import { useAgora } from '@/shared/hooks/useAgora';
-import type { SessionVideoInfo } from '@/shared/types/availability';
+import type { SessionVideoInfo } from '@/shared/types/teaching';
 import Button from '@/shared/components/ui/Button';
 
 export const VideoSessionPage: FC = () => {
@@ -284,8 +284,8 @@ export const VideoSessionPage: FC = () => {
                 <button
                     onClick={toggleAudio}
                     className={`p-4 rounded-full transition-colors ${isAudioEnabled
-                        ? 'bg-gray-700 hover:bg-gray-600 text-white'
-                        : 'bg-red-600 hover:bg-red-700 text-white'
+                            ? 'bg-gray-700 hover:bg-gray-600 text-white'
+                            : 'bg-red-600 hover:bg-red-700 text-white'
                         }`}
                 >
                     {isAudioEnabled ? <Mic className="h-6 w-6" /> : <MicOff className="h-6 w-6" />}
@@ -294,8 +294,8 @@ export const VideoSessionPage: FC = () => {
                 <button
                     onClick={toggleVideo}
                     className={`p-4 rounded-full transition-colors ${isVideoEnabled
-                        ? 'bg-gray-700 hover:bg-gray-600 text-white'
-                        : 'bg-red-600 hover:bg-red-700 text-white'
+                            ? 'bg-gray-700 hover:bg-gray-600 text-white'
+                            : 'bg-red-600 hover:bg-red-700 text-white'
                         }`}
                 >
                     {isVideoEnabled ? <Video className="h-6 w-6" /> : <VideoOff className="h-6 w-6" />}
@@ -304,8 +304,8 @@ export const VideoSessionPage: FC = () => {
                 <button
                     onClick={toggleScreenShare}
                     className={`p-4 rounded-full transition-colors ${isScreenSharing
-                        ? 'bg-[#7682e8] hover:bg-[#5a67d8] text-white'
-                        : 'bg-gray-700 hover:bg-gray-600 text-white'
+                            ? 'bg-[#7682e8] hover:bg-[#5a67d8] text-white'
+                            : 'bg-gray-700 hover:bg-gray-600 text-white'
                         }`}
                 >
                     {isScreenSharing ? <MonitorOff className="h-6 w-6" /> : <Monitor className="h-6 w-6" />}

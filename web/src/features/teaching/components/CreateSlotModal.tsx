@@ -4,8 +4,8 @@ import { toast } from 'sonner';
 import Button from '@/shared/components/ui/Button';
 import { Input } from '@/shared/components/ui/input';
 import { Label } from '@/shared/components/ui/label';
-import { teachingService } from '@/shared/services/availability.service';
-import type { CreateSlotPayload, SessionType, TeachingSlot } from '@/shared/types/availability';
+import { teachingService } from '@/shared/services/teaching.service';
+import type { CreateSlotPayload, SessionType, TeachingSlot } from '@/shared/types/teaching';
 
 interface CreateSlotModalProps {
     isOpen: boolean;

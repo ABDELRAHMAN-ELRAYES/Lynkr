@@ -22,9 +22,8 @@ export type IUser = {
     email: string;
     phone: string | null;
     password: string;
-    role: string; // UserRole enum value as string
+    role: UserRole; 
     active: boolean;
-    emailVerified: boolean;
     passwordChangedAt: Date | null;
     createdAt: Date;
     updatedAt: Date;

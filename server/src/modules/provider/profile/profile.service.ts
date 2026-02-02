@@ -129,7 +129,7 @@ class ProfileService {
 
     /**
      * Approve Provider Profile (Admin only)
-     * Changes user role to PROVIDER_APPROVED
+     * Changes user role to PROVIDER
      */
     static async approveProviderProfile(profileId: string, next: NextFunction) {
         try {
@@ -141,11 +141,11 @@ class ProfileService {
             // Update profile approval status
             await this.profileRepository.approveProfile(profileId);
 
-            // Update user role to PROVIDER_APPROVED directly via UserRepository
+            // Update user role to PROVIDER directly via UserRepository
             const userRepository = UserRepository.getInstance();
             await userRepository.getPrismaClient().user.update({
                 where: { id: profile.userId },
-                data: { role: UserRole.PROVIDER_APPROVED },
+                data: { role: UserRole.PROVIDER },
             });
 
             // Notify provider
@@ -163,7 +163,7 @@ class ProfileService {
 
     /**
      * Reject Provider Profile (Admin only)
-     * Changes user role to PROVIDER_REJECTED
+     * Changes user role to REJECTED_PROVIDER
      */
     static async rejectProviderProfile(profileId: string, next: NextFunction) {
         try {
@@ -175,11 +175,11 @@ class ProfileService {
             // Update profile approval status
             await this.profileRepository.rejectProfile(profileId);
 
-            // Update user role to PROVIDER_REJECTED directly via UserRepository
+            // Update user role to REJECTED_PROVIDER directly via UserRepository
             const userRepository = UserRepository.getInstance();
             await userRepository.getPrismaClient().user.update({
                 where: { id: profile.userId },
-                data: { role: UserRole.PROVIDER_REJECTED },
+                data: { role: UserRole.REJECTED_PROVIDER },
             });
 
             // Notify provider

@@ -44,8 +44,8 @@ class ProviderApplicationService {
             providerProfileId: profile.id,
         });
 
-        // 5. Update user role to PROVIDER_PENDING
-        await UserService.updateUserRole(userId, UserRole.PROVIDER_PENDING);
+        // 5. Update user role to PENDING_PROVIDER
+        await UserService.updateUserRole(userId, UserRole.PENDING_PROVIDER);
 
         return application;
     }
@@ -93,7 +93,7 @@ class ProviderApplicationService {
 
         // 4. Update user role
         if (application.userId) {
-            await UserService.updateUserRole(application.userId, UserRole.PROVIDER_APPROVED);
+            await UserService.updateUserRole(application.userId, UserRole.PROVIDER);
         }
 
         return { message: "Application approved successfully" };

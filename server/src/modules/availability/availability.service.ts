@@ -3,6 +3,16 @@ import AppError from "../../utils/app-error";
 import { NextFunction } from "express";
 import { ICreateAvailabilityData, ISaveAvailabilityPayload } from "./types/IAvailability";
 import { isStartBeforeEnd, validateDayOfWeek, validateTimeFormat } from "@/utils/date-time-helpers";
+import ProfileService from "../provider/profile/profile.service";
+const WEEKDAYS = [
+    "Sunday",
+    "Monday",
+    "Tuesday",
+    "Wednesday",
+    "Thursday",
+    "Friday",
+    "Saturday",
+];
 
 class AvailabilityService {
     private static availabilityRepository: AvailabilityRepository = AvailabilityRepository.getInstance();
@@ -19,16 +29,22 @@ class AvailabilityService {
         return AvailabilityService.instance;
     }
 
-
-
     /**
      * Create a single availability entry
      */
     static async createAvailability(
-        providerProfileId: string,
+        providerId: string,
         data: ICreateAvailabilityData,
         next: NextFunction
     ) {
+        /// Get provider Profile ID
+        const providerProfile = await ProfileService.getProviderProfileByUserId(providerId, next);
+        if (!providerProfile || !providerProfile.id) {
+            return next(new AppError(403, "Non Providers users can't set availabilities")
+            )
+        }
+        const providerProfileId: string = providerProfile.id;
+
         // Validate day of week
         if (!validateDayOfWeek(data.dayOfWeek)) {
             return next(new AppError(400, "Invalid day of week. Must be 0-6 (Sunday-Saturday)"));
@@ -62,8 +78,8 @@ class AvailabilityService {
     /**
      * Get all availabilities for a provider
      */
-    static async getProviderAvailabilities(providerProfileId: string) {
-        return await this.availabilityRepository.getAvailabilitiesByProviderId(providerProfileId);
+    static async getProviderAvailabilities(providerId: string) {
+        return await this.availabilityRepository.getAvailabilitiesByProviderId(providerId);
     }
 
     /**
@@ -78,11 +94,19 @@ class AvailabilityService {
      * This deletes existing availabilities and creates new ones
      */
     static async saveAvailabilities(
-        providerProfileId: string,
+        providerId: string,
         payload: ISaveAvailabilityPayload,
         next: NextFunction
     ) {
         const { availabilities } = payload;
+
+        // Get the provider profile Id
+        const providerProfile = await ProfileService.getProviderProfileByUserId(providerId, next);
+        if (!providerProfile || !providerProfile.id) {
+            return next(new AppError(403, "Non Providers users can't set availabilities")
+            )
+        }
+        const providerProfileId: string = providerProfile.id;
 
         // Validate all entries
         for (const entry of availabilities) {
@@ -116,7 +140,7 @@ class AvailabilityService {
                         (a.startTime <= b.startTime && a.endTime > b.startTime) ||
                         (b.startTime <= a.startTime && b.endTime > a.startTime)
                     ) {
-                        return next(new AppError(400, `Overlapping times found for day ${day}`));
+                        return next(new AppError(400, `Overlapping times found for ${WEEKDAYS[day]}`));
                     }
                 }
             }
@@ -137,7 +161,15 @@ class AvailabilityService {
     /**
      * Delete a specific availability
      */
-    static async deleteAvailability(id: string, providerProfileId: string, next: NextFunction) {
+    static async deleteAvailability(id: string, providerId: string, next: NextFunction) {
+        /// Get provider Profile ID
+        const providerProfile = await ProfileService.getProviderProfileByUserId(providerId, next);
+        if (!providerProfile || !providerProfile.id) {
+            return next(new AppError(403, "Non Providers users can't set availabilities")
+            )
+        }
+        const providerProfileId: string = providerProfile.id;
+
         const availability = await this.availabilityRepository.getAvailabilityById(id);
 
         if (!availability) {

@@ -44,10 +44,14 @@ class AvailabilityRepository {
         }
     }
 
-    async getAvailabilitiesByProviderId(providerProfileId: string) {
+    async getAvailabilitiesByProviderId(providerId: string) {
         try {
             return await this.prisma.providerAvailability.findMany({
-                where: { providerProfileId },
+                where: {
+                    providerProfile: {
+                        userId: providerId
+                    }
+                },
                 orderBy: [
                     { dayOfWeek: "asc" },
                     { startTime: "asc" }

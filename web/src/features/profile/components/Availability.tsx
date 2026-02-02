@@ -17,7 +17,7 @@ const WEEKDAYS = [
 ];
 
 interface TimeSlot {
-  id: string; // Temp ID for UI
+  id: string; 
   start: string;
   end: string;
 }
@@ -49,7 +49,7 @@ export default function Availability() {
       try {
         setFetching(true);
         const availabilities = await availabilityService.getMyAvailabilities();
-
+        console.log(availabilities)
         if (availabilities.length > 0) {
           // Reset schedule to empty first
           const newSchedule = WEEKDAYS.map((day, index) => ({
@@ -180,6 +180,7 @@ export default function Availability() {
       }
 
       const payload: SaveAvailabilityPayload = { availabilities };
+
       await availabilityService.saveAvailabilities(payload);
 
       toast.success("Availability updated successfully!");

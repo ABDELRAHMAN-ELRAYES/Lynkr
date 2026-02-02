@@ -198,7 +198,7 @@ interface UpdateProfileInput { ... }
 
 // Enum-like types (string unions)
 type RequestStatus = 'PENDING' | 'PUBLIC' | 'ACCEPTED' | 'CANCELLED' | 'EXPIRED';
-type UserRole = 'CLIENT' | 'PROVIDER_PENDING' | 'PROVIDER_APPROVED' | 'ADMIN';
+type UserRole = 'CLIENT' | 'PENDING_PROVIDER' | 'PROVIDER' | 'ADMIN';
 ```
 
 ### 4.3 Type Location Rules

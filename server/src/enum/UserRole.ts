@@ -1,15 +1,12 @@
 export enum UserRole {
     // Module 1: Primary Roles
     CLIENT = "CLIENT",
-    PROVIDER_PENDING = "PROVIDER_PENDING",
-    PROVIDER_APPROVED = "PROVIDER_APPROVED",
-    PROVIDER_REJECTED = "PROVIDER_REJECTED",
-    PROVIDER_SUSPENDED = "PROVIDER_SUSPENDED",
+    PROVIDER = "PROVIDER",
     ADMIN = "ADMIN",
     SUPER_ADMIN = "SUPER_ADMIN",
-    // Frontend compatibility aliases (frontend uses these names)
     PENDING_PROVIDER = "PENDING_PROVIDER",
     REJECTED_PROVIDER = "REJECTED_PROVIDER",
+    SUSPENDED_PROVIDER = "SUSPENDED_PROVIDER"
 }
 
 export enum AdminPrivilege {

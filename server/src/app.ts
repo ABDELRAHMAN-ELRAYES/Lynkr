@@ -55,7 +55,6 @@ import { setupSwagger } from "./config/swagger";
         phone: "+1234567890",
         role: UserRole.SUPER_ADMIN,
         active: true,
-        emailVerified: true,
     };
 
     try {

@@ -90,7 +90,7 @@ export const createProviderProfile = catchAsync(
  */
 export const getProviderProfileByUserId = catchAsync(
     async (request: Request, response: Response, next: NextFunction) => {
-        const userId = request.params.userId;
+        const userId = Array.isArray(request.params.userId) ? request.params.userId[0] : request.params.userId;
         const profile = await ProfileService.getProviderProfileByUserId(userId, next);
         if (!profile) return;
 
@@ -106,7 +106,7 @@ export const getProviderProfileByUserId = catchAsync(
  */
 export const getProviderProfileById = catchAsync(
     async (request: Request, response: Response, next: NextFunction) => {
-        const profileId = request.params.id;
+        const profileId = Array.isArray(request.params.id) ? request.params.id[0] : request.params.id;
         const profile = await ProfileService.getProviderProfileById(profileId, next);
         if (!profile) return;
 
@@ -175,7 +175,7 @@ export const searchProviderProfiles = catchAsync(
  */
 export const updateProviderProfile = catchAsync(
     async (request: Request, response: Response, next: NextFunction) => {
-        const profileId = request.params.id;
+        const profileId = Array.isArray(request.params.id) ? request.params.id[0] : request.params.id;
         const data: IUpdateProfileData = request.body;
 
         const profile = await ProfileService.updateProviderProfile(profileId, data, next);
@@ -194,7 +194,7 @@ export const updateProviderProfile = catchAsync(
  */
 export const approveProviderProfile = catchAsync(
     async (request: Request, response: Response, next: NextFunction) => {
-        const profileId = request.params.id;
+        const profileId = Array.isArray(request.params.id) ? request.params.id[0] : request.params.id;
 
         const result = await ProfileService.approveProviderProfile(profileId, next);
         if (!result) return;
@@ -211,7 +211,7 @@ export const approveProviderProfile = catchAsync(
  */
 export const rejectProviderProfile = catchAsync(
     async (request: Request, response: Response, next: NextFunction) => {
-        const profileId = request.params.id;
+        const profileId = Array.isArray(request.params.id) ? request.params.id[0] : request.params.id;
 
         const result = await ProfileService.rejectProviderProfile(profileId, next);
         if (!result) return;
@@ -228,7 +228,7 @@ export const rejectProviderProfile = catchAsync(
  */
 export const deleteProviderProfile = catchAsync(
     async (request: Request, response: Response, next: NextFunction) => {
-        const profileId = request.params.id;
+        const profileId = Array.isArray(request.params.id) ? request.params.id[0] : request.params.id;
 
         await ProfileService.deleteProviderProfile(profileId, next);
 
@@ -281,7 +281,7 @@ export const getPendingProfiles = catchAsync(
  */
 export const evaluateProfileRequest = catchAsync(
     async (request: Request, response: Response, next: NextFunction) => {
-        const requestId = request.params.id;
+        const requestId = Array.isArray(request.params.id) ? request.params.id[0] : request.params.id;
         const { decision, adminNotes } = request.body;
 
         let result;

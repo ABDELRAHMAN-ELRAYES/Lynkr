@@ -4,14 +4,12 @@ import { cn } from "@/shared/lib/utils";
 
 export type UserRole =
     | "CLIENT"
-    | "PROVIDER_PENDING"
-    | "PROVIDER_APPROVED"
-    | "PROVIDER_REJECTED"
-    | "PROVIDER_SUSPENDED"
-    | "ADMIN"
-    | "SUPER_ADMIN"
     | "PENDING_PROVIDER"
-    | "REJECTED_PROVIDER";
+    | "PROVIDER"
+    | "REJECTED_PROVIDER"
+    | "SUSPENDED_PROVIDER"
+    | "ADMIN"
+    | "SUPER_ADMIN";
 
 export interface UserRoleTagProps extends React.HTMLAttributes<HTMLSpanElement> {
     role: UserRole;
@@ -20,14 +18,12 @@ export interface UserRoleTagProps extends React.HTMLAttributes<HTMLSpanElement> 
 
 const roleConfig: Record<UserRole, { label: string; colorScheme: ColorScheme }> = {
     CLIENT: { label: "Client", colorScheme: "sky" },
-    PROVIDER_PENDING: { label: "Provider (Pending)", colorScheme: "warning" },
-    PROVIDER_APPROVED: { label: "Provider (Approved)", colorScheme: "emerald" },
-    PROVIDER_REJECTED: { label: "Provider (Rejected)", colorScheme: "rose" },
-    PROVIDER_SUSPENDED: { label: "Provider (Suspended)", colorScheme: "rose" },
+    PENDING_PROVIDER: { label: "Provider (Pending)", colorScheme: "warning" },
+    PROVIDER: { label: "Provider", colorScheme: "emerald" },
+    REJECTED_PROVIDER: { label: "Provider (Rejected)", colorScheme: "rose" },
+    SUSPENDED_PROVIDER: { label: "Provider (Suspended)", colorScheme: "rose" },
     ADMIN: { label: "Admin", colorScheme: "violet" },
     SUPER_ADMIN: { label: "Super Admin", colorScheme: "purple" },
-    PENDING_PROVIDER: { label: "Pending Provider", colorScheme: "warning" },
-    REJECTED_PROVIDER: { label: "Rejected Provider", colorScheme: "error" },
 };
 
 export function UserRoleTag({ role, size, className, ...props }: UserRoleTagProps) {

@@ -3,8 +3,8 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Calendar, Clock, Users, Video, X, MessageSquare } from 'lucide-react';
 import { toast } from 'sonner';
 import { SessionStatusTag, SessionTypeTag } from '@/shared/components/common/tags';
-import { teachingService } from '@/shared/services/availability.service';
-import type { TeachingSession } from '@/shared/types/availability';
+import { teachingService } from '@/shared/services/teaching.service';
+import type { TeachingSession } from '@/shared/types/teaching';
 import { useAuth } from '@/shared/hooks/use-auth';
 import Button from '@/shared/components/ui/Button';
 
@@ -15,7 +15,7 @@ export const SessionDetailPage: FC = () => {
     const [loading, setLoading] = useState(true);
     const [session, setSession] = useState<TeachingSession | null>(null);
 
-    const isInstructor = user?.id === session?.instructorId;
+    const isInstructor = user?.id === session?.providerId;
 
     useEffect(() => {
         if (id) {
@@ -125,7 +125,9 @@ export const SessionDetailPage: FC = () => {
         );
     }
 
-    const instructorName = `${session.slot.providerProfile.user.firstName} ${session.slot.providerProfile.user.lastName}`;
+    const instructorName = session.slot.providerProfile
+        ? `${session.slot.providerProfile.user.firstName} ${session.slot.providerProfile.user.lastName}`
+        : 'Instructor';
     const canStart = isInstructor && session.status === 'SCHEDULED';
     const canJoin = session.status === 'IN_PROGRESS';
     const canCancel = session.status === 'SCHEDULED';
@@ -212,20 +214,17 @@ export const SessionDetailPage: FC = () => {
                                 <div className="space-y-2">
                                     {session.participants.map((participant) => (
                                         <div
-                                            key={participant.id}
+                                            key={participant.userId}
                                             className="flex items-center gap-3 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg"
                                         >
                                             <div className="w-8 h-8 rounded-full bg-[#7682e8]/20 flex items-center justify-center">
                                                 <span className="text-sm font-medium text-[#7682e8]">
-                                                    {participant.user?.firstName?.[0] || 'U'}
+                                                    {participant.name?.[0] || 'U'}
                                                 </span>
                                             </div>
                                             <div className="flex-1">
                                                 <p className="text-sm font-medium text-gray-900 dark:text-gray-100">
-                                                    {participant.user?.firstName} {participant.user?.lastName}
-                                                </p>
-                                                <p className="text-xs text-gray-500">
-                                                    {participant.status}
+                                                    {participant.name}
                                                 </p>
                                             </div>
                                         </div>
@@ -234,6 +233,7 @@ export const SessionDetailPage: FC = () => {
                             )}
                         </div>
                     </div>
+
 
                     {/* Actions */}
                     <div className="p-6 border-t border-gray-200 dark:border-gray-700 flex flex-wrap gap-3">

@@ -238,7 +238,7 @@ Enable qualified users to apply as service providers, submit comprehensive profe
 4. User clicks "Reapply"
 5. System validates profile completeness
 6. Create new application with status `PENDING`
-7. Update user role to `PROVIDER_PENDING`
+7. Update user role to `PENDING_PROVIDER`
 8. Notify user of successful submission
 
 **Rules:**
@@ -312,7 +312,7 @@ Module 2 is complete when:
 2.  **Submission**: User submits application (changes status to `PENDING`).
 3.  **Review**: Admin views pending applications.
 4.  **Decision**:
-    *   *Approve*: Updates status to `APPROVED`, changes User Role to `PROVIDER_APPROVED`.
+    *   *Approve*: Updates status to `APPROVED`, changes User Role to `PROVIDER`.
     *   *Reject*: Updates status to `REJECTED`, sets cooldown period (30 days).
 
 **API Endpoints (Provider Application Module)**:

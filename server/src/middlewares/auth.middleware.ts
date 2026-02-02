@@ -62,7 +62,7 @@ export class AuthMiddleware {
                 return next(new AppError(401, "غير مصرح"));
             }
 
-            if (user.role === UserRole.SUPER_ADMIN || user.role === "SUPER_ADMIN") {
+            if (user.role === UserRole.SUPER_ADMIN) {
                 return next();
             }
 
@@ -74,7 +74,7 @@ export class AuthMiddleware {
             }
 
             // --- Privilege Check (Only for ADMIN role) ---
-            if ((user.role === UserRole.ADMIN || user.role === "ADMIN") && requiredPrivileges.length > 0) {
+            if ((user.role === UserRole.ADMIN) && requiredPrivileges.length > 0) {
                 const userPrivilegeNames = user.privileges?.map(p => p.name) || [];
                 const requiredPrivilegeNames = requiredPrivileges.map(p => p as string);
 

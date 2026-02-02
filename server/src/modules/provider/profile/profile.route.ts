@@ -15,7 +15,7 @@ import {
 import { protect, checkPermissions } from "../../auth/auth.controller";
 import { UserRole } from "../../../enum/UserRole";
 
-const ProfileRouter = Router();
+const ProfileRouter:Router = Router();
 
 // Public routes (approved profiles only)
 ProfileRouter.get("/", getAllProviderProfiles);
@@ -40,11 +40,10 @@ ProfileRouter.post(
 ProfileRouter.get("/:id", getProviderProfileById);
 
 // Protected routes - Providers can manage their own profiles
-// Note: Supporting both PROVIDER_PENDING (backend enum) and PENDING_PROVIDER (frontend sends)
 ProfileRouter.post(
     "/",
     protect,
-    checkPermissions([UserRole.PROVIDER_PENDING, UserRole.PROVIDER_APPROVED, UserRole.PENDING_PROVIDER]),
+    checkPermissions([UserRole.PENDING_PROVIDER, UserRole.PROVIDER, UserRole.PENDING_PROVIDER]),
     createProviderProfile
 );
 
@@ -52,14 +51,14 @@ ProfileRouter.post(
 ProfileRouter.post(
     "/full",
     protect,
-    checkPermissions([UserRole.PROVIDER_PENDING, UserRole.PROVIDER_APPROVED, UserRole.PENDING_PROVIDER]),
+    checkPermissions([UserRole.PENDING_PROVIDER, UserRole.PROVIDER, UserRole.PENDING_PROVIDER]),
     createProviderProfile
 );
 
 ProfileRouter.put(
     "/:id",
     protect,
-    checkPermissions([UserRole.PROVIDER_PENDING, UserRole.PROVIDER_APPROVED, UserRole.PENDING_PROVIDER]),
+    checkPermissions([UserRole.PENDING_PROVIDER, UserRole.PROVIDER, UserRole.PENDING_PROVIDER]),
     updateProviderProfile
 );
 

@@ -606,7 +606,7 @@ model Meeting {
 model ProviderAvailability {
   id                String   @id @default(uuid())
   providerProfileId String   @map("provider_profile_id")
-  dayOfWeek         Int      @map("day_of_week") // 0=Sunday, 1=Monday, ..., 6=Saturday
+  dayOfWeek         Int      @map("day_of_week")
   startTime         String   @map("start_time") // HH:mm format
   endTime           String   @map("end_time") // HH:mm format
   timezone          String   @default("UTC")

@@ -2,7 +2,8 @@ import { Request, Response, NextFunction } from "express";
 import EscrowService from "./escrow.service";
 
 export const getEscrowByProject = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
-    const escrow = await EscrowService.getEscrowByProjectId(req.params.projectId, next);
+    const projectId = Array.isArray(req.params.projectId) ? req.params.projectId[0] : req.params.projectId;
+    const escrow = await EscrowService.getEscrowByProjectId(projectId, next);
 
     if (escrow) {
         res.status(200).json({

@@ -2,15 +2,12 @@ import { Request, Response, NextFunction } from "express";
 import AvailabilityService from "./availability.service";
 import AppError from "../../utils/app-error";
 import { catchAsync } from "@/utils/catch-async";
+import { IUser } from "../user/types/IUser";
 
 
 export const saveAvailabilities = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
-    const { providerProfileId } = req.user as { providerProfileId?: string };
-
-    if (!providerProfileId) {
-        return next(new AppError(403, "Only providers can set availability"));
-    }
-
+    const user = req.user as IUser;
+    const userId = user.id;
     const { availabilities } = req.body;
 
     if (!Array.isArray(availabilities)) {
@@ -18,7 +15,7 @@ export const saveAvailabilities = catchAsync(async (req: Request, res: Response,
     }
 
     const result = await AvailabilityService.saveAvailabilities(
-        providerProfileId,
+        userId,
         { availabilities },
         next
     );
@@ -37,13 +34,8 @@ export const saveAvailabilities = catchAsync(async (req: Request, res: Response,
  * GET /api/availability/my
  */
 export const getMyAvailabilities = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
-    const { providerProfileId } = req.user as { providerProfileId?: string };
-
-    if (!providerProfileId) {
-        return next(new AppError(403, "Only providers can access this"));
-    }
-
-    const availabilities = await AvailabilityService.getProviderAvailabilities(providerProfileId);
+    const user = req.user as IUser;
+    const availabilities = await AvailabilityService.getProviderAvailabilities(user.id);
 
     res.status(200).json({
         status: "success",
@@ -56,8 +48,8 @@ export const getMyAvailabilities = catchAsync(async (req: Request, res: Response
  * GET /api/availability/provider/:providerId
  */
 export const getProviderAvailabilities = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
-    const providerId = Array.isArray(req.params.providerId) ? req.params.providerId[0] : req.params.providerId;
-
+    const user = req.user as IUser;
+    const providerId = user.id;
     if (!providerId) {
         return next(new AppError(400, "Provider ID is required"));
     }
@@ -76,13 +68,13 @@ export const getProviderAvailabilities = catchAsync(async (req: Request, res: Re
  */
 export const deleteAvailability = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
     const id = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
-    const { providerProfileId } = req.user as { providerProfileId?: string };
-
-    if (!providerProfileId) {
+    const user = req.user as IUser;
+    const providerId = user.id;
+    if (!providerId) {
         return next(new AppError(403, "Only providers can delete availability"));
     }
 
-    const result = await AvailabilityService.deleteAvailability(id, providerProfileId, next);
+    const result = await AvailabilityService.deleteAvailability(id, providerId, next);
 
     if (!result) return;
 

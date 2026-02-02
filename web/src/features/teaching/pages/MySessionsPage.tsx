@@ -3,8 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { Calendar, Filter } from 'lucide-react';
 import { toast } from 'sonner';
 import { SessionCard } from '../components/SessionCard';
-import { teachingService } from '@/shared/services/availability.service';
-import type { TeachingSession, SessionStatus } from '@/shared/types/availability';
+import { teachingService } from '@/shared/services/teaching.service';
+import type { TeachingSession, SessionStatus } from '@/shared/types/teaching';
 
 export const MySessionsPage: FC = () => {
     const navigate = useNavigate();

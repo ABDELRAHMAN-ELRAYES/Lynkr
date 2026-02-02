@@ -33,7 +33,7 @@ const allLinks: NavLink[] = [
     name: "Browse Requests",
     path: "/public-requests",
     requiresAuth: true,
-    roles: ["PROVIDER_APPROVED"],
+    roles: ["PROVIDER"],
     icon: <Briefcase size={16} className="mr-1" />,
   },
   {

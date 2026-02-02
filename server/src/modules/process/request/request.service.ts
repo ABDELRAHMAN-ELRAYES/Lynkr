@@ -84,7 +84,7 @@ class RequestService {
         const isClient = request.clientId === user.id;
         const isTargetProvider = request.targetProvider?.userId === user.id; // Note: targetProvider has userId relation
         const isAdmin = user.role === UserRole.ADMIN || user.role === UserRole.SUPER_ADMIN;
-        const isPublicProvider = request.isPublic && (user.role === UserRole.PROVIDER_APPROVED);
+        const isPublicProvider = request.isPublic && (user.role === UserRole.PROVIDER);
 
         if (!isClient && !isTargetProvider && !isAdmin && !isPublicProvider) {
             return next(new AppError(403, "Not authorized to view this request"));
