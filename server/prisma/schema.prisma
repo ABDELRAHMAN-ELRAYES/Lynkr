@@ -146,6 +146,7 @@ model Service {
   id          String   @id @default(uuid())
   name        String   @unique
   description String?
+  type        String   @default("PROJECT") // HOURLY or PROJECT
   isActive    Boolean  @default(true) @map("is_active")
   createdAt   DateTime @default(now()) @map("created_at")
   updatedAt   DateTime @updatedAt @map("updated_at")
@@ -894,4 +895,19 @@ model ProviderSubscription {
   plan            SubscriptionPlan @relation(fields: [planId], references: [id])
 
   @@map("provider_subscriptions")
+}
+
+// ============================================
+// Platform Settings
+// ============================================
+
+model Setting {
+  id                 String   @id @default(uuid())
+  platformName       String   @default("Lynkr") @map("platform_name")
+  platformCommission Decimal  @default(15) @map("platform_commission") @db.Decimal(5, 2) // Percentage (0-100)
+  minWithdrawal      Decimal  @default(10) @map("min_withdrawal") @db.Decimal(10, 2) // USD
+  createdAt          DateTime @default(now()) @map("created_at")
+  updatedAt          DateTime @updatedAt @map("updated_at")
+
+  @@map("settings")
 }

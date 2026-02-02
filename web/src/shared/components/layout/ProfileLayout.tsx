@@ -107,7 +107,7 @@ function RightSidebar() {
   }
 
   return (
-    <aside className="w-80 p-6 space-y-6 hidden xl:block">
+    <aside className="w-80 space-y-6 hidden xl:block mt-[24px]">
       <div className="bg-white rounded-xl border border-gray-200 p-6">
         <h3 className="text-lg text-gray-900 mb-4">Quick Stats</h3>
         <div className="space-y-4">

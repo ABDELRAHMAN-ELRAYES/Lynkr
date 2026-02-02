@@ -11,6 +11,7 @@ import {
 import { protect, checkPermissions } from "../../auth/auth.controller";
 import { UserRole } from "../../../enum/UserRole";
 import upload from "@/middlewares/file-upload";
+import { compressImages } from "@/middlewares/compress-image";
 
 const ProviderDocumentRouter: Router = Router();
 
@@ -23,6 +24,7 @@ ProviderDocumentRouter.post(
     protect,
     checkPermissions([UserRole.PROVIDER, UserRole.PENDING_PROVIDER]),
     upload.single("file"),
+    compressImages, // Compress if it's an image
     createDocument
 );
 

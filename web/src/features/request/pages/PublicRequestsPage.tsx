@@ -71,7 +71,7 @@ export const PublicRequestsPage: FC = () => {
 
     if (loading && requests.length === 0) {
         return (
-            <div className="min-h-screen flex flex-col bg-gray-50 dark:bg-gray-900">
+            <div className="min-h-screen flex flex-col">
                 <Navbar />
                 <main className="flex-1 container mx-auto px-4 py-8 mt-[5rem]">
                     <div className="flex items-center justify-center py-12">
@@ -84,17 +84,15 @@ export const PublicRequestsPage: FC = () => {
     }
 
     return (
-        <div className="min-h-screen flex flex-col bg-gray-50 dark:bg-gray-900">
+        <div className="min-h-screen flex flex-col">
             <Navbar />
-            <main className="flex-1 container mx-auto px-4 py-8 max-w-7xl mt-[5rem]">
+            <main className="flex-1 container mx-auto px-4 py-8 max-w-[90rem] mt-[5rem]">
                 {/* Header */}
                 <div className="mb-8">
                     <div className="flex items-center gap-3 mb-2">
-                        <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#7682e8] to-[#5a67d8] flex items-center justify-center">
-                            <Briefcase className="h-6 w-6 text-white" />
-                        </div>
-                        <div>
-                            <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">
+
+                        <div className="mb-4">
+                            <h1 className="max-w-[90rem] bg-gradient-to-r from-slate-900 to-slate-600 bg-clip-text text-4xl font-extrabold leading-tight tracking-tighter text-transparent text-[4rem]">
                                 Browse Requests
                             </h1>
                             <p className="text-gray-600 dark:text-gray-400">
@@ -113,7 +111,7 @@ export const PublicRequestsPage: FC = () => {
                             placeholder="Search by title or description..."
                             value={searchInput}
                             onChange={(e) => setSearchInput(e.target.value)}
-                            className="pl-10"
+                            className="pl-10 border-0 ring-0 outline-0 shadow-none"
                         />
                     </div>
                 </div>

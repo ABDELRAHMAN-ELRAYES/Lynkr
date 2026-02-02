@@ -7,6 +7,7 @@ import OperationRequestForm from "@/shared/components/common/modals/request-moda
 import ProviderProfileModal from "@/features/services/components/ProviderProfileModal";
 import type { SearchResult } from "@/shared/types/search";
 import type { SortBy, SortOrder } from "@/shared/types/search";
+import { StatusTag } from "@/shared/components/common/tags";
 
 interface ResultsSectionProps {
   searchResult: SearchResult | null;
@@ -222,12 +223,9 @@ const ResultsSection: FC<ResultsSectionProps> = ({
                     {skills.length > 0 && (
                       <div className="flex flex-wrap gap-2 mb-4 justify-start">
                         {skills.slice(0, 4).map((skill) => (
-                          <span
-                            key={skill}
-                            className="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-sm"
-                          >
+                          <StatusTag key={skill} colorScheme="primary" className="text-xs">
                             {skill}
-                          </span>
+                          </StatusTag>
                         ))}
                         {skills.length > 4 && (
                           <span className="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-sm">

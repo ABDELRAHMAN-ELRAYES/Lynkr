@@ -12,3 +12,8 @@ export type UpdateSettingsRequest = {
 };
 
 export type SettingsResponse = ISettings;
+export interface UpdateSettingsData {
+    platformName?: string;
+    platformCommission?: number;
+    minWithdrawal?: number;
+}

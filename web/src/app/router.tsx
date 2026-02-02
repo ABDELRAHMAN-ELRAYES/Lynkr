@@ -40,6 +40,7 @@ import Documents from "@/features/profile/components/Documents";
 import Finance from "@/features/profile/components/Finance";
 import SettingsSection from "@/features/profile/components/Settings";
 import ApplicationStatusPage from "@/features/profile/pages/ApplicationStatusPage";
+import PortfolioProjectDetailPage from "@/features/profile/pages/PortfolioProjectDetailPage";
 
 // Services
 import ServicesPage from "@/features/services/pages/ServicesPage";
@@ -230,6 +231,10 @@ export const router = createBrowserRouter([
       {
         path: "portfolio",
         element: <Portfolio />,
+      },
+      {
+        path: "portfolio/:projectId",
+        element: <PortfolioProjectDetailPage />,
       },
       {
         path: "availability",

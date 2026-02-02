@@ -3,6 +3,7 @@ import { ExternalLink, Tag } from 'lucide-react';
 import { portfolioService } from '@/shared/services/portfolio.service';
 import type { PortfolioProject } from '@/shared/types/portfolio';
 import { toast } from 'sonner';
+import { getFilePath } from '@/shared/utils/get-file-path';
 
 interface PublicPortfolioViewProps {
     profileId: string;
@@ -62,11 +63,11 @@ const ProjectCard: FC<ProjectCardProps> = ({ project }) => {
     // Get the first image as thumbnail
     const thumbnail = project.images?.[0];
     const imageUrl = thumbnail
-        ? `${import.meta.env.VITE_API_BASE_URL?.replace('/api', '') || 'http://localhost:3000'}/api/uploads/${thumbnail.file.path.split('/').pop()}`
-        : null;
+        ? getFilePath(thumbnail.file.filename):'';
+
 
     return (
-        <div className="bg-white rounded-lg border border-gray-200 overflow-hidden hover:shadow-lg transition-shadow">
+        <div className="bg-white rounded-lg border border-gray-200 overflow-hidden transition-shadow">
             {/* Thumbnail Image */}
             {imageUrl && (
                 <div className="aspect-video bg-gray-100 overflow-hidden">

@@ -205,7 +205,7 @@ const ProjectsPage: React.FC = () => {
         {/* Page Header */}
         <div className="flex flex-col lg:flex-row justify-between items-start lg:items-end gap-4 mb-6">
           <div>
-            <h2 className="max-w-[90rem] mb-4 bg-gradient-to-r from-slate-900 to-slate-600 bg-clip-text text-4xl font-extrabold leading-tight tracking-tighter text-transparent md:text-[4rem] lg:text-[5rem]">
+            <h2 className="max-w-[90rem] bg-gradient-to-r from-slate-900 to-slate-600 bg-clip-text text-4xl font-extrabold leading-tight tracking-tighter text-transparent text-[4rem]">
               My Projects
             </h2>
             <p className="text-sm font-inter font-normal text-global-5">

@@ -14,6 +14,7 @@ import {
 import { protect, checkPermissions } from "../../auth/auth.controller";
 import { UserRole } from "../../../enum/UserRole";
 import upload from "@/middlewares/file-upload";
+import { compressImages } from "@/middlewares/compress-image";
 
 const ProviderPortfolioRouter: Router = Router();
 
@@ -27,6 +28,7 @@ ProviderPortfolioRouter.post(
     protect,
     checkPermissions([UserRole.PROVIDER, UserRole.PENDING_PROVIDER]),
     upload.array("images", 5), // Max 5 images
+    compressImages, // Compress uploaded images
     createProject
 );
 
@@ -63,6 +65,7 @@ ProviderPortfolioRouter.post(
     protect,
     checkPermissions([UserRole.PROVIDER, UserRole.PENDING_PROVIDER]),
     upload.single("image"),
+    compressImages, // Compress uploaded image
     addProjectImage
 );
 
@@ -81,3 +84,4 @@ ProviderPortfolioRouter.patch(
 );
 
 export default ProviderPortfolioRouter;
+

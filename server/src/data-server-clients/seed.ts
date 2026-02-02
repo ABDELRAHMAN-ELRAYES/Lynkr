@@ -5,6 +5,7 @@ const prisma = new PrismaClient();
 const services = [
     {
         name: 'Engineering Projects',
+        type: 'PROJECT',
         description: 'Professional engineering services including design, analysis, and implementation for various engineering disciplines.',
         skills: [
             'CAD Design',
@@ -21,6 +22,7 @@ const services = [
     },
     {
         name: 'Tutoring',
+        type: 'HOURLY',
         description: 'Expert tutoring sessions for students of all levels in various subjects.',
         skills: [
             'Mathematics',
@@ -37,6 +39,7 @@ const services = [
     },
     {
         name: 'Research Writing',
+        type: 'PROJECT',
         description: 'Academic and professional research writing services, including thesis guidance, data analysis, and technical reporting.',
         skills: [
             'Academic Writing',
@@ -53,40 +56,24 @@ const services = [
     }
 ];
 
-async function main() {
+export async function seedDatabase() {
     console.log('Start seeding services...');
 
     for (const serviceData of services) {
         const service = await prisma.service.upsert({
             where: { name: serviceData.name },
-            update: {},
+            update: { type: serviceData.type }, // Update type if service exists
             create: {
                 name: serviceData.name,
+                type: serviceData.type,
                 description: serviceData.description,
                 isActive: true,
             },
         });
 
-        console.log(`Upserted service: ${service.name}`);
+        console.log(`Upserted service: ${service.name} (${service.type})`);
 
         for (const skillName of serviceData.skills) {
-            // Check if skill exists for this service to avoid duplicates if run multiple times
-            // Note: Logic assumes skill names are unique per service or we simply want to ensure they exist.
-            // Since Skill model doesn't have a unique constraint on [name, serviceId] (based on provided schema, only id is unique usually unless specified),
-            // we need to check first to be safe, or just create.
-            // Schema:
-            // model Skill {
-            //   id        String   @id @default(uuid())
-            //   name      String
-            //   serviceId String   @map("service_id")
-            //   ...
-            // }
-            // There is no unique constraint on name+serviceId in the schema snippet provided?
-            // Wait, let me check the schema again.
-            // @@unique([userId, name]) is in AdminPrivilege.
-            // In Skill model: @@map("skills"). No @@unique([serviceId, name]).
-            // So if I just create, I might duplicate. I should findFirst with matching name and serviceId.
-
             const existingSkill = await prisma.skill.findFirst({
                 where: {
                     name: skillName,
@@ -103,20 +90,25 @@ async function main() {
                     },
                 });
                 console.log(`  + Created skill: ${skillName}`);
-            } else {
-                console.log(`  = Skill already exists: ${skillName}`);
             }
         }
+    }
+
+    // Initialize default settings if not exist
+    const existingSettings = await prisma.setting.findFirst();
+    if (!existingSettings) {
+        await prisma.setting.create({
+            data: {
+                platformName: 'Lynkr',
+                platformCommission: 15,
+                minWithdrawal: 10,
+            },
+        });
+        console.log('Default settings initialized');
+    } else {
+        console.log('Settings already exist');
     }
 
     console.log('Seeding finished.');
 }
 
-main()
-    .catch((e) => {
-        console.error(e);
-        process.exit(1);
-    })
-    .finally(async () => {
-        await prisma.$disconnect();
-    });

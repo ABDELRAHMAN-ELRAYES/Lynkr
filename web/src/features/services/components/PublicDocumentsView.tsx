@@ -3,6 +3,7 @@ import { FileText, Download } from 'lucide-react';
 import { documentService } from '@/shared/services/document.service';
 import type { ProviderDocument, DocumentType } from '@/shared/types/portfolio';
 import { toast } from 'sonner';
+import { getFilePath } from '@/shared/utils/get-file-path';
 
 interface PublicDocumentsViewProps {
     profileId: string;
@@ -58,7 +59,7 @@ interface DocumentCardProps {
 }
 
 const DocumentCard: FC<DocumentCardProps> = ({ document }) => {
-    const fileUrl = documentService.getFileUrl(document.file.path);
+    const fileUrl = getFilePath(document.file.path);
     const typeLabel = documentService.getDocumentTypeLabel(document.documentType as DocumentType);
 
     // Format file size

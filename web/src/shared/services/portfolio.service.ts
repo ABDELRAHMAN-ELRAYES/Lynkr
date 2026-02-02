@@ -1,11 +1,9 @@
-import axios from 'axios';
+import { apiClient, apiFormClient } from './api-client';
 import type { PortfolioProject, CreatePortfolioProjectData, UpdatePortfolioProjectData } from '../types/portfolio';
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000/api';
-
-class PortfolioService {
+export const portfolioService = {
     // Create a new portfolio project
-    async createProject(data: CreatePortfolioProjectData): Promise<PortfolioProject> {
+    createProject: async (data: CreatePortfolioProjectData): Promise<PortfolioProject> => {
         const formData = new FormData();
         formData.append('name', data.name);
         formData.append('description', data.description);
@@ -18,106 +16,130 @@ class PortfolioService {
             formData.append('images', image);
         });
 
-        const response = await axios.post(`${API_BASE_URL}/provider/portfolio`, formData, {
-            headers: {
-                'Content-Type': 'multipart/form-data',
+        const response = await apiFormClient({
+            url: '/provider/portfolio',
+            options: {
+                method: 'POST',
             },
-            withCredentials: true,
+            formData,
         });
 
-        return response.data.data.project;
-    }
+        return response.data.project;
+    },
 
     // Get all projects for authenticated provider
-    async getMyProjects(): Promise<PortfolioProject[]> {
-        const response = await axios.get(`${API_BASE_URL}/provider/portfolio`, {
-            withCredentials: true,
+    getMyProjects: async (): Promise<PortfolioProject[]> => {
+        const response = await apiClient({
+            url: '/provider/portfolio',
+            options: {
+                method: 'GET',
+            },
         });
 
-        return response.data.data.projects;
-    }
+        return response.data.projects;
+    },
 
     // Get public projects for a provider (client view)
-    async getPublicProjects(profileId: string): Promise<PortfolioProject[]> {
-        const response = await axios.get(`${API_BASE_URL}/provider/portfolio/profile/${profileId}`);
-
-        return response.data.data.projects;
-    }
-
-    // Get a single project by ID
-    async getProjectById(projectId: string): Promise<PortfolioProject> {
-        const response = await axios.get(`${API_BASE_URL}/provider/portfolio/${projectId}`, {
-            withCredentials: true,
+    getPublicProjects: async (profileId: string): Promise<PortfolioProject[]> => {
+        const response = await apiClient({
+            url: `/provider/portfolio/profile/${profileId}`,
+            options: {
+                method: 'GET',
+            },
         });
 
-        return response.data.data.project;
-    }
+        return response.data.projects;
+    },
+
+    // Get a single project by ID
+    getProjectById: async (projectId: string): Promise<PortfolioProject> => {
+        const response = await apiClient({
+            url: `/provider/portfolio/${projectId}`,
+            options: {
+                method: 'GET',
+            },
+        });
+
+        return response.data.project;
+    },
 
     // Get a public project by ID (for client view)
-    async getPublicProjectById(profileId: string, projectId: string): Promise<PortfolioProject> {
-        const response = await axios.get(`${API_BASE_URL}/provider/portfolio/profile/${profileId}/project/${projectId}`);
+    getPublicProjectById: async (profileId: string, projectId: string): Promise<PortfolioProject> => {
+        const response = await apiClient({
+            url: `/provider/portfolio/profile/${profileId}/project/${projectId}`,
+            options: {
+                method: 'GET',
+            },
+        });
 
-        return response.data.data.project;
-    }
-
+        return response.data.project;
+    },
     // Update a project
-    async updateProject(projectId: string, data: UpdatePortfolioProjectData): Promise<PortfolioProject> {
+    updateProject: async (projectId: string, data: UpdatePortfolioProjectData): Promise<PortfolioProject> => {
         const requestData: any = { ...data };
         if (data.tags) {
             requestData.tags = JSON.stringify(data.tags);
         }
 
-        const response = await axios.patch(`${API_BASE_URL}/provider/portfolio/${projectId}`, requestData, {
-            withCredentials: true,
+        const response = await apiClient({
+            url: `/provider/portfolio/${projectId}`,
+            options: {
+                method: 'PATCH',
+                body: JSON.stringify(requestData),
+            },
         });
 
-        return response.data.data.project;
-    }
+        return response.data.project;
+    },
 
     // Delete a project
-    async deleteProject(projectId: string): Promise<void> {
-        await axios.delete(`${API_BASE_URL}/provider/portfolio/${projectId}`, {
-            withCredentials: true,
+    deleteProject: async (projectId: string): Promise<void> => {
+        await apiClient({
+            url: `/provider/portfolio/${projectId}`,
+            options: {
+                method: 'DELETE',
+            },
         });
-    }
+    },
 
     // Toggle project privacy
-    async togglePrivacy(projectId: string, isPublic: boolean): Promise<PortfolioProject> {
-        const response = await axios.patch(
-            `${API_BASE_URL}/provider/portfolio/${projectId}/privacy`,
-            { isPublic },
-            { withCredentials: true }
-        );
+    togglePrivacy: async (projectId: string, isPublic: boolean): Promise<PortfolioProject> => {
+        const response = await apiClient({
+            url: `/provider/portfolio/${projectId}/privacy`,
+            options: {
+                method: 'PATCH',
+                body: JSON.stringify({ isPublic }),
+            },
+        });
 
-        return response.data.data.project;
-    }
+        return response.data.project;
+    },
 
     // Add an image to a project
-    async addProjectImage(projectId: string, image: File, order?: number): Promise<any> {
+    addProjectImage: async (projectId: string, image: File, order?: number): Promise<any> => {
         const formData = new FormData();
         formData.append('image', image);
         if (order !== undefined) formData.append('order', String(order));
 
-        const response = await axios.post(
-            `${API_BASE_URL}/provider/portfolio/${projectId}/images`,
+        const response = await apiFormClient({
+            url: `/provider/portfolio/${projectId}/images`,
+            options: {
+                method: 'POST',
+            },
             formData,
-            {
-                headers: {
-                    'Content-Type': 'multipart/form-data',
-                },
-                withCredentials: true,
-            }
-        );
+        });
 
-        return response.data.data.image;
-    }
+        return response.data.image;
+    },
 
     // Remove an image from a project
-    async removeProjectImage(projectId: string, imageId: string): Promise<void> {
-        await axios.delete(`${API_BASE_URL}/provider/portfolio/${projectId}/images/${imageId}`, {
-            withCredentials: true,
+    removeProjectImage: async (projectId: string, imageId: string): Promise<void> => {
+        apiClient({
+            url: `/provider/portfolio/${projectId}/images/${imageId}`,
+            options: {
+                method: 'DELETE',
+            },
         });
     }
 }
 
-export const portfolioService = new PortfolioService();

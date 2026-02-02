@@ -2,7 +2,7 @@ export const proficiencyLevels = [
   { value: "BASIC", label: "Basic" },
   { value: "CONVERSATIONAL", label: "Conversational" },
   { value: "FLUENT", label: "Fluent" },
-  { value: "NATIVE", label: "Native or Bilingual" },
+  { value: "NATIVE", label: "Native" },
 ];
 
 export const commonLanguages = [

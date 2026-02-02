@@ -1,11 +1,9 @@
-import axios from 'axios';
+import { apiClient, apiFormClient } from './api-client';
 import type { ProviderDocument, CreateDocumentData, UpdateDocumentData, DocumentType } from '../types/portfolio';
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000/api';
-
-class DocumentService {
+export const documentService = {
     // Create a new document
-    async createDocument(data: CreateDocumentData): Promise<ProviderDocument> {
+    createDocument: async (data: CreateDocumentData): Promise<ProviderDocument> => {
         const formData = new FormData();
         formData.append('title', data.title);
         if (data.description) formData.append('description', data.description);
@@ -13,70 +11,91 @@ class DocumentService {
         formData.append('file', data.file);
         formData.append('isPublic', String(data.isPublic ?? false));
 
-        const response = await axios.post(`${API_BASE_URL}/provider/documents`, formData, {
-            headers: {
-                'Content-Type': 'multipart/form-data',
+        const response = await apiFormClient({
+            url: '/provider/documents',
+            options: {
+                method: 'POST',
             },
-            withCredentials: true,
+            formData,
         });
 
-        return response.data.data.document;
+        return response.data.document;
     }
-
+    ,
     // Get all documents for authenticated provider
-    async getMyDocuments(): Promise<ProviderDocument[]> {
-        const response = await axios.get(`${API_BASE_URL}/provider/documents`, {
-            withCredentials: true,
+    getMyDocuments: async (): Promise<ProviderDocument[]> => {
+        const response = await apiClient({
+            url: '/provider/documents',
+            options: {
+                method: 'GET',
+            },
         });
 
-        return response.data.data.documents;
+        return response.data.documents;
     }
-
+    ,
     // Get public documents for a provider (client view)
-    async getPublicDocuments(profileId: string): Promise<ProviderDocument[]> {
-        const response = await axios.get(`${API_BASE_URL}/provider/documents/profile/${profileId}`);
+    getPublicDocuments: async (profileId: string): Promise<ProviderDocument[]> => {
+        const response = await apiClient({
+            url: `/provider/documents/profile/${profileId}`,
+            options: {
+                method: 'GET',
+            },
+        });
 
-        return response.data.data.documents;
+        return response.data.documents;
     }
-
+    ,
     // Get a single document by ID
-    async getDocumentById(documentId: string): Promise<ProviderDocument> {
-        const response = await axios.get(`${API_BASE_URL}/provider/documents/${documentId}`, {
-            withCredentials: true,
+    getDocumentById: async (documentId: string): Promise<ProviderDocument> => {
+        const response = await apiClient({
+            url: `/provider/documents/${documentId}`,
+            options: {
+                method: 'GET',
+            },
         });
 
-        return response.data.data.document;
+        return response.data.document;
     }
-
+    ,
     // Update a document
-    async updateDocument(documentId: string, data: UpdateDocumentData): Promise<ProviderDocument> {
-        const response = await axios.patch(`${API_BASE_URL}/provider/documents/${documentId}`, data, {
-            withCredentials: true,
+    updateDocument: async (documentId: string, data: UpdateDocumentData): Promise<ProviderDocument> => {
+        const response = await apiClient({
+            url: `/provider/documents/${documentId}`,
+            options: {
+                method: 'PATCH',
+                body: JSON.stringify(data),
+            },
         });
 
-        return response.data.data.document;
+        return response.data.document;
     }
-
+    ,
     // Delete a document
-    async deleteDocument(documentId: string): Promise<void> {
-        await axios.delete(`${API_BASE_URL}/provider/documents/${documentId}`, {
-            withCredentials: true,
+    deleteDocument: async (documentId: string): Promise<void> => {
+        await apiClient({
+            url: `/provider/documents/${documentId}`,
+            options: {
+                method: 'DELETE',
+            },
         });
     }
-
+    ,
     // Toggle document privacy
-    async togglePrivacy(documentId: string, isPublic: boolean): Promise<ProviderDocument> {
-        const response = await axios.patch(
-            `${API_BASE_URL}/provider/documents/${documentId}/privacy`,
-            { isPublic },
-            { withCredentials: true }
-        );
+    togglePrivacy: async (documentId: string, isPublic: boolean): Promise<ProviderDocument> => {
+        const response = await apiClient({
+            url: `/provider/documents/${documentId}/privacy`,
+            options: {
+                method: 'PATCH',
+                body: JSON.stringify({ isPublic }),
+            },
+        });
 
-        return response.data.data.document;
+        return response.data.document;
     }
-
+    ,
     // Helper to get document type display name
-    getDocumentTypeLabel(type: DocumentType): string {
+    getDocumentTypeLabel: (type: DocumentType): string => {
         const labels: Record<DocumentType, string> = {
             RESUME: 'Resume',
             CERTIFICATE: 'Certificate',
@@ -85,11 +104,5 @@ class DocumentService {
         };
         return labels[type] || 'Document';
     }
-
-    // Helper to generate file download URL
-    getFileUrl(filePath: string): string {
-        return `${API_BASE_URL.replace('/api', '')}/api/uploads/${filePath.split('/').pop()}`;
-    }
 }
 
-export const documentService = new DocumentService();
