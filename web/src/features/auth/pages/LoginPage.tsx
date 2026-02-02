@@ -102,7 +102,7 @@ const Login = () => {
                 Welcome to
                 <Button
                   onClick={handleRedirect("/")}
-                  className="cursor-pointer text-[4rem] text-[#7682e8] font-pacifico font-extralight"
+                  className="cursor-pointer text-[4rem] text-[#7682e8] font-pacifico font-extralight border-none"
                 >
                   lynkr
                 </Button>

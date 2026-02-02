@@ -31,6 +31,8 @@ import ConversationRouter from "./modules/messaging/conversation/conversation.ro
 import MessageRouter from "./modules/messaging/message/message.route";
 import AvailabilityRouter from "./modules/availability/availability.route";
 import ReportRouter from "./modules/report/report.route";
+import ProviderDocumentRouter from "./modules/provider/provider-document/provider-document.route";
+import ProviderPortfolioRouter from "./modules/provider/provider-portfolio/provider-portfolio.route";
 import { bodyParser, cookieParserMiddleware, corsMiddleware, formParser } from "./middlewares/middlewares";
 import { setupSwagger } from "./config/swagger";
 
@@ -124,6 +126,8 @@ app.use("/api/conversations", ConversationRouter);
 app.use("/api/messages", MessageRouter);
 app.use("/api/availability", AvailabilityRouter);
 app.use("/api/reports", ReportRouter);
+app.use("/api/provider/documents", ProviderDocumentRouter);
+app.use("/api/provider/portfolio", ProviderPortfolioRouter);
 
 // 404 handler
 app.use(notFoundHandler);

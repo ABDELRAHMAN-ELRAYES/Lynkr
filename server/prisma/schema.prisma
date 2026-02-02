@@ -107,9 +107,9 @@ model ProviderProfile {
 
   // Relations
   // ProviderProfile -> User (One -> One)
-  user                 User                   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user                 User                       @relation(fields: [userId], references: [id], onDelete: Cascade)
   // ProviderProfile -> Service (Many -> One)
-  service              Service?               @relation(fields: [serviceId], references: [id])
+  service              Service?                   @relation(fields: [serviceId], references: [id])
   // ProviderProfile -> ProviderSkill (One -> Many)
   skills               ProviderSkill[]
   // ProviderProfile -> ProviderExperience (One -> Many)
@@ -119,7 +119,7 @@ model ProviderProfile {
   // ProviderProfile -> ProviderLanguage (One -> Many)
   languages            ProviderLanguage[]
   // ProviderProfile -> Request (One -> Many)
-  targetRequests       Request[]              @relation("TargetProviderRequests")
+  targetRequests       Request[]                  @relation("TargetProviderRequests")
   // ProviderProfile -> Proposal (One -> Many)
   proposals            Proposal[]
   // ProviderProfile -> ProviderApplication (One -> Many)
@@ -130,6 +130,10 @@ model ProviderProfile {
   availabilities       ProviderAvailability[]
   // ProviderProfile -> ProviderSubscription (One -> Many)
   subscriptions        ProviderSubscription[]
+  // ProviderProfile -> ProviderDocument (One -> Many)
+  documents            ProviderDocument[]
+  // ProviderProfile -> ProviderPortfolioProject (One -> Many)
+  portfolioProjects    ProviderPortfolioProject[]
 
   @@map("provider_profiles")
 }
@@ -227,6 +231,76 @@ model ProviderLanguage {
   providerProfile ProviderProfile @relation(fields: [providerProfileId], references: [id], onDelete: Cascade)
 
   @@map("provider_languages")
+}
+
+model ProviderDocument {
+  id                String   @id @default(uuid())
+  providerProfileId String   @map("provider_profile_id")
+  title             String
+  description       String?  @db.Text
+  documentType      String   @map("document_type") // RESUME, CERTIFICATE, LICENSE, OTHER
+  fileId            String   @map("file_id")
+  isPublic          Boolean  @default(false) @map("is_public")
+  createdAt         DateTime @default(now()) @map("created_at")
+  updatedAt         DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  // ProviderDocument -> ProviderProfile (Many -> One)
+  providerProfile ProviderProfile @relation(fields: [providerProfileId], references: [id], onDelete: Cascade)
+  // ProviderDocument -> File (Many -> One)
+  file            File            @relation(fields: [fileId], references: [id])
+
+  @@map("provider_documents")
+}
+
+model ProviderPortfolioProject {
+  id                String   @id @default(uuid())
+  providerProfileId String   @map("provider_profile_id")
+  name              String
+  description       String   @db.Text
+  projectLink       String?  @map("project_link")
+  isPublic          Boolean  @default(true) @map("is_public")
+  createdAt         DateTime @default(now()) @map("created_at")
+  updatedAt         DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  // ProviderPortfolioProject -> ProviderProfile (Many -> One)
+  providerProfile ProviderProfile                 @relation(fields: [providerProfileId], references: [id], onDelete: Cascade)
+  // ProviderPortfolioProject -> ProviderPortfolioProjectImage (One -> Many)
+  images          ProviderPortfolioProjectImage[]
+  // ProviderPortfolioProject -> ProviderPortfolioProjectTag (One -> Many)
+  tags            ProviderPortfolioProjectTag[]
+
+  @@map("provider_portfolio_projects")
+}
+
+model ProviderPortfolioProjectImage {
+  id        String   @id @default(uuid())
+  projectId String   @map("project_id")
+  fileId    String   @map("file_id")
+  order     Int      @default(0) // For image ordering
+  createdAt DateTime @default(now()) @map("created_at")
+
+  // Relations
+  // ProviderPortfolioProjectImage -> ProviderPortfolioProject (Many -> One)
+  project ProviderPortfolioProject @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  // ProviderPortfolioProjectImage -> File (Many -> One)
+  file    File                     @relation(fields: [fileId], references: [id])
+
+  @@map("provider_portfolio_project_images")
+}
+
+model ProviderPortfolioProjectTag {
+  id        String   @id @default(uuid())
+  projectId String   @map("project_id")
+  tag       String
+  createdAt DateTime @default(now()) @map("created_at")
+
+  // Relations
+  // ProviderPortfolioProjectTag -> ProviderPortfolioProject (Many -> One)
+  project ProviderPortfolioProject @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@map("provider_portfolio_project_tags")
 }
 
 model ProviderApplication {
@@ -350,7 +424,11 @@ model File {
   projectFiles  ProjectFile[]
 
   // File -> ReportFile (One -> Many)
-  reportFiles ReportFile[]
+  reportFiles                    ReportFile[]
+  // File -> ProviderDocument (One -> Many)
+  providerDocuments              ProviderDocument[]
+  // File -> ProviderPortfolioProjectImage (One -> Many)
+  providerPortfolioProjectImages ProviderPortfolioProjectImage[]
 
   @@map("files")
 }

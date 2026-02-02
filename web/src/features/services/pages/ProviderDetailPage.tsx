@@ -12,13 +12,15 @@ import OperationRequestForm from "@/shared/components/common/modals/request-moda
 import Button from "@/shared/components/ui/Button";
 import { AvailabilityView } from "../components/AvailabilityView";
 import { StatusTag } from "@/shared/components/common/tags";
+import { PublicPortfolioView } from "../components/PublicPortfolioView";
+import { PublicDocumentsView } from "../components/PublicDocumentsView";
 
 const ProviderDetailPage: FC = () => {
     const { id } = useParams<{ id: string }>();
     const navigate = useNavigate();
     const [profile, setProfile] = useState<ProviderProfile | null>(null);
     const [loading, setLoading] = useState(true);
-    const [activeTab, setActiveTab] = useState<"profile" | "availability">("profile");
+    const [activeTab, setActiveTab] = useState<"profile" | "availability" | "projects" | "documents">("profile");
     const [isRequestModalOpen, setIsRequestModalOpen] = useState(false);
 
     useEffect(() => {
@@ -192,6 +194,30 @@ const ProviderDetailPage: FC = () => {
                                 <div className="absolute bottom-0 left-0 w-full h-0.5 bg-[#7682e8] rounded-t-full" />
                             )}
                         </button>
+                        <button
+                            onClick={() => setActiveTab("projects")}
+                            className={`pb-4 text-sm font-medium transition-all relative ${activeTab === "projects"
+                                ? "text-[#7682e8]"
+                                : "text-gray-500 hover:text-gray-700"
+                                }`}
+                        >
+                            Projects
+                            {activeTab === "projects" && (
+                                <div className="absolute bottom-0 left-0 w-full h-0.5 bg-[#7682e8] rounded-t-full" />
+                            )}
+                        </button>
+                        <button
+                            onClick={() => setActiveTab("documents")}
+                            className={`pb-4 text-sm font-medium transition-all relative ${activeTab === "documents"
+                                ? "text-[#7682e8]"
+                                : "text-gray-500 hover:text-gray-700"
+                                }`}
+                        >
+                            Documents
+                            {activeTab === "documents" && (
+                                <div className="absolute bottom-0 left-0 w-full h-0.5 bg-[#7682e8] rounded-t-full" />
+                            )}
+                        </button>
                     </div>
 
                     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -268,8 +294,12 @@ const ProviderDetailPage: FC = () => {
                                         </div>
                                     )}
                                 </>
-                            ) : (
+                            ) : activeTab === "availability" ? (
                                 <AvailabilityView providerId={profile.id} />
+                            ) : activeTab === "projects" ? (
+                                <PublicPortfolioView profileId={profile.id} />
+                            ) : (
+                                <PublicDocumentsView profileId={profile.id} />
                             )}
                         </div>
 
