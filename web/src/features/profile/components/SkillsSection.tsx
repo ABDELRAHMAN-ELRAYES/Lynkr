@@ -74,7 +74,7 @@ export const SkillsSection: FC<SkillsSectionProps> = ({
                 {skills.map((skill) => (
                     <span
                         key={skill.id}
-                        className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-gray-100 text-gray-700 rounded-full text-sm"
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-indigo-50 text-indigo-700 border-indigo-200 rounded-full text-sm"
                     >
                         {skill.skillName}
                         {isEditable && (

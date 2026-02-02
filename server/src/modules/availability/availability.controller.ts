@@ -31,7 +31,6 @@ export const saveAvailabilities = catchAsync(async (req: Request, res: Response,
 
 /**
  * Get authenticated provider's own availabilities
- * GET /api/availability/my
  */
 export const getMyAvailabilities = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
     const user = req.user as IUser;
@@ -44,17 +43,15 @@ export const getMyAvailabilities = catchAsync(async (req: Request, res: Response
 });
 
 /**
- * Get a provider's public availabilities
- * GET /api/availability/provider/:providerId
+ * Get a provider's public availabilities by provider profile id
  */
 export const getProviderAvailabilities = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
-    const user = req.user as IUser;
-    const providerId = user.id;
-    if (!providerId) {
-        return next(new AppError(400, "Provider ID is required"));
+    const providerProfileId = Array.isArray(req.params.providerProfileId) ? req.params.providerProfileId[0] : req.params.providerProfileId;
+    if (!providerProfileId) {
+        return next(new AppError(400, "Provider Profile ID is required"));
     }
 
-    const availabilities = await AvailabilityService.getProviderAvailabilities(providerId);
+    const availabilities = await AvailabilityService.getProviderAvailabilities(providerProfileId);
 
     res.status(200).json({
         status: "success",

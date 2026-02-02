@@ -33,7 +33,7 @@ const proficiencyColors: Record<LanguageProficiency, string> = {
     BASIC: 'bg-gray-100 text-gray-700',
     CONVERSATIONAL: 'bg-blue-100 text-blue-700',
     FLUENT: 'bg-green-100 text-green-700',
-    NATIVE: 'bg-purple-100 text-purple-700',
+    NATIVE: 'bg-indigo-50 text-indigo-700 border-indigo-200',
 };
 
 const initialFormData: LanguageFormData = {

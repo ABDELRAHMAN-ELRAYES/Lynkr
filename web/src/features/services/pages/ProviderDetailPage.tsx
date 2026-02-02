@@ -11,6 +11,7 @@ import { toast } from "sonner";
 import OperationRequestForm from "@/shared/components/common/modals/request-modal";
 import Button from "@/shared/components/ui/Button";
 import { AvailabilityView } from "../components/AvailabilityView";
+import { StatusTag } from "@/shared/components/common/tags";
 
 const ProviderDetailPage: FC = () => {
     const { id } = useParams<{ id: string }>();
@@ -144,11 +145,10 @@ const ProviderDetailPage: FC = () => {
                                 </div>
 
                                 {profile.service && (
-                                    <div className="mb-4">
-                                        <span className="inline-block px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-medium">
-                                            {profile.service.name}
-                                        </span>
-                                    </div>
+                                    <StatusTag key={profile.service.name} colorScheme="primary" className="text-xs">
+                                        {profile.service.name}
+                                    </StatusTag>
+
                                 )}
                                 <div className="w-full flex justify-end">
                                     <Button
@@ -171,8 +171,8 @@ const ProviderDetailPage: FC = () => {
                         <button
                             onClick={() => setActiveTab("profile")}
                             className={`pb-4 text-sm font-medium transition-all relative ${activeTab === "profile"
-                                    ? "text-[#7682e8]"
-                                    : "text-gray-500 hover:text-gray-700"
+                                ? "text-[#7682e8]"
+                                : "text-gray-500 hover:text-gray-700"
                                 }`}
                         >
                             Profile
@@ -183,8 +183,8 @@ const ProviderDetailPage: FC = () => {
                         <button
                             onClick={() => setActiveTab("availability")}
                             className={`pb-4 text-sm font-medium transition-all relative ${activeTab === "availability"
-                                    ? "text-[#7682e8]"
-                                    : "text-gray-500 hover:text-gray-700"
+                                ? "text-[#7682e8]"
+                                : "text-gray-500 hover:text-gray-700"
                                 }`}
                         >
                             Availability
@@ -284,12 +284,10 @@ const ProviderDetailPage: FC = () => {
                                     </h2>
                                     <div className="flex flex-wrap gap-2">
                                         {skills.map((skill) => (
-                                            <span
-                                                key={skill}
-                                                className="px-4 py-2 bg-gray-100 text-gray-700 rounded-full text-sm font-medium"
-                                            >
+
+                                            <StatusTag key={skill} colorScheme="primary" className="text-xs">
                                                 {skill}
-                                            </span>
+                                            </StatusTag>
                                         ))}
                                     </div>
                                 </div>

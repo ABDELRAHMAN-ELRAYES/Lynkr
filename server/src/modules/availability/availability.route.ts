@@ -15,8 +15,8 @@ router.post("/", saveAvailabilities);
 // Get authenticated provider's own availabilities
 router.get("/my", getMyAvailabilities);
 
-// Get a specific provider's public availabilities
-router.get("/provider/:providerId", getProviderAvailabilities);
+/// Get a provider's public availabilities by provider profile id
+router.get("/provider/:providerProfileId", getProviderAvailabilities);
 
 // Delete a specific availability
 router.delete("/:id", deleteAvailability);
