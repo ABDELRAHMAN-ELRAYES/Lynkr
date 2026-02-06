@@ -1,8 +1,6 @@
 import { useState } from "react";
 
 export default function SettingsSection() {
-  const [notifEmail, setNotifEmail] = useState(true);
-  const [notifPush, setNotifPush] = useState(false);
 
   return (
     <div className="bg-white rounded-xl border border-gray-200 p-6">
@@ -31,44 +29,6 @@ export default function SettingsSection() {
           </div>
         </div>
 
-        <div className="space-y-4">
-          <div className="flex items-center justify-between border border-gray-200 rounded-lg p-4">
-            <div>
-              <p className="text-gray-900">Email Notifications</p>
-              <p className="text-sm text-gray-600">
-                Receive updates and messages via email
-              </p>
-            </div>
-            <button
-              onClick={() => setNotifEmail(!notifEmail)}
-              className={`relative w-11 h-6 rounded-full ${notifEmail ? "bg-brand-blue" : "bg-gray-300"
-                }`}
-            >
-              <span
-                className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-transform ${notifEmail ? "translate-x-6" : "translate-x-1"
-                  }`}
-              />
-            </button>
-          </div>
-          <div className="flex items-center justify-between border border-gray-200 rounded-lg p-4">
-            <div>
-              <p className="text-gray-900">Push Notifications</p>
-              <p className="text-sm text-gray-600">
-                Enable browser notifications
-              </p>
-            </div>
-            <button
-              onClick={() => setNotifPush(!notifPush)}
-              className={`relative w-11 h-6 rounded-full ${notifPush ? "bg-brand-blue" : "bg-gray-300"
-                }`}
-            >
-              <span
-                className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-transform ${notifPush ? "translate-x-6" : "translate-x-1"
-                  }`}
-              />
-            </button>
-          </div>
-        </div>
       </div>
 
       <div className="flex justify-end mt-6">

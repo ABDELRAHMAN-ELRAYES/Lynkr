@@ -85,6 +85,7 @@ app.use(helmet({
             imgSrc: ["'self'", "data:", "blob:"],
         },
     },
+    crossOriginResourcePolicy: { policy: "cross-origin" },
     crossOriginEmbedderPolicy: false, // Allow cross-origin embedding for uploads
 }));
 

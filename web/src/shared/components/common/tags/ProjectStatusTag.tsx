@@ -6,6 +6,7 @@ export type ProjectStatus =
     | "PENDING_PAYMENT"
     | "IN_PROGRESS"
     | "AWAITING_REVIEW"
+    | "AWAITING_CLIENT_REVIEW"
     | "COMPLETED"
     | "CONFIRMED"
     | "CANCELLED"
@@ -20,6 +21,7 @@ const statusConfig: Record<ProjectStatus, { label: string; colorScheme: ColorSch
     PENDING_PAYMENT: { label: "Pending Payment", colorScheme: "orange" },
     IN_PROGRESS: { label: "In Progress", colorScheme: "sky" },
     AWAITING_REVIEW: { label: "Awaiting Review", colorScheme: "warning" },
+    AWAITING_CLIENT_REVIEW: { label: "Awaiting Review", colorScheme: "warning" },
     COMPLETED: { label: "Completed", colorScheme: "emerald" },
     CONFIRMED: { label: "Confirmed", colorScheme: "teal" },
     CANCELLED: { label: "Cancelled", colorScheme: "rose" },

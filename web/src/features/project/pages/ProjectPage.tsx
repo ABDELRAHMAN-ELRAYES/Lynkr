@@ -38,7 +38,7 @@ import {
   Check,
   CheckCheck,
 } from "lucide-react";
-import axios from "axios";
+
 import { toast } from "sonner";
 
 const ProjectDetailPage: React.FC = () => {
@@ -173,12 +173,9 @@ const ProjectDetailPage: React.FC = () => {
       } catch (convErr) {
         console.log("No conversation found for project");
       }
-    } catch (err) {
-      if (axios.isAxiosError(err)) {
-        setError(err.response?.data?.message || "Failed to load project");
-      } else {
-        setError("An unexpected error occurred");
-      }
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error ? err.message : "Failed to load project";
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -402,8 +399,8 @@ const ProjectDetailPage: React.FC = () => {
                   <div className="flex items-center gap-2 text-sm text-global-5">
                     <Users size={16} />
                     <span>
-                      {project.client?.name || "Client"} ↔{" "}
-                      {project.provider?.user?.name || "Provider"}
+                      {project.client ? `${project.client.firstName} ${project.client.lastName}` : "Client"} ↔{" "}
+                      {project.provider?.user ? `${project.provider.user.firstName} ${project.provider.user.lastName}` : "Provider"}
                     </span>
                   </div>
                 </div>
@@ -416,7 +413,7 @@ const ProjectDetailPage: React.FC = () => {
                     </p>
                     <div className="flex items-baseline justify-end">
                       <span className="text-[2rem] font-inter font-semibold text-global-1">
-                        {formatCurrency(project.totalPrice)}
+                        {formatCurrency(project.totalPrice || 0)}
                       </span>
                     </div>
                   </div>
@@ -727,7 +724,7 @@ const ProjectDetailPage: React.FC = () => {
                                   </p>
                                   <p className="text-xs text-global-5">
                                     {formatFileSize(file.size)} • Uploaded by{" "}
-                                    {file.uploader?.name || "Unknown"}
+                                    {file.uploader ? `${file.uploader.firstName} ${file.uploader.lastName}` : "Unknown"}
                                   </p>
                                 </div>
                               </div>
@@ -783,7 +780,7 @@ const ProjectDetailPage: React.FC = () => {
                                 <p className="text-xs text-global-5">
                                   {formatDate(activity.createdAt)} at{" "}
                                   {formatTime(activity.createdAt)} •{" "}
-                                  {activity.user?.name || "System"}
+                                  {activity.user ? `${activity.user.firstName} ${activity.user.lastName}` : "System"}
                                 </p>
                               </div>
                             </div>
@@ -807,12 +804,12 @@ const ProjectDetailPage: React.FC = () => {
                       <div className="flex items-center gap-3">
                         <div className="w-10 h-10 rounded-full bg-global-3 flex items-center justify-center">
                           <span className="text-sm font-medium">
-                            {project.client?.name?.[0] || "C"}
+                            {project.client?.firstName?.[0] || "C"}
                           </span>
                         </div>
                         <div>
                           <h3 className="text-base font-inter font-normal text-global-1">
-                            {project.client?.name || "Client"}
+                            {project.client ? `${project.client.firstName} ${project.client.lastName}` : "Client"}
                           </h3>
                           <p className="text-sm font-inter font-normal text-global-6">
                             Client
@@ -824,12 +821,12 @@ const ProjectDetailPage: React.FC = () => {
                       <div className="flex items-center gap-3">
                         <div className="w-10 h-10 rounded-full bg-global-3 flex items-center justify-center">
                           <span className="text-sm font-medium">
-                            {project.provider?.user?.name?.[0] || "P"}
+                            {project.provider?.user?.firstName?.[0] || "P"}
                           </span>
                         </div>
                         <div>
                           <h3 className="text-base font-inter font-normal text-global-1">
-                            {project.provider?.user?.name || "Provider"}
+                            {project.provider?.user ? `${project.provider.user.firstName} ${project.provider.user.lastName}` : "Provider"}
                           </h3>
                           <p className="text-sm font-inter font-normal text-global-6">
                             Provider

@@ -7,3 +7,4 @@ export * from './service.service';
 export * from './search.service';
 export * from './request.service';
 export * from './proposal.service';
+export * from './review.service';

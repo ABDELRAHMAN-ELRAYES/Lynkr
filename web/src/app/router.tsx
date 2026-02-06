@@ -33,7 +33,6 @@ import SettingsPage from "@/features/admin/pages/settings/SettingsPage";
 // Profile
 import ProfileLayout from "@/shared/components/layout/ProfileLayout";
 import Profile from "@/features/profile/components/Profile";
-import ServicesPricing from "@/features/profile/components/ServicesPricing";
 import Portfolio from "@/features/profile/components/Portfolio";
 import Availability from "@/features/profile/components/Availability";
 import Documents from "@/features/profile/components/Documents";
@@ -48,7 +47,7 @@ import ProviderDetailPage from "@/features/services/pages/ProviderDetailPage";
 
 // Project
 import ProjectDetails from "@/features/project/pages/ProjectPage";
-import ProjectsPage from "@/features/projects/pages/PorjectsPage";
+import ProjectsPage from "@/features/projects/pages/ProjectsPage";
 
 // Meeting
 import MeetingRoomPage from "@/features/meeting/pages/MeetingRoomPage";
@@ -223,10 +222,6 @@ export const router = createBrowserRouter([
       {
         path: "requests",
         element: <RequestsListPage />,
-      },
-      {
-        path: "services",
-        element: <ServicesPricing />,
       },
       {
         path: "portfolio",

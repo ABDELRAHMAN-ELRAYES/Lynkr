@@ -62,7 +62,20 @@ class ProjectRepository {
                             user: { select: { id: true, firstName: true, lastName: true, email: true } }
                         }
                     },
-                    acceptedProposal: true,
+                    acceptedProposal: {
+                        include: {
+                            request: {
+                                include: {
+                                    targetProvider: {
+                                        select: {
+                                            id: true,
+                                            user: { select: { id: true, firstName: true, lastName: true } }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
                     escrow: true,
                     projectPayments: {
                         include: {
@@ -95,7 +108,12 @@ class ProjectRepository {
                             user: { select: { id: true, firstName: true, lastName: true } }
                         }
                     },
-                    escrow: true
+                    escrow: true,
+                    acceptedProposal: {
+                        include: {
+                            request: true
+                        }
+                    }
                 },
                 orderBy: { createdAt: "desc" }
             });
@@ -112,7 +130,12 @@ class ProjectRepository {
                     client: {
                         select: { id: true, firstName: true, lastName: true }
                     },
-                    escrow: true
+                    escrow: true,
+                    acceptedProposal: {
+                        include: {
+                            request: true
+                        }
+                    }
                 },
                 orderBy: { createdAt: "desc" }
             });

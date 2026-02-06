@@ -89,7 +89,7 @@ export const ProposalCard: FC<ProposalCardProps> = ({
                         <DollarSign className="h-4 w-4" />
                         <span className="font-medium">Price:</span>
                         <span>
-                            ${proposal.price} {proposal.priceType === 'HOURLY' ? '/hour' : 'fixed'}
+                            ${proposal.price}
                         </span>
                     </div>
 

@@ -3,7 +3,7 @@ import { AlertCircle, Upload, X, FileText } from 'lucide-react';
 import { Label } from '@/shared/components/ui/label';
 import { Input } from '@/shared/components/ui/input';
 import { Textarea } from '@/shared/components/ui/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/shared/components/ui/select';
+// Select imports removed
 import Button from '@/shared/components/ui/Button';
 import { proposalService } from '@/shared/services/proposal.service';
 import type { CreateProposalPayload } from '@/shared/types/request';
@@ -42,11 +42,8 @@ export const ProposalForm: FC<ProposalFormProps> = ({ requestId, onSubmit, onCan
                     return 'Price must be greater than 0';
                 }
                 return '';
-            case 'priceType':
-                if (!value || (value !== 'FIXED' && value !== 'HOURLY')) {
-                    return 'Please select a price type';
-                }
-                return '';
+            // case 'priceType' removed
+
             case 'estimatedDays':
                 if (!value || Number(value) < 1) {
                     return 'Estimated days must be at least 1';
@@ -89,8 +86,8 @@ export const ProposalForm: FC<ProposalFormProps> = ({ requestId, onSubmit, onCan
         const priceError = validateField('price', formData.price);
         if (priceError) newErrors.price = priceError;
 
-        const priceTypeError = validateField('priceType', formData.priceType);
-        if (priceTypeError) newErrors.priceType = priceTypeError;
+        // Price type validation removed
+
 
         const estimatedDaysError = validateField('estimatedDays', formData.estimatedDays);
         if (estimatedDaysError) newErrors.estimatedDays = estimatedDaysError;
@@ -125,7 +122,7 @@ export const ProposalForm: FC<ProposalFormProps> = ({ requestId, onSubmit, onCan
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
                     <Label htmlFor="price">
-                        Price <span className="text-red-500">*</span>
+                        Price (Fixed) <span className="text-red-500">*</span>
                     </Label>
                     <Input
                         id="price"
@@ -144,31 +141,8 @@ export const ProposalForm: FC<ProposalFormProps> = ({ requestId, onSubmit, onCan
                         </div>
                     )}
                 </div>
-
-                <div className="space-y-2">
-                    <Label htmlFor="priceType">
-                        Price Type <span className="text-red-500">*</span>
-                    </Label>
-                    <Select
-                        value={formData.priceType}
-                        onValueChange={(value) => handleInputChange('priceType', value)}
-                    >
-                        <SelectTrigger className={errors.priceType ? 'border-red-500' : ''}>
-                            <SelectValue placeholder="Select price type" />
-                        </SelectTrigger>
-                        <SelectContent>
-                            <SelectItem value="FIXED">Fixed Price</SelectItem>
-                            <SelectItem value="HOURLY">Hourly Rate</SelectItem>
-                        </SelectContent>
-                    </Select>
-                    {errors.priceType && (
-                        <div className="flex items-center gap-1.5 text-sm text-red-500">
-                            <AlertCircle className="h-4 w-4" />
-                            <span>{errors.priceType}</span>
-                        </div>
-                    )}
-                </div>
             </div>
+
 
             <div className="space-y-2">
                 <Label htmlFor="estimatedDays">
@@ -278,6 +252,6 @@ export const ProposalForm: FC<ProposalFormProps> = ({ requestId, onSubmit, onCan
                     {loading ? 'Submitting...' : 'Submit Proposal'}
                 </Button>
             </div>
-        </form>
+        </form >
     );
 };

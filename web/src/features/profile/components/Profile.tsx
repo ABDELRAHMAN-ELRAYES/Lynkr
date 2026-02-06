@@ -211,7 +211,7 @@ export default function Profile() {
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-6 mb-6">
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-6 mb-6">
         <div className="bg-white rounded-lg border border-gray-200 p-4 text-center">
           <div className="flex items-center justify-center gap-1 text-2xl font-bold text-gray-900">
             <DollarSign className="w-5 h-5" />
@@ -219,13 +219,7 @@ export default function Profile() {
           </div>
           <div className="text-sm text-gray-500">Hourly Rate</div>
         </div>
-        <div className="bg-white rounded-lg border border-gray-200 p-4 text-center">
-          <div className="flex items-center justify-center gap-1 text-2xl font-bold text-gray-900">
-            <Clock className="w-5 h-5" />
-            2h
-          </div>
-          <div className="text-sm text-gray-500">Response Time</div>
-        </div>
+
         <div className="bg-white rounded-lg border border-gray-200 p-4 text-center">
           <div className="flex items-center justify-center gap-1 text-2xl font-bold text-gray-900">
             <Briefcase className="w-5 h-5" />

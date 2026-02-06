@@ -7,6 +7,8 @@ import { IUser } from "@/modules/user/types/IUser";
 import NotificationService from "@/modules/notification/notification.service";
 import ProfileRepository from "@/modules/provider/profile/profile.repository";
 import ProfileService from "@/modules/provider/profile/profile.service";
+import ProposalRepository from "@/modules/proposal/proposal.repository";
+import ProjectService from "../project/project.service";
 
 class RequestService {
     private static repository = RequestRepository.getInstance();
@@ -165,16 +167,65 @@ class RequestService {
             return next(new AppError(400, `Cannot accept a request with status: ${request.status}`));
         }
 
-        const updatedRequest = await this.repository.updateRequestStatus(id, "ACCEPTED");
+        // Calculate average price from budget range
+        const fromBudget = Number(request.fromBudget) || 0;
+        const toBudget = Number(request.toBudget) || fromBudget;
+        let averagePrice = (fromBudget + toBudget) / 2;
 
-        // Notify client
-        await NotificationService.sendSystemNotification(
-            request.clientId,
-            "Request Accepted",
-            `Your request "${request.title}" has been accepted by the provider.`
-        );
+        if (averagePrice <= 0) {
+            // Fallback if budget is not set properly, though it should be required
+            averagePrice = 0;
+        }
 
-        return updatedRequest;
+        // 1. Auto-create a proposal with the calculated average price
+        // We use a fixed price type for direct acceptance
+        try {
+            const proposalData: any = {
+                requestId: id,
+                providerProfileId: profile.id,
+                price: averagePrice,
+                priceType: "FIXED",
+                estimatedDays: 30, // Default duration, or we could ask for it in the accept modal later
+                notes: "Auto-generated proposal from direct request acceptance."
+            };
+
+            // Use repo directly to avoid permissions checks in service if any
+            const proposal = await ProposalRepository.getInstance().createProposal(proposalData);
+
+            // 2. Update proposal status to ACCEPTED
+            await ProposalRepository.getInstance().updateProposalStatus(proposal.id, "ACCEPTED");
+
+            // 3. Update request status to ACCEPTED
+            const updatedRequest = await this.repository.updateRequestStatus(id, "ACCEPTED");
+
+            // 4. Create project using existing flow
+            // Note: createProjectFromProposal expects (clientId, providerProfileId, proposalId, totalPrice, next)
+            const project = await ProjectService.createProjectFromProposal(
+                request.clientId,
+                profile.id,
+                proposal.id,
+                averagePrice,
+                next
+            );
+
+            // 5. Notify client
+            await NotificationService.sendSystemNotification(
+                request.clientId,
+                "Request Accepted",
+                `Your request "${request.title}" has been accepted by the provider. A project has been created.`
+            );
+
+            return {
+                ...updatedRequest,
+                project
+            };
+
+        } catch (error) {
+            console.error("Error in acceptRequest flow:", error);
+            // Revert request status if it was changed? 
+            // Ideally use a transaction, but for now just pass error
+            return next(new AppError(500, "Failed to process request acceptance"));
+        }
     }
 
     static async rejectRequest(id: string, userId: string, next: NextFunction) {

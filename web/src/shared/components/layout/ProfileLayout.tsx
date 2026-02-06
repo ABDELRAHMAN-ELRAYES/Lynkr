@@ -6,7 +6,6 @@ import {
 } from "react-router-dom";
 import {
   User,
-  Briefcase,
   FolderOpen,
   Calendar,
   FileText,
@@ -28,11 +27,6 @@ const providerNav = [
     to: "requests",
     label: "Available Requests",
     icon: ClipboardList,
-  },
-  {
-    to: "services",
-    label: "Services & Pricing",
-    icon: Briefcase,
   },
   {
     to: "portfolio",

@@ -69,20 +69,39 @@ class ProjectService {
         return await this.projectRepo.getProjectById(project.id);
     }
 
+    // ===== Helper: Transform Project Data =====
+    private static transformProject(project: any) {
+        if (!project) return null;
+
+        // Map request from acceptedProposal if available
+        const request = project.acceptedProposal?.request;
+
+        return {
+            ...project,
+            // Flatten functionality for frontend convenience
+            title: request?.title || "Untitled Project",
+            request: request,
+            // Ensure we don't leak internal structure if not needed, 
+            // but keeping it doesn't hurt.
+        };
+    }
+
     static async getProjectById(projectId: string, next: NextFunction) {
         const project = await this.projectRepo.getProjectById(projectId);
         if (!project) {
             return next(new AppError(404, "Project not found"));
         }
-        return project;
+        return this.transformProject(project);
     }
 
     static async getClientProjects(clientId: string, _next: NextFunction) {
-        return await this.projectRepo.getProjectsByClientId(clientId);
+        const projects = await this.projectRepo.getProjectsByClientId(clientId);
+        return projects.map(p => this.transformProject(p));
     }
 
     static async getProviderProjects(providerProfileId: string, _next: NextFunction) {
-        return await this.projectRepo.getProjectsByProviderId(providerProfileId);
+        const projects = await this.projectRepo.getProjectsByProviderId(providerProfileId);
+        return projects.map(p => this.transformProject(p));
     }
 
     static async markProjectComplete(projectId: string, userId: string, providerProfileId: string, next: NextFunction) {

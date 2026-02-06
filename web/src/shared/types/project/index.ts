@@ -1,15 +1,16 @@
 // Project Types - Aligned with backend models
 
-export type ProjectStatus = 'IN_PROGRESS' | 'AWAITING_REVIEW' | 'COMPLETED' | 'CANCELLED';
+export type ProjectStatus = 'IN_PROGRESS' | 'AWAITING_REVIEW' | 'AWAITING_CLIENT_REVIEW' | 'COMPLETED' | 'CANCELLED';
 export type MeetingStatus = 'PENDING' | 'ACTIVE' | 'COMPLETED' | 'CANCELLED';
 
 // ===== CORE ENTITIES =====
 
 export interface ProjectParticipant {
     id: string;
-    name: string;
-    email: string;
-    avatarUrl?: string;
+    firstName: string;
+    lastName: string;
+    email?: string;
+    avatar?: string;
 }
 
 export interface ProviderParticipant {
@@ -19,24 +20,33 @@ export interface ProviderParticipant {
 
 export interface Project {
     id: string;
-    title: string;
-    description: string;
+    title?: string;
+    description?: string;
     status: ProjectStatus;
-    totalPrice: number;
+    totalPrice?: number;
     deadline?: string;
     clientId: string;
+    providerId?: string; // User ID of provider
     providerProfileId: string;
-    requestId: string;
-    proposalId: string;
+    requestId?: string;
+    proposalId?: string;
     createdAt: string;
     updatedAt: string;
+    completedAt?: string;
     // Expanded relations
-    client: ProjectParticipant;
-    provider: ProviderParticipant;
+    client?: ProjectParticipant;
+    provider?: ProviderParticipant;
     request?: {
         id: string;
         title: string;
-        serviceId: string;
+        description?: string;
+        category?: string;
+        budgetType?: string;
+        fromBudget?: number;
+        toBudget?: number;
+        budgetCurrency?: string;
+        deadline?: string;
+        serviceId?: string;
         service?: {
             id: string;
             name: string;
@@ -100,10 +110,12 @@ export interface ProjectFile {
     projectId: string;
     filename: string;
     path: string;
+    url: string;
     mimetype: string;
     size: number;
     uploaderId: string;
     description?: string;
+    uploadedAt: string;
     createdAt: string;
     // Expanded relations
     uploader?: ProjectParticipant;
@@ -113,8 +125,10 @@ export interface ProjectActivity {
     id: string;
     projectId: string;
     userId: string;
+    type: string;
     action: string;
     details: string;
+    metadata?: any;
     createdAt: string;
     // Expanded relations
     user?: ProjectParticipant;

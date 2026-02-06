@@ -75,9 +75,9 @@ const ProjectsPage: React.FC = () => {
   const filteredProjects = projects.filter((project) => {
     const matchesSearch =
       searchQuery === "" ||
-      project.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (project.title || "").toLowerCase().includes(searchQuery.toLowerCase()) ||
       project.description?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      project.client?.name?.toLowerCase().includes(searchQuery.toLowerCase());
+      `${project.client?.firstName || ""} ${project.client?.lastName || ""}`.toLowerCase().includes(searchQuery.toLowerCase());
 
     const matchesStatus =
       statusFilter === "all" || project.status === statusFilter;
@@ -255,7 +255,7 @@ const ProjectsPage: React.FC = () => {
                       <div className="flex flex-col lg:flex-row justify-between items-start gap-4 mb-3">
                         <div className="flex-1">
                           <h3 className="text-base font-inter font-semibold text-global-2 mb-2">
-                            {project.title}
+                            {project.title || "Untitled Project"}
                           </h3>
                           <div className="flex flex-wrap items-center gap-2 mb-2">
                             <ProjectStatusTag status={project.status} />
@@ -289,13 +289,13 @@ const ProjectsPage: React.FC = () => {
                         <div className="flex items-center gap-1">
                           <Users size={14} />
                           <span>
-                            {project.client?.name || "Client"} ↔{" "}
-                            {project.provider?.user?.name || "Provider"}
+                            {project.client ? `${project.client.firstName} ${project.client.lastName}` : "Client"} ↔{" "}
+                            {project.provider?.user ? `${project.provider.user.firstName} ${project.provider.user.lastName}` : "Provider"}
                           </span>
                         </div>
                         <div className="flex items-center gap-1">
                           <DollarSign size={14} />
-                          <span>{formatCurrency(project.totalPrice)}</span>
+                          <span>{formatCurrency(project.totalPrice || 0)}</span>
                         </div>
                         <div className="flex items-center gap-1">
                           <Calendar size={14} />
